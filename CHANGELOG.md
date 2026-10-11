@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Pin `@merqo/ui` to commit `9b202ba529dfd8fecbcbb9a2cc9f37efba4bd7d4` (tag `v0.32.3`) with matching build permission. Long info tooltips now wrap inside the screen instead of staying on one line that runs off a phone, and tests that import `@merqo/ui` no longer load about 3,400 Simple Icons modules. No tooltip here was long enough to run off the screen.
 - Pin `@merqo/ui` to commit `a8063218e5954bef35242550070606628d79375a` (tag `v0.32.2`) with matching build permission. Every info icon now takes taps through a transparent 44px touch area on touch devices; the icon is drawn as before and nothing moves. Here the printer help icons, drawn at 24px, go from a 24px to a 44px target.
 - Drop the leftover `allowBuilds` entry for the previous `@merqo/ui` commit, so build permission names only the pinned source URL.
 - Pin `@merqo/ui` to commit `cb9dd39ab56d6bc2030d30edb7474ee8ebf60820` (tag `v0.32.1`) with matching build permission. From this revision, `Section` title tooltips and default-mode `InfoTooltip`s open on a tap as well as on hover and keyboard focus. Nothing changes for vendors here: printer help already opens on a tap.
@@ -33,6 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- On a phone or tablet, the help icon beside the helper-device buttons on Bluetooth setup no longer takes taps meant for the edge of the "Raspberry Pi" button. Its touch area overlapped that button by about 2px.
 - Restore login controls after unexpected authentication failures and display offline printer timestamps in the Singapore timezone.
 
 - Improve small brand-text and input-boundary contrast in both themes while preserving primary button fills and decorative separators.
