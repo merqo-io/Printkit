@@ -49,7 +49,7 @@ Overview and printers share a vendor-scoped batch loader. Connector setup flows 
 
 Shared dashboard nav/account menu, and `JobStatusBadge`'s shared
 `StatusBadge` shape, come from `@merqo/ui`
-(`github:merqo-io/merqo-ui#a8063218e5954bef35242550070606628d79375a`, tagged `v0.32.2`, `package.json`; `pnpm-workspace.yaml` allows its build for that commit only). This audited source includes shared client-boundary and account-menu hardening; login uses its shared `GoogleMark` instead of a local copy. Earlier releases added
+(`github:merqo-io/merqo-ui#9b202ba529dfd8fecbcbb9a2cc9f37efba4bd7d4`, tagged `v0.32.3`, `package.json`; `pnpm-workspace.yaml` allows its build for that commit only). Its help icons take taps through a 44px touch area on touch devices, and a long tooltip wraps inside the viewport; where a help icon follows a button (Bluetooth setup) it carries a small margin so that area stays off the button. This audited source includes shared client-boundary and account-menu hardening; login uses its shared `GoogleMark` instead of a local copy. Earlier releases added
 `DashboardTours`, a route-matched multi-tour router for kits with more than
 one dashboard-page tour; purely additive, this kit's own `DashboardTour`
 usage is unchanged; bumped again 2026-09-16 for per-kit terms-schedule
