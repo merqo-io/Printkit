@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- On a phone or tablet, the help icon beside the helper-device buttons on Bluetooth setup no longer takes taps meant for the edge of the "Raspberry Pi" button. Its touch area overlapped that button by about 2px.
 - Restore login controls after unexpected authentication failures and display offline printer timestamps in the Singapore timezone.
 
 - Improve small brand-text and input-boundary contrast in both themes while preserving primary button fills and decorative separators.

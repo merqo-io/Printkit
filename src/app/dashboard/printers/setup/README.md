@@ -9,6 +9,9 @@ The setup wizard for the chosen printer, one flow per kind of printer.
 - `page.tsx` — resolves the booth and catalog entry.
 - `setup-wizard.tsx` — compatibility exports for the connector components.
 - `setup-step.tsx` — numbered steps and printer-state polling with teardown.
+- In `bridge-setup.tsx` the help icon after the helper-device buttons sits 4px
+  further right (`ml-1`): its 44px touch area reaches 10px past the 24px icon,
+  and the row's 8px gap alone let it cover the last button's edge.
 - `cloud-poll-setup.tsx`, `vendor-cloud-setup.tsx`, `bridge-setup.tsx` — cloud printer (copy its private address), brand-cloud
   printer (SN and KEY), Bluetooth (a Chrome helper device: an Android
   phone, a Windows laptop or a Mac, never an iPad, or a Raspberry Pi

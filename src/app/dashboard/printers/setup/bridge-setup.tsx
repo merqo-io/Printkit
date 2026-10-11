@@ -71,7 +71,9 @@ export function BridgeSetup({
             >
               Raspberry Pi
             </Button>
-            <InfoButton topic="helper_device" />
+            <span className="ml-1 inline-flex">
+              <InfoButton topic="helper_device" />
+            </span>
           </div>
         </Step>
 
