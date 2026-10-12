@@ -45,6 +45,8 @@ than a loose shell script. `verify-harness.sh` (one level up, in `.claude/`)
 treats every script in this folder as part of the integrity-checked
 enforcement layer.
 
+`session-context.sh` labels its output "printkit routing context".
+
 ## Parent
 
 [.claude](../README.md)

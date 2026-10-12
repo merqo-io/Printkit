@@ -44,7 +44,7 @@
       "path": ".claude/hooks/post-edit-typecheck.sh"
     },
     ".claude/hooks/session-context.sh": {
-      "origin_hash": "9bc0b18f5f4d9c90921bcf84c52ae01e479f8cdf82847431c32081a865e8f6ec",
+      "origin_hash": "a3e8facd103e97b8129f0bbe311403f4431888b115b81741ce298619b3b15db9",
       "path": ".claude/hooks/session-context.sh"
     },
     ".claude/hooks/skill-usage-log.sh": {
