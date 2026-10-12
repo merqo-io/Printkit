@@ -18,6 +18,12 @@ everything else sits flat here.
   deployment host), or null. Used for a CloudPRNT printer's address and
   Feie's callback URL; null rather than "" so nothing hands a device a
   relative URL.
+- `manage-url.ts` — `locationManageUrl(requestOrigin, location, hasPrinter)`:
+  the absolute printkit page a vendor should open for one location (the
+  printers list, the picker, or that location's row), returned by
+  `GET /api/v1/print-locations/status` as `manage_url` so no calling kit
+  builds a printkit path. `locationRowId(id)` is the row's element id,
+  shared with the printers page so the link and the row cannot drift.
 - `safe-redirect.ts` — `safeRedirectPath(next, fallback)`: rejects an absolute
   URL, a protocol-relative `//`/`/\` path, or one carrying an embedded control
   character, falling back otherwise. The open-redirect guard for the
@@ -94,7 +100,7 @@ everything else sits flat here.
   that no device draws its own label. It downloads the PNG the server
   rendered and decodes it into the canvas `niimbluelib` encodes, so a
   Bluetooth printer produces the same label as every other connector.
-- `printer-info-copy.ts` — `INFO_COPY`/`BLUETOOTH_WARNING`: the
+- `printer-info-copy.ts` — `INFO_COPY`/`BLUETOOTH_WARNING`/`PRINTER_CHOICE_ADVICE`: the
   plain-language explanation behind every badge, icon and filter a vendor
   meets while choosing a printer. One module because the same fact has to
   appear on the picker, in a setup wizard and in the Bluetooth guide, and a
@@ -106,6 +112,8 @@ everything else sits flat here.
   qkit via env vars, and no-ops silently if either is unset (not every
   calling kit needs a callback). Never throws; every failure (lookup error,
   missing config, network error, non-2xx) is swallowed after a log line.
+  The body names the job `source_ref`; `order_id` carries the same value
+  for a receiver that still reads that name.
 - `vendor-session.ts` — `getVendorSession()`: shared dashboard auth guard
   (gets a session-scoped Supabase client and the authenticated user,
   redirects to `/login` if none, then bounces to `/legal/accept` via
@@ -172,8 +180,8 @@ everything else sits flat here.
   returns.
 - `env.ts` — `publicEnv`: required-env-var accessors that throw at import
   time if unset, instead of silently reading `undefined`.
-- `utils.ts` � `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
-- `location-printer-summaries.ts` � reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
+- `utils.ts` � `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
+- `location-printer-summaries.ts` � reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
 
 ## Connectivity
 

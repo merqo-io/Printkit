@@ -16,6 +16,9 @@ is online or it is not.
   the shared `last_seen_at` signal), loaded through one vendor-scoped printer summary query, what kind it is in plain words, and the
   one action that makes sense next. A booth with no printer offers only
   "Choose a printer"; a Bluetooth booth also offers Bridge mode.
+  Each row carries the id `booth-<location id>` (`locationRowId`), which the
+  status API's `manage_url` names so a calling kit's "manage this booth's
+  printer" link lands on the right row.
 - `new/page.tsx` and `new/printer-picker.tsx` — the picker. Cards come from
   the static catalog, filtered by "works with iPad alone" (on by default,
   because that is the recommendation), connection, and the label width a
@@ -26,6 +29,9 @@ is online or it is not.
   Every badge carries an `InfoButton`, so a vendor can find out what "4G" or
   "untested" means without leaving the page. A Bluetooth card says it is the
   most setup and links to the guide before the vendor can continue.
+  The picker opens with one sentence saying which printers work with an
+  iPad alone and what a Bluetooth printer needs, with a link to the guide.
+  Calling kits link here instead of repeating that advice.
 - `setup/page.tsx`, the connector setup files exported by `setup/setup-wizard.tsx`, and `setup/actions.ts` — one
   wizard per kind of printer, each a short numbered list ending in a live
   wait that turns into "Connected" when the printer first reports in:

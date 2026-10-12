@@ -14,8 +14,10 @@ The printer picker: choose a model for a booth from the catalog.
   `isRecommended` in the catalog: printers that work with an iPad alone and
   cost nothing more first (cheapest first), 4G printers second, Bluetooth
   last. Each card has a "Monthly cost" row with its own `InfoButton`.
-- `printer-picker.dom.test.tsx` — filtering, sorting and the Bluetooth
-  warning.
+  Above the filters it shows `PRINTER_CHOICE_ADVICE` and a "Read why" link
+  to the Bluetooth guide.
+- `printer-picker.dom.test.tsx` — filtering, sorting, the opening advice and
+  the Bluetooth warning.
 
 ## Parent
 
