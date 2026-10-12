@@ -18,7 +18,8 @@ is online or it is not.
   "Choose a printer"; a Bluetooth booth also offers Bridge mode.
   Each row carries the id `booth-<location id>` (`locationRowId`), which the
   status API's `manage_url` names so a calling kit's "manage this booth's
-  printer" link lands on the right row.
+  printer" link lands on the right row, which is outlined while it is the
+  link's target.
 - `new/page.tsx` and `new/printer-picker.tsx` — the picker. Cards come from
   the static catalog, filtered by "works with iPad alone" (on by default,
   because that is the recommendation), connection, and the label width a

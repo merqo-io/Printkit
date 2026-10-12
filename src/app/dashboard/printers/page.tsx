@@ -35,7 +35,7 @@ export default async function PrintersPage() {
             <li
               key={location.id}
               id={locationRowId(location.id)}
-              className="border-border scroll-mt-4 rounded-lg border p-4"
+              className="border-border target:ring-ring scroll-mt-4 rounded-lg border p-4 target:ring-2"
             >
               <PrinterStatusRow
                 label={location.label}

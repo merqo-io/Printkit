@@ -37,7 +37,9 @@ it("shows setup links and live status from the scoped summaries", async () => {
   ).toHaveAttribute("href", "/dashboard/bridge?booth=booth-b");
   expect(screen.getByText("Printer B")).toBeInTheDocument();
   expect(screen.getByText("Offline")).toBeInTheDocument();
-  expect(document.getElementById("booth-loc-b")).not.toBeNull();
+  const linkedRow = document.getElementById("booth-loc-b");
+  expect(linkedRow).not.toBeNull();
+  expect(linkedRow?.className).toContain("target:ring-2");
 });
 it("directs vendors without active booths to qkit", async () => {
   summaries.mockResolvedValue([]);
