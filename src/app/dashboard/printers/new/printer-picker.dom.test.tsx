@@ -29,6 +29,9 @@ describe("PrinterPicker", () => {
     renderPicker();
 
     expect(screen.getByText(/works with just your iPad/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/A Bluetooth-only printer needs a helper device/),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Read why" })).toHaveAttribute(
       "href",
       "/guides/bluetooth-printers",

@@ -27,8 +27,9 @@ vi.mock("@/lib/job-dispatch", () => ({
   sweepLocation: (...args: unknown[]) => sweepLocationMock(...args),
 }));
 
+const publicSiteUrlMock = vi.fn<() => string | null>();
 vi.mock("@/lib/site-url", () => ({
-  publicSiteUrl: () => "https://printkit.merqo.io",
+  publicSiteUrl: () => publicSiteUrlMock(),
 }));
 
 import { GET } from "./route";
@@ -44,6 +45,7 @@ beforeEach(() => {
   resolveActiveLocationMock.mockReset();
   getPrinterByLocationMock.mockReset();
   sweepLocationMock.mockClear();
+  publicSiteUrlMock.mockReset().mockReturnValue("https://printkit.merqo.io");
 });
 
 describe("GET /api/v1/print-locations/status", () => {
@@ -126,6 +128,16 @@ describe("GET /api/v1/print-locations/status", () => {
 
     const body = await (await GET(request())).json();
     expect(body.printer.state).toBe("offline");
+  });
+
+  it("builds the link from the request's origin when no public origin is configured", async () => {
+    publicSiteUrlMock.mockReturnValue(null);
+    resolveActiveLocationMock.mockResolvedValue(null);
+
+    expect(await (await GET(request())).json()).toEqual({
+      printer: null,
+      manage_url: "https://printkit.test/dashboard/printers",
+    });
   });
 
   it("scopes the lookup to the calling kit", async () => {

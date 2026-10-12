@@ -17,7 +17,7 @@ it("shows setup links and live status from the scoped summaries", async () => {
       state: "not_set_up",
     },
     {
-      location: { id: "b", label: "B", source_ref: "booth-b" },
+      location: { id: "loc-b", label: "B", source_ref: "booth-b" },
       printer: {
         display_name: "Printer B",
         connector: "bridge",
@@ -37,7 +37,7 @@ it("shows setup links and live status from the scoped summaries", async () => {
   ).toHaveAttribute("href", "/dashboard/bridge?booth=booth-b");
   expect(screen.getByText("Printer B")).toBeInTheDocument();
   expect(screen.getByText("Offline")).toBeInTheDocument();
-  expect(document.getElementById("booth-b")).not.toBeNull();
+  expect(document.getElementById("booth-loc-b")).not.toBeNull();
 });
 it("directs vendors without active booths to qkit", async () => {
   summaries.mockResolvedValue([]);

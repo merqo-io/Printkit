@@ -14,7 +14,11 @@ export default async function NewPrinterPage({
     searchParams,
   ]);
 
-  const booth = locations.find((item) => item.id === location) ?? locations[0];
+  // A link that names a booth opens that booth or nothing: falling back to
+  // another booth would set a printer up on the wrong one.
+  const booth = location
+    ? locations.find((item) => item.id === location)
+    : locations[0];
 
   return (
     <div className="mx-auto max-w-4xl">

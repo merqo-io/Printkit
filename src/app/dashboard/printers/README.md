@@ -29,8 +29,10 @@ is online or it is not.
   Every badge carries an `InfoButton`, so a vendor can find out what "4G" or
   "untested" means without leaving the page. A Bluetooth card says it is the
   most setup and links to the guide before the vendor can continue.
-  The picker opens with one sentence saying which printers work with an
-  iPad alone and what a Bluetooth printer needs, with a link to the guide.
+  The picker opens with a short note saying which printers work with an
+  iPad alone and what a Bluetooth-only printer needs, with a link to the
+  guide. A link that names a booth the vendor has no active location for
+  shows no picker, never another booth's.
   Calling kits link here instead of repeating that advice.
 - `setup/page.tsx`, the connector setup files exported by `setup/setup-wizard.tsx`, and `setup/actions.ts` — one
   wizard per kind of printer, each a short numbered list ending in a live

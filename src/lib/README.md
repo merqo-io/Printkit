@@ -15,7 +15,7 @@ everything else sits flat here.
   `Functions` typing for the `printkit` schema.
 - `site-url.ts` â€” `publicSiteUrl()`: the absolute origin a printer can
   reach printkit on (`PRINTKIT_PUBLIC_URL`, else Vercel's production or
-  deployment host), or null. Used for a CloudPRNT printer's address and
+  deployment host), or null. Used for a CloudPRNT printer's address, the status API's `manage_url` and
   Feie's callback URL; null rather than "" so nothing hands a device a
   relative URL.
 - `manage-url.ts` â€” `locationManageUrl(requestOrigin, location, hasPrinter)`:
@@ -180,8 +180,8 @@ everything else sits flat here.
   returns.
 - `env.ts` â€” `publicEnv`: required-env-var accessors that throw at import
   time if unset, instead of silently reading `undefined`.
-- `utils.ts` ï¿½ `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
-- `location-printer-summaries.ts` ï¿½ reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
+- `utils.ts` — `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
+- `location-printer-summaries.ts` — reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
 
 ## Connectivity
 
