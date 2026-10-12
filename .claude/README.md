@@ -29,6 +29,8 @@ recorded `origin_hash`.
 
 `.harness-base/` mirrors the seeded harness files and holds no READMEs; the CI README-freshness gate skips it.
 
+`harness.json` records the hash of each hook script; a hook edit is committed together with its new hash.
+
 ## Parent
 
 [printkit](../README.md)
