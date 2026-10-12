@@ -78,3 +78,5 @@ Audit progress and validation limits are recorded in
 [the October 2026 audit](docs/audits/2026-10-08-printkit-audit.md).
 Device result handlers report persistence failures and recheck delivery state
 in the update. Feie callbacks also bind the update to the signed attempt ID.
+
+The AI harness follows templateCentral 6.0.4: hook commands are anchored on the project directory, and the guard against committing to `main` reads the branch of the directory a command runs in. The dated entry in `AGENTS.md` lists what was adopted.
