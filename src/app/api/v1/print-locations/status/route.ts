@@ -5,13 +5,16 @@ import { resolveActiveLocation } from "@/lib/print-locations";
 import { getPrinterByLocation, printerState } from "@/lib/printers";
 import { sweepLocation } from "@/lib/job-dispatch";
 import { getCatalogEntry } from "@/lib/printer-catalog";
+import { locationManageUrl } from "@/lib/manage-url";
 
 const querySchema = z.object({ source_ref: z.string().min(1) });
 
 /**
  * A calling kit asks whether one of its locations has a printer and whether
  * that printer is reachable, so it can show the vendor a live status
- * without subscribing to printkit's own realtime channels.
+ * without subscribing to printkit's own realtime channels. Every answer
+ * names the printkit page for that location (`manage_url`), so the kit
+ * links there without knowing printkit's routes.
  */
 export async function GET(request: Request) {
   const auth = await verifyKitAuth(request);
@@ -35,14 +38,20 @@ export async function GET(request: Request) {
     parsed.data.source_ref,
   );
   if (!location) {
-    return NextResponse.json({ printer: null });
+    return NextResponse.json({
+      printer: null,
+      manage_url: locationManageUrl(url.origin, null, false),
+    });
   }
 
   await sweepLocation(location.id);
 
   const printer = await getPrinterByLocation(location.id);
   if (!printer) {
-    return NextResponse.json({ printer: null });
+    return NextResponse.json({
+      printer: null,
+      manage_url: locationManageUrl(url.origin, location, false),
+    });
   }
 
   return NextResponse.json({
@@ -55,5 +64,6 @@ export async function GET(request: Request) {
       hardware_verified:
         getCatalogEntry(printer.catalog_id)?.hardwareVerified ?? false,
     },
+    manage_url: locationManageUrl(url.origin, location, true),
   });
 }

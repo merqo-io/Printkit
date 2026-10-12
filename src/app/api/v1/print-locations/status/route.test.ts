@@ -27,6 +27,10 @@ vi.mock("@/lib/job-dispatch", () => ({
   sweepLocation: (...args: unknown[]) => sweepLocationMock(...args),
 }));
 
+vi.mock("@/lib/site-url", () => ({
+  publicSiteUrl: () => "https://printkit.merqo.io",
+}));
+
 import { GET } from "./route";
 
 function request(ref = "booth-1"): Request {
@@ -57,20 +61,27 @@ describe("GET /api/v1/print-locations/status", () => {
     expect(res.status).toBe(400);
   });
 
-  it("returns a null printer for an unknown location", async () => {
+  it("returns a null printer and the printers list for an unknown location", async () => {
     resolveActiveLocationMock.mockResolvedValue(null);
     const res = await GET(request());
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ printer: null });
+    expect(await res.json()).toEqual({
+      printer: null,
+      manage_url: "https://printkit.merqo.io/dashboard/printers",
+    });
   });
 
-  it("returns a null printer when the location has none", async () => {
+  it("returns a null printer and the picker when the location has none", async () => {
     resolveActiveLocationMock.mockResolvedValue({
       id: "loc-1",
       vendorId: "vendor-1",
     });
     getPrinterByLocationMock.mockResolvedValue(null);
-    expect(await (await GET(request())).json()).toEqual({ printer: null });
+    expect(await (await GET(request())).json()).toEqual({
+      printer: null,
+      manage_url:
+        "https://printkit.merqo.io/dashboard/printers/new?location=loc-1",
+    });
   });
 
   it("reports the printer and its live state", async () => {
@@ -94,6 +105,9 @@ describe("GET /api/v1/print-locations/status", () => {
       state: "online",
       hardware_verified: false,
     });
+    expect(body.manage_url).toBe(
+      "https://printkit.merqo.io/dashboard/printers#booth-loc-1",
+    );
     expect(sweepLocationMock).toHaveBeenCalledWith("loc-1");
   });
 
