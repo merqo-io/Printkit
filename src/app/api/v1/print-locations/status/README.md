@@ -23,10 +23,13 @@ read, same as every other cross-kit call.
 Responses:
 
 ```json
-{ "printer": null }
+{
+  "printer": null,
+  "manage_url": "https://printkit.merqo.io/dashboard/printers/new?location=<location id>"
+}
 ```
 
-for an unknown location or one with no printer yet, or:
+for a location with no printer yet, or:
 
 ```json
 {
@@ -37,9 +40,24 @@ for an unknown location or one with no printer yet, or:
     "state": "online",
     "last_seen_at": "2026-09-20T10:15:00Z",
     "hardware_verified": false
-  }
+  },
+  "manage_url": "https://printkit.merqo.io/dashboard/printers#booth-<location id>"
 }
 ```
+
+`manage_url` is in every 200 answer. It is the printkit page a vendor should
+open for that location, so a calling kit shows one link and never builds a
+printkit path of its own:
+
+| The location                     | `manage_url` points to                   |
+| -------------------------------- | ---------------------------------------- |
+| unknown to printkit, or inactive | the printers list                        |
+| active, no printer               | the picker for that location             |
+| active, has a printer            | that location's row on the printers list |
+
+It comes from `locationManageUrl` (`../../../../lib/manage-url.ts`). Its
+origin is `publicSiteUrl()`, or the origin the request arrived on when no
+public origin is configured.
 
 `state` is `online` when the printer was seen inside the last 60 seconds,
 otherwise `offline`. `hardware_verified` is false until Merqo has tested
@@ -48,8 +66,9 @@ that model's driver on a real unit, so a kit can label it honestly.
 ## Connectivity
 
 Reads `../../../../lib/printers.ts` (printer row and health),
-`../../../../lib/job-dispatch.ts` (the sweep) and
-`../../../../lib/printer-catalog.ts` (the hardware-verified flag).
+`../../../../lib/job-dispatch.ts` (the sweep),
+`../../../../lib/printer-catalog.ts` (the hardware-verified flag) and
+`../../../../lib/manage-url.ts` (the link).
 
 ## Parent
 

@@ -51,9 +51,11 @@ export async function notifyKitPrintStatus(
         Authorization: `Bearer ${data.callback_secret}`,
         "Content-Type": "application/json",
       },
-      // order_id matches qkit's own inbound route contract -- a future
-      // second kit's route needs the same shape, or this becomes per-kit.
+      // source_ref is the calling kit's own reference for the job, under
+      // the name every printkit API uses for it. order_id carries the same
+      // value for a receiver that still reads that name.
       body: JSON.stringify({
+        source_ref: sourceRef,
         order_id: sourceRef,
         status,
         attempt_at: attempt,

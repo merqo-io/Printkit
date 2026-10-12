@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
 import { getCatalogEntry } from "@/lib/printer-catalog";
+import { locationRowId } from "@/lib/manage-url";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { Button } from "@/components/ui/button";
 
@@ -33,7 +34,8 @@ export default async function PrintersPage() {
           {rows.map(({ location, printer, state }) => (
             <li
               key={location.id}
-              className="border-border rounded-lg border p-4"
+              id={locationRowId(location.id)}
+              className="border-border target:ring-ring scroll-mt-4 rounded-lg border p-4 target:ring-2"
             >
               <PrinterStatusRow
                 label={location.label}

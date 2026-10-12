@@ -93,6 +93,7 @@ describe("notifyKitPrintStatus", () => {
     expect(init.method).toBe("POST");
     expect(init.headers.Authorization).toBe("Bearer shared-secret");
     expect(JSON.parse(init.body)).toEqual({
+      source_ref: "order-1",
       order_id: "order-1",
       status: "failed",
       attempt_at: "2026-10-08T01:00:00.123456Z",

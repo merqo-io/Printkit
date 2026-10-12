@@ -21,6 +21,10 @@ no public marketing site or pricing; `/` redirects straight to
 field (the DB still only allows `'label'` for now). The outbound
 print-status callback is kit-agnostic too — configured per calling kit in
 `kit_api_keys` (`callback_url`/`callback_secret`), not hardcoded to qkit.
+Its body names the job `source_ref`, with `order_id` kept beside it until
+every calling kit reads the new name. `GET /api/v1/print-locations/status`
+also returns `manage_url`, the printkit page for that location, so a calling
+kit links to it instead of building printkit paths.
 `next.config.ts` keeps `@napi-rs/canvas` (the label rasterizer's native
 module) out of the bundle and traces `src/assets/fonts/` into every API
 route.
