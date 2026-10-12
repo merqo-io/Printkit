@@ -13,6 +13,7 @@ import {
   worksWithIpadAlone,
   type CatalogEntry,
 } from "@/lib/printer-catalog";
+import { PRINTER_CHOICE_ADVICE } from "@/lib/printer-info-copy";
 import { cn } from "@/lib/utils";
 
 type Connection = "4g" | "wifi" | "bluetooth";
@@ -113,6 +114,16 @@ export function PrinterPicker({
 
   return (
     <div className="space-y-6">
+      <p className="text-muted-foreground text-sm">
+        {PRINTER_CHOICE_ADVICE}{" "}
+        <Link
+          href="/guides/bluetooth-printers"
+          className="text-foreground underline underline-offset-4"
+        >
+          Read why
+        </Link>
+      </p>
+
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Chip active={ipadOnly} onClick={() => setIpadOnly(!ipadOnly)}>

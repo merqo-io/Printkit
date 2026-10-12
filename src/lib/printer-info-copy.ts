@@ -67,3 +67,9 @@ export const INFO_COPY: Record<InfoTopic, { title: string; body: string }> = {
 
 export const BLUETOOTH_WARNING =
   "We do not recommend this setup. A Bluetooth printer needs a second device that stays switched on next to it all day. If you are choosing a new printer, pick one that works with an iPad alone.";
+
+/** The one-sentence answer to "which printer should I buy", shown above the
+ *  picker. It says the same thing as the `ipad_alone` and `helper_device`
+ *  topics, for a vendor who has not opened either. */
+export const PRINTER_CHOICE_ADVICE =
+  "A printer that connects to the internet by itself works with just your iPad. A Bluetooth printer needs a helper device next to it all day: an Android phone, a laptop or a Raspberry Pi.";

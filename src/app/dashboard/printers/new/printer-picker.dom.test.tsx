@@ -25,6 +25,16 @@ function card(printerId: string): HTMLElement {
 }
 
 describe("PrinterPicker", () => {
+  it("says up front which printers work with an iPad alone, and links to why", () => {
+    renderPicker();
+
+    expect(screen.getByText(/works with just your iPad/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Read why" })).toHaveAttribute(
+      "href",
+      "/guides/bluetooth-printers",
+    );
+  });
+
   it("starts by showing only printers that need no helper device", () => {
     renderPicker();
 
