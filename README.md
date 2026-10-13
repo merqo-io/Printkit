@@ -78,6 +78,11 @@ one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
 
 `e2e/` holds the Playwright public smoke and auth-guard specs, run with `pnpm test:e2e` (see its own README).
 
+A signed-out vendor who opens a dashboard link is returned to it after
+sign-in: the proxy records the path as `next` on `/login`, and the login
+page and `/auth/callback` honour it for same-origin paths only (see
+`src/app/login/README.md`).
+
 Audit progress and validation limits are recorded in
 [the October 2026 audit](docs/audits/2026-10-08-printkit-audit.md).
 Device result handlers report persistence failures and recheck delivery state

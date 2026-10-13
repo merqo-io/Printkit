@@ -28,7 +28,12 @@ deliberate.
   Both are generic over `Database`/`"printkit"` (see `@/lib/types`).
 - `middleware.ts` — `updateSession(request)`: refreshes the Supabase
   session cookie and redirects unauthenticated requests to `/dashboard/*`
-  (`isProtectedPath`) to `/login`. Called from `src/proxy.ts`.
+  (`isProtectedPath`) to `/login`. The path and query the visitor asked
+  for go along as `next`, so the login page can return there after
+  sign-in; a bare `/dashboard` is where sign-in lands anyway and adds no
+  `next`. Any other query parameter is dropped from the `/login` URL. A URL
+  fragment never reaches the server, so it is not in `next`. Called from
+  `src/proxy.ts`.
 
 ## Connectivity
 

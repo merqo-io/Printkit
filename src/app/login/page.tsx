@@ -4,6 +4,7 @@ import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,8 @@ import { ElevatedCard } from "@/components/elevated-card";
 import { GoogleMark } from "@merqo/ui";
 
 type Mode = "signin" | "signup";
+
+const DEFAULT_RETURN_PATH = "/dashboard";
 
 const OAUTH_ERROR_MESSAGE =
   "Something went wrong signing in with Google. Please try again.";
@@ -40,6 +43,25 @@ function LoginForm() {
   const [checkEmail, setCheckEmail] = useState<string | null>(null);
   const isSignin = mode === "signin";
 
+  // A URL fragment never reaches the server, but the browser carries it across
+  // the proxy's redirect to this page. It is put back on a valid `next`, so a
+  // link to one row of a page still names that row after sign-in.
+  function returnPath(): string {
+    const next = safeRedirectPath(
+      searchParams.get("next"),
+      DEFAULT_RETURN_PATH,
+    );
+    if (next === DEFAULT_RETURN_PATH || next.includes("#")) return next;
+    return safeRedirectPath(next + window.location.hash, next);
+  }
+
+  function authCallbackUrl(): string {
+    const url = new URL("/auth/callback", window.location.origin);
+    const next = returnPath();
+    if (next !== DEFAULT_RETURN_PATH) url.searchParams.set("next", next);
+    return url.toString();
+  }
+
   async function signInWithGoogle() {
     setBusy(true);
     setError(null);
@@ -47,7 +69,7 @@ function LoginForm() {
       const { error } = await createClient().auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: authCallbackUrl(),
           queryParams: { hl: "en" },
         },
       });
@@ -97,7 +119,7 @@ function LoginForm() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: authCallbackUrl(),
           },
         });
         if (error) {
@@ -121,7 +143,7 @@ function LoginForm() {
           return;
         }
       }
-      router.push("/dashboard");
+      router.push(returnPath());
       router.refresh();
     } catch {
       setError("Could not sign in. Check your connection and try again.");

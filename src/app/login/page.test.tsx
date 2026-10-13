@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import LoginPage from "./page";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -214,6 +214,138 @@ describe("LoginPage", () => {
     expect(
       screen.getByRole("heading", { name: /welcome back/i }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("LoginPage return path", () => {
+  const DEEP_LINK = "/dashboard/printers/new?location=loc-1";
+
+  function withNext(next: string) {
+    useSearchParamsMock.mockReturnValue(new URLSearchParams({ next }));
+  }
+
+  async function signInWithPassword() {
+    const push = vi.fn();
+    useRouterMock.mockReturnValue({ push, refresh: vi.fn() });
+    const user = userEvent.setup();
+    render(<LoginPage />);
+    await user.type(screen.getByLabelText("Email"), "vendor@example.com");
+    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await waitFor(() => expect(push).toHaveBeenCalled());
+    return push;
+  }
+
+  async function googleRedirectTo(): Promise<URL> {
+    const user = userEvent.setup();
+    render(<LoginPage />);
+    await user.click(
+      screen.getByRole("button", { name: /continue with google/i }),
+    );
+    return new URL(signInWithOAuthMock.mock.calls[0][0].options.redirectTo);
+  }
+
+  it("returns to a valid next after password sign-in", async () => {
+    withNext(DEEP_LINK);
+
+    const push = await signInWithPassword();
+
+    expect(push).toHaveBeenCalledWith(DEEP_LINK);
+  });
+
+  it("carries a valid next through the Google callback URL", async () => {
+    withNext(DEEP_LINK);
+
+    const redirectTo = await googleRedirectTo();
+
+    expect(redirectTo.pathname).toBe("/auth/callback");
+    expect(redirectTo.searchParams.get("next")).toBe(DEEP_LINK);
+  });
+
+  const UNSAFE_NEXT = [
+    ["an absolute URL", "https://evil.example/dashboard"],
+    ["a protocol-relative //host", "//evil.example/dashboard"],
+    ["a backslash path", "/\\evil.example/dashboard"],
+  ];
+
+  it.each(UNSAFE_NEXT)(
+    "falls back to /dashboard after password sign-in when next is %s",
+    async (_label, next) => {
+      withNext(next);
+
+      const push = await signInWithPassword();
+
+      expect(push).toHaveBeenCalledWith("/dashboard");
+    },
+  );
+
+  it.each(UNSAFE_NEXT)(
+    "sends no next to the Google callback when next is %s",
+    async (_label, next) => {
+      withNext(next);
+
+      const redirectTo = await googleRedirectTo();
+
+      expect(redirectTo.pathname).toBe("/auth/callback");
+      expect(redirectTo.search).toBe("");
+    },
+  );
+
+  describe("with a fragment on the login URL", () => {
+    beforeEach(() => {
+      window.location.hash = "#booth-loc-1";
+    });
+    afterEach(() => {
+      window.location.hash = "";
+    });
+
+    it("puts the fragment back on next after password sign-in", async () => {
+      withNext("/dashboard/printers");
+
+      const push = await signInWithPassword();
+
+      expect(push).toHaveBeenCalledWith("/dashboard/printers#booth-loc-1");
+    });
+
+    it("puts the fragment back on next for the Google callback", async () => {
+      withNext("/dashboard/printers");
+
+      const redirectTo = await googleRedirectTo();
+
+      expect(redirectTo.searchParams.get("next")).toBe(
+        "/dashboard/printers#booth-loc-1",
+      );
+      expect(redirectTo.hash).toBe("");
+    });
+
+    it("drops the fragment when next is unsafe", async () => {
+      withNext("//evil.example/dashboard");
+
+      const push = await signInWithPassword();
+
+      expect(push).toHaveBeenCalledWith("/dashboard");
+    });
+  });
+
+  it("carries a valid next through the sign-up confirmation link", async () => {
+    withNext(DEEP_LINK);
+    signUpMock.mockResolvedValue({ data: { session: null }, error: null });
+    const user = userEvent.setup();
+    render(<LoginPage />);
+
+    await user.click(
+      screen.getByRole("button", { name: /create an account/i }),
+    );
+    await user.type(screen.getByLabelText("Email"), "new@example.com");
+    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+
+    await waitFor(() => expect(signUpMock).toHaveBeenCalled());
+    const emailRedirectTo = new URL(
+      signUpMock.mock.calls[0][0].options.emailRedirectTo,
+    );
+    expect(emailRedirectTo.pathname).toBe("/auth/callback");
+    expect(emailRedirectTo.searchParams.get("next")).toBe(DEEP_LINK);
   });
 });
 

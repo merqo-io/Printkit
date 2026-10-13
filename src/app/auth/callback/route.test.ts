@@ -72,6 +72,44 @@ describe("GET /auth/callback", () => {
     expect(res.headers.get("location")).toBe("http://localhost/dashboard");
   });
 
+  it("falls back to /dashboard when ?next= is a backslash path", async () => {
+    exchangeCodeForSessionMock.mockResolvedValue({ error: null });
+    const { GET } = await import("./route");
+    const res = await GET(
+      req(
+        "http://localhost/auth/callback?code=abc&next=" +
+          encodeURIComponent("/\\evil.com"),
+      ),
+    );
+    expect(res.headers.get("location")).toBe("http://localhost/dashboard");
+  });
+
+  it("falls back to /dashboard when ?next= carries a control character", async () => {
+    exchangeCodeForSessionMock.mockResolvedValue({ error: null });
+    const { GET } = await import("./route");
+    const res = await GET(
+      req(
+        "http://localhost/auth/callback?code=abc&next=" +
+          encodeURIComponent("/\t/evil.com"),
+      ),
+    );
+    expect(res.headers.get("location")).toBe("http://localhost/dashboard");
+  });
+
+  it("returns to a deep link with its query string and fragment", async () => {
+    exchangeCodeForSessionMock.mockResolvedValue({ error: null });
+    const { GET } = await import("./route");
+    const res = await GET(
+      req(
+        "http://localhost/auth/callback?code=abc&next=" +
+          encodeURIComponent("/dashboard/printers?location=loc-1#booth-loc-1"),
+      ),
+    );
+    expect(res.headers.get("location")).toBe(
+      "http://localhost/dashboard/printers?location=loc-1#booth-loc-1",
+    );
+  });
+
   it("redirects to /login?error=oauth when the code exchange fails", async () => {
     exchangeCodeForSessionMock.mockResolvedValue({
       error: { message: "invalid code" },
