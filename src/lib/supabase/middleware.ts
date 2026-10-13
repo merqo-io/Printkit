@@ -4,6 +4,8 @@ import type { User } from "@supabase/supabase-js";
 import { publicEnv } from "@/lib/env";
 import type { Database } from "@/lib/types";
 
+const DEFAULT_SIGNED_IN_PATH = "/dashboard";
+
 function isProtectedPath(path: string): boolean {
   return path.startsWith("/dashboard");
 }
@@ -49,8 +51,15 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (!user) {
+    const { pathname, search } = request.nextUrl;
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.search = "";
+    // The login page returns the vendor to `next` after sign-in. The overview
+    // is where sign-in lands by default, so it is not recorded.
+    if (pathname + search !== DEFAULT_SIGNED_IN_PATH) {
+      url.searchParams.set("next", pathname + search);
+    }
     return NextResponse.redirect(url);
   }
 

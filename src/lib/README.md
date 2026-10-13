@@ -26,8 +26,9 @@ everything else sits flat here.
   shared with the printers page so the link and the row cannot drift.
 - `safe-redirect.ts` — `safeRedirectPath(next, fallback)`: rejects an absolute
   URL, a protocol-relative `//`/`/\` path, or one carrying an embedded control
-  character, falling back otherwise. The open-redirect guard for the
-  `/legal/accept` flow's `next` search param.
+  character, falling back otherwise. The open-redirect guard for every
+  `next` search param: the `/legal/accept` flow, the login page and
+  `/auth/callback`.
 - `legal-gate.ts` — `checkLegalAcceptance(email)`/
   `requireCurrentLegalAcceptance(email)`. printkit owns no acceptance
   record — merqo does — so currency is a bearer-authed (`MERQO_CUSTOMER_SECRET`)
@@ -180,8 +181,8 @@ everything else sits flat here.
   returns.
 - `env.ts` — `publicEnv`: required-env-var accessors that throw at import
   time if unset, instead of silently reading `undefined`.
-- `utils.ts` � `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
-- `location-printer-summaries.ts` � reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
+- `utils.ts` � `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
+- `location-printer-summaries.ts` � reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
 
 ## Connectivity
 

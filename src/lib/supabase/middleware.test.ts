@@ -53,6 +53,29 @@ describe("updateSession", () => {
     );
   });
 
+  it("records a signed-out deep link as next on the /login redirect", async () => {
+    createServerClient.mockImplementation(() => ({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
+      },
+    }));
+    const request = new NextRequest(
+      "https://printkit.merqo.io/dashboard/printers/new?location=loc-1",
+    );
+
+    const response = await updateSession(request);
+
+    expect(response.status).toBe(307);
+    const location = new URL(response.headers.get("location") ?? "");
+    expect(location.origin + location.pathname).toBe(
+      "https://printkit.merqo.io/login",
+    );
+    expect([...location.searchParams.keys()]).toEqual(["next"]);
+    expect(location.searchParams.get("next")).toBe(
+      "/dashboard/printers/new?location=loc-1",
+    );
+  });
+
   it("redirects to /login when getUser throws", async () => {
     createServerClient.mockImplementation(() => ({
       auth: {

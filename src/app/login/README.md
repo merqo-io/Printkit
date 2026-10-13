@@ -26,21 +26,35 @@ OAuth, plus password reset. Sign-up is a client-side toggle; `/reset-password` c
   - `Wordmark` (`@/components/wordmark`) and `GoogleMark`
     (`@merqo/ui`) brand the card; the card container is `ElevatedCard`
     (`@/components/elevated-card`), matching every other kit's login page.
+  - The return path. `returnPath()` reads `?next=` through
+    `safeRedirectPath` (`@/lib/safe-redirect`), so an absolute URL, a
+    `//host` or a backslash path falls back to `/dashboard`. Password
+    sign-in pushes to it; Google sign-in and the sign-up confirmation link
+    carry it as `next` on the `/auth/callback` URL (`authCallbackUrl()`),
+    where it is checked again. A fragment on the login URL
+    (`#booth-<id>`) is put back on a valid `next`: the server never sees a
+    fragment, but the browser keeps it across the proxy's redirect here.
 - `page.test.tsx` — RTL/jsdom tests: the `?error=oauth` banner, the
   check-your-email state on a sessionless sign-up (and returning from it via
   "Back to sign in"), the redirect-on-session-present path, and the Forgot
   password flow (visible only in sign-in mode, sends a reset email, toasts
-  an error on an empty email or a failed reset call).
+  an error on an empty email or a failed reset call). Also the return
+  path: a valid `next` is honoured by password sign-in, Google sign-in and
+  sign-up, an unsafe one falls back to `/dashboard`, and a fragment is kept.
 - `login-page.dom.test.tsx` — RTL/jsdom test asserting the page renders a
   single top-level heading alongside the Google and email/password form.
 
 ## Connectivity
 
 Signed-out visitors reach `/login` directly (the landing page,
-`src/app/page.tsx`, redirects to `/dashboard`, whose auth gate sends signed-out visitors to `/login`). On
-success it calls `router.push("/dashboard")` + `router.refresh()`;
-`/dashboard`'s `layout.tsx` (`getVendorSession()`) is the actual auth gate
-this page's happy path leads into.
+`src/app/page.tsx`, redirects to `/dashboard`, whose auth gate sends signed-out visitors to `/login`). A
+signed-out request for any other dashboard page arrives as
+`/login?next=<path and query>`, set by `updateSession`
+(`src/lib/supabase/middleware.ts`). On success the page calls
+`router.push(returnPath())` + `router.refresh()`: the page named by `next`,
+or `/dashboard` without one. `/dashboard`'s `layout.tsx`
+(`getVendorSession()`) is the actual auth gate this page's happy path leads
+into.
 
 ## Parent
 
