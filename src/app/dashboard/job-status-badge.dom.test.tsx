@@ -6,8 +6,8 @@ import { JobStatusBadge } from "./job-status-badge";
 describe("JobStatusBadge", () => {
   it.each([
     ["queued", "Queued", "text-secondary"],
-    ["sent", "Sent", "text-flow"],
-    ["printed", "Printed", "text-mint"],
+    ["sent", "Sent", "text-info-text"],
+    ["printed", "Printed", "text-success-text"],
     ["failed", "Failed", "text-destructive"],
   ] as const)(
     "renders the %s label with its status color",

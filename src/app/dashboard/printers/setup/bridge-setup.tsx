@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import Link from "next/link";
+import { Notice } from "@/components/notice";
+import { TextLink } from "@/components/text-link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { InfoButton } from "@/components/info-button";
 import { BLUETOOTH_WARNING } from "@/lib/printer-info-copy";
 import { createBridgePairingCode } from "./actions";
-import { Step, WaitingForPrinter } from "./setup-step";
+import { Step, Steps, WaitingForPrinter } from "./setup-step";
 
 export function BridgeSetup({
   locationId,
@@ -39,22 +41,16 @@ export function BridgeSetup({
 
   return (
     <div className="space-y-6">
-      <div className="border-border rounded-lg border p-4">
-        <p className="text-sm font-medium">Before you start</p>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {BLUETOOTH_WARNING}
-        </p>
-        <p className="mt-2 text-sm">
-          <Link
-            href="/guides/bluetooth-printers"
-            className="underline underline-offset-4"
-          >
+      <Notice tone="warning" title="Before you start">
+        <p>{BLUETOOTH_WARNING}</p>
+        <p>
+          <TextLink href="/guides/bluetooth-printers">
             Read the Bluetooth guide
-          </Link>
+          </TextLink>
         </p>
-      </div>
+      </Notice>
 
-      <ol className="space-y-5">
+      <Steps>
         <Step number={1} title="Choose the helper device">
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -111,7 +107,7 @@ export function BridgeSetup({
               </div>
             ) : (
               <Button onClick={onPairingCode} disabled={busy} size="sm">
-                {busy ? "Working..." : "Show a pairing code"}
+                {busy ? "Working…" : "Show a pairing code"}
               </Button>
             )}
             <p className="text-muted-foreground text-sm">
@@ -123,7 +119,7 @@ export function BridgeSetup({
         <Step number={3} title="Check it is connected">
           <WaitingForPrinter locationId={locationId} />
         </Step>
-      </ol>
+      </Steps>
     </div>
   );
 }

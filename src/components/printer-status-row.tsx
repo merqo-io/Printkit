@@ -8,9 +8,9 @@ export type PrinterStatusRowProps = {
 };
 
 const TONE: Record<PrinterStatusRowProps["state"], string> = {
-  online: "bg-emerald-500",
+  online: "bg-success",
   offline: "bg-muted-foreground",
-  not_set_up: "bg-amber-500",
+  not_set_up: "bg-warning",
 };
 
 function describe(props: PrinterStatusRowProps): string {
@@ -30,17 +30,26 @@ export function PrinterStatusRow(props: PrinterStatusRowProps) {
   return (
     <div className="flex items-center justify-between gap-3">
       <div>
-        <p className="text-sm font-medium">{props.label}</p>
-        <p className="text-muted-foreground text-xs">
+        <p className="font-medium">{props.label}</p>
+        <p className="text-muted-foreground text-sm">
           {props.printerName ?? "No printer set up"}
         </p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <span
           aria-hidden
-          className={cn("size-2 rounded-full", TONE[props.state])}
+          className={cn("size-2.5 rounded-full", TONE[props.state])}
         />
-        <span className="text-muted-foreground text-xs">{describe(props)}</span>
+        <span
+          className={cn(
+            "text-sm",
+            props.state === "online"
+              ? "text-success-text font-medium"
+              : "text-muted-foreground",
+          )}
+        >
+          {describe(props)}
+        </span>
       </div>
     </div>
   );

@@ -2,6 +2,10 @@ import Link from "next/link";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listPrintHistoryPage } from "@/lib/print-history";
 import { listActiveLocations } from "@/lib/print-locations";
+import { Notice } from "@/components/notice";
+import { PageHeader } from "@/components/page-header";
+import { TextLink } from "@/components/text-link";
+import { Button } from "@/components/ui/button";
 import { JobHistoryTable } from "./job-history-table";
 
 export default async function HistoryPage({
@@ -24,31 +28,57 @@ export default async function HistoryPage({
   const next = new URLSearchParams();
   if (unrouted) next.set("unrouted", "1");
   if (nextCursor) next.set("cursor", nextCursor);
+
+  let emptyMessage: string | undefined;
+  if (unrouted) emptyMessage = "No unrouted jobs. Every job has a booth.";
+  else if (params.cursor) emptyMessage = "No older jobs.";
+
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Print job history
-      </h1>
-      <p className="text-muted-foreground mt-1 text-sm">
-        Your label jobs, most recent first. Browse older jobs below.
-      </p>
-      <div className="mt-6">
-        <JobHistoryTable jobs={jobs} locations={locations} />
-      </div>
-      <nav aria-label="Print history pages" className="mt-6 flex gap-4 text-sm">
-        {params.cursor && (
-          <Link
-            href={
-              unrouted ? "/dashboard/history?unrouted=1" : "/dashboard/history"
-            }
-          >
-            Newest jobs
-          </Link>
-        )}
-        {nextCursor && (
-          <Link href={"/dashboard/history?" + next.toString()}>Older jobs</Link>
-        )}
-      </nav>
+      <PageHeader
+        title="History"
+        description="Every label job, most recent first."
+      />
+      {unrouted && (
+        <Notice tone="info" className="mb-4">
+          <p>
+            Showing only jobs that need a booth assigned.{" "}
+            <TextLink href="/dashboard/history">Show all jobs</TextLink>
+          </p>
+        </Notice>
+      )}
+      <JobHistoryTable
+        jobs={jobs}
+        locations={locations}
+        emptyMessage={emptyMessage}
+      />
+      {(params.cursor || nextCursor) && (
+        <nav
+          aria-label="Print history pages"
+          className="mt-6 flex flex-wrap gap-3"
+        >
+          {params.cursor && (
+            <Button asChild variant="outline" size="sm">
+              <Link
+                href={
+                  unrouted
+                    ? "/dashboard/history?unrouted=1"
+                    : "/dashboard/history"
+                }
+              >
+                Newest jobs
+              </Link>
+            </Button>
+          )}
+          {nextCursor && (
+            <Button asChild variant="outline" size="sm">
+              <Link href={"/dashboard/history?" + next.toString()}>
+                Older jobs
+              </Link>
+            </Button>
+          )}
+        </nav>
+      )}
     </div>
   );
 }

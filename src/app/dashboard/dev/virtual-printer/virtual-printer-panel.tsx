@@ -143,7 +143,7 @@ export function VirtualPrinterPanel({
             </Select>
           </div>
           <Button onClick={onStart} disabled={!locationId || starting}>
-            {starting ? "Starting..." : "Start virtual printer"}
+            {starting ? "Starting…" : "Start virtual printer"}
           </Button>
         </div>
       )}

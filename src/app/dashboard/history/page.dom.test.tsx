@@ -99,3 +99,16 @@ it("offers a return to the newest filtered page", async () => {
     cursor: "current-page",
   });
 });
+
+it("says when the unrouted filter is on and offers a way out", async () => {
+  render(
+    await HistoryPage({ searchParams: Promise.resolve({ unrouted: "1" }) }),
+  );
+  expect(
+    screen.getByText(/showing only jobs that need a booth/i),
+  ).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Show all jobs" })).toHaveAttribute(
+    "href",
+    "/dashboard/history",
+  );
+});

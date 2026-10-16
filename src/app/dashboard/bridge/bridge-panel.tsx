@@ -226,14 +226,19 @@ export function BridgePanel({
       )}
       {pairState === "connected" && (
         <div className="space-y-3">
-          <p className="text-mint text-sm font-medium">Connected</p>
+          <p className="text-success-text text-sm font-medium">Connected</p>
           <Button variant="outline" onClick={handleTestPrint}>
             Print test
           </Button>
         </div>
       )}
-      {pairState === "error" && (
-        <p className="text-destructive text-sm">Could not pair — try again.</p>
+      {enabled && pairState === "error" && (
+        <div className="space-y-3">
+          <p role="alert" className="text-destructive text-sm">
+            Could not pair with the printer. Check it is on and nearby.
+          </p>
+          <Button onClick={handlePair}>Try again</Button>
+        </div>
       )}
     </div>
   );

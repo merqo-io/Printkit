@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { CatalogEntry } from "@/lib/printer-catalog";
 import { createPrinterUrl } from "./actions";
-import { Step, WaitingForPrinter } from "./setup-step";
+import { Step, Steps, WaitingForPrinter } from "./setup-step";
 
 export function CloudPollSetup({
   entry,
@@ -35,7 +35,7 @@ export function CloudPollSetup({
   };
 
   return (
-    <ol className="space-y-5">
+    <Steps>
       <Step number={1} title="Get this booth's printer address">
         {url ? (
           <div className="space-y-2">
@@ -61,7 +61,7 @@ export function CloudPollSetup({
           </div>
         ) : (
           <Button onClick={onCreate} disabled={busy}>
-            {busy ? "Working..." : "Create the address"}
+            {busy ? "Working…" : "Create the address"}
           </Button>
         )}
       </Step>
@@ -87,6 +87,6 @@ export function CloudPollSetup({
       <Step number={4} title="Wait for it to connect">
         <WaitingForPrinter locationId={locationId} />
       </Step>
-    </ol>
+    </Steps>
   );
 }

@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
+import { PageHeader } from "@/components/page-header";
+import { TextLink } from "@/components/text-link";
 import { PrinterPicker } from "./printer-picker";
 
 export default async function NewPrinterPage({
@@ -22,30 +23,24 @@ export default async function NewPrinterPage({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Choose a printer
-      </h1>
-      <p className="text-muted-foreground mt-1 text-sm">
-        {booth
-          ? `Which printer will print labels at ${booth.label}?`
-          : "Turn printing on for a booth in qkit first."}
-      </p>
+      <PageHeader
+        title="Choose a printer"
+        back={{ href: "/dashboard/printers", label: "Printers" }}
+        description={
+          booth
+            ? `Which printer will print labels at ${booth.label}?`
+            : "Turn printing on for a booth in qkit first."
+        }
+      />
 
       {booth ? (
-        <div className="mt-6">
-          <PrinterPicker
-            locationId={booth.id}
-            includeDev={process.env.VERCEL_ENV !== "production"}
-          />
-        </div>
+        <PrinterPicker
+          locationId={booth.id}
+          includeDev={process.env.VERCEL_ENV !== "production"}
+        />
       ) : (
-        <p className="mt-6 text-sm">
-          <Link
-            href="/dashboard/printers"
-            className="underline underline-offset-4"
-          >
-            Back to printers
-          </Link>
+        <p className="text-sm">
+          <TextLink href="/dashboard/printers">Back to printers</TextLink>
         </p>
       )}
     </div>

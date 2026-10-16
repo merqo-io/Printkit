@@ -1,5 +1,7 @@
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
+import { PageHeader } from "@/components/page-header";
+import { Panel } from "@/components/panel";
 import { BridgePanel } from "./bridge-panel";
 import { BridgeLocationGate } from "./bridge-location-gate";
 
@@ -15,7 +17,7 @@ function BridgeBody({
   if (locations.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">
-        No booths have printing enabled yet — turn it on in qkit&apos;s booth
+        No booths have printing enabled yet. Turn it on in qkit&apos;s booth
         settings.
       </p>
     );
@@ -45,17 +47,18 @@ export default async function BridgePage({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-semibold tracking-tight">Printer bridge</h1>
-      <p className="text-muted-foreground mt-1 text-sm">
-        Turn on Bridge mode on the device next to your printer, then pair it.
-      </p>
-      <div className="mt-6">
+      <PageHeader
+        title="Bridge mode"
+        back={{ href: "/dashboard/printers", label: "Printers" }}
+        description="Turn on Bridge mode on the device next to your printer, then pair it. Keep this page open while you sell."
+      />
+      <Panel>
         <BridgeBody
           vendorId={user.id}
           locations={locations}
           preselectedLocationId={preselectedLocationId}
         />
-      </div>
+      </Panel>
     </div>
   );
 }

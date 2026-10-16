@@ -3,7 +3,10 @@ import { getVendorSession } from "@/lib/vendor-session";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
 import { getCatalogEntry } from "@/lib/printer-catalog";
 import { locationRowId } from "@/lib/manage-url";
+import { PageHeader } from "@/components/page-header";
+import { Panel } from "@/components/panel";
 import { PrinterStatusRow } from "@/components/printer-status-row";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 const CONNECTOR_LABEL: Record<string, string> = {
@@ -17,25 +20,27 @@ export default async function PrintersPage() {
   const rows = await listLocationPrinterSummaries(user.id);
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <h1 className="text-2xl font-semibold tracking-tight">Printers</h1>
-      <p className="text-muted-foreground mt-1 text-sm">
-        One printer per booth. New orders print by themselves once a booth has a
-        printer that is online.
-      </p>
+    <div className="mx-auto max-w-4xl">
+      <PageHeader
+        title="Printers"
+        description="One printer per booth. New orders print by themselves once a booth has a printer that is online."
+      />
 
       {rows.length === 0 ? (
-        <p className="text-muted-foreground mt-6 text-sm">
-          No booths have printing enabled yet. Turn it on in qkit&apos;s booth
-          settings, then come back here.
-        </p>
+        <Panel>
+          <p className="text-muted-foreground text-sm">
+            No booths have printing enabled yet. Turn it on in qkit&apos;s booth
+            settings, then come back here.
+          </p>
+        </Panel>
       ) : (
-        <ul className="mt-6 space-y-3">
+        <ul className="space-y-3">
           {rows.map(({ location, printer, state }) => (
-            <li
+            <Panel
+              as="li"
               key={location.id}
               id={locationRowId(location.id)}
-              className="border-border target:ring-ring scroll-mt-4 rounded-lg border p-4 target:ring-2"
+              className="target:ring-ring scroll-mt-4 target:ring-2"
             >
               <PrinterStatusRow
                 label={location.label}
@@ -44,16 +49,16 @@ export default async function PrintersPage() {
                 lastSeenAt={printer?.last_seen_at ?? null}
               />
 
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t pt-4">
                 {printer ? (
                   <>
-                    <span className="text-muted-foreground text-xs">
+                    <span className="text-muted-foreground text-sm">
                       {CONNECTOR_LABEL[printer.connector] ?? printer.connector}
                     </span>
                     {!getCatalogEntry(printer.catalog_id)?.hardwareVerified && (
-                      <span className="text-muted-foreground text-xs">
+                      <Badge variant="outline">
                         Untested with real hardware
-                      </span>
+                      </Badge>
                     )}
                     <span className="grow" />
                     {printer.connector === "bridge" && (
@@ -89,7 +94,7 @@ export default async function PrintersPage() {
                   </Button>
                 )}
               </div>
-            </li>
+            </Panel>
           ))}
         </ul>
       )}

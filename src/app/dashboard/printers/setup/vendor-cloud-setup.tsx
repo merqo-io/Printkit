@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { CatalogEntry } from "@/lib/printer-catalog";
 import { registerBrandCloudPrinter } from "./actions";
-import { Step, WaitingForPrinter } from "./setup-step";
+import { Step, Steps, WaitingForPrinter } from "./setup-step";
 
 export function VendorCloudSetup({
   entry,
@@ -51,7 +51,7 @@ export function VendorCloudSetup({
   };
 
   return (
-    <ol className="space-y-5">
+    <Steps>
       <Step number={1} title="Put the printer where it will be used">
         <p className="text-muted-foreground text-sm">
           {entry.connectivity.includes("4g")
@@ -86,7 +86,7 @@ export function VendorCloudSetup({
             We use the KEY once to claim the printer and never store it.
           </p>
           <Button type="submit" disabled={busy || !sn || !key}>
-            {busy ? "Adding..." : "Add this printer"}
+            {busy ? "Adding…" : "Add this printer"}
           </Button>
         </form>
       </Step>
@@ -100,6 +100,6 @@ export function VendorCloudSetup({
           </p>
         )}
       </Step>
-    </ol>
+    </Steps>
   );
 }

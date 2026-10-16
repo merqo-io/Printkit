@@ -9,14 +9,16 @@ import type { PrintJob } from "@/lib/print-jobs-list";
 export function JobHistoryTable({
   jobs,
   locations = [],
+  emptyMessage = "No print jobs yet. They show up here once qkit sends one.",
 }: {
   jobs: PrintJob[];
   locations?: { id: string; label: string }[];
+  emptyMessage?: string;
 }) {
   if (jobs.length === 0) {
     return (
-      <p className="text-muted-foreground py-8 text-center text-sm">
-        No print jobs yet — they&apos;ll show up here once qkit sends one.
+      <p className="text-muted-foreground rounded-xl border border-dashed px-5 py-10 text-center text-sm">
+        {emptyMessage}
       </p>
     );
   }

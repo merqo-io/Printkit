@@ -98,6 +98,21 @@ describe("BridgePanel", () => {
     vi.mocked(useJobDelivery).mockReset();
   });
 
+  it("offers the pair button again after a failed pairing", async () => {
+    vi.mocked(connectPrinter).mockRejectedValueOnce(new Error("cancelled"));
+    render(<BridgePanel vendorId="vendor-1" locationId="loc-1" />);
+    fireEvent.click(screen.getByRole("switch"));
+    fireEvent.click(screen.getByRole("button", { name: /pair printer/i }));
+    expect(
+      await screen.findByText(/could not pair with the printer/i),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /try again/i }));
+    await waitFor(() => {
+      expect(screen.getByText("Connected")).toBeInTheDocument();
+    });
+    expect(connectPrinter).toHaveBeenCalledTimes(2);
+  });
+
   it("disconnects a pairing completed after unmount", async () => {
     let finish!: (client: Awaited<ReturnType<typeof connectPrinter>>) => void;
     vi.mocked(connectPrinter).mockImplementationOnce(

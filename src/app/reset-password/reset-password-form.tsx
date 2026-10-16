@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ElevatedCard } from "@/components/elevated-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -76,17 +77,17 @@ export function ResetPasswordForm() {
 
   if (state === "checking") {
     return (
-      <div className="rounded-xl border bg-card px-7 py-8 shadow-sm">
+      <ElevatedCard className="px-7 py-8">
         <p className="text-center text-sm text-muted-foreground">
           Checking your reset link…
         </p>
-      </div>
+      </ElevatedCard>
     );
   }
 
   if (state === "no-session" || state === "failed") {
     return (
-      <div className="rounded-xl border bg-card px-7 py-8 shadow-sm">
+      <ElevatedCard className="px-7 py-8">
         <h1 className="font-display text-2xl font-semibold leading-tight">
           {state === "failed"
             ? "Could not check your reset link"
@@ -104,12 +105,12 @@ export function ResetPasswordForm() {
         >
           <Link href="/login">Back to sign in</Link>
         </Button>
-      </div>
+      </ElevatedCard>
     );
   }
 
   return (
-    <div className="rounded-xl border bg-card px-7 py-8 shadow-sm">
+    <ElevatedCard className="px-7 py-8">
       <h1 className="font-display text-2xl font-semibold leading-tight">
         Set a new password
       </h1>
@@ -124,7 +125,10 @@ export function ResetPasswordForm() {
         className="mt-6 space-y-5"
       >
         <div className="space-y-2">
-          <Label htmlFor="new-password" className="text-sm font-medium">
+          <Label
+            htmlFor="new-password"
+            className="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+          >
             New password
           </Label>
           <Input
@@ -138,7 +142,10 @@ export function ResetPasswordForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirm-password" className="text-sm font-medium">
+          <Label
+            htmlFor="confirm-password"
+            className="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+          >
             Confirm new password
           </Label>
           <Input
@@ -165,6 +172,6 @@ export function ResetPasswordForm() {
           {pending ? "Updating…" : "Update password"}
         </Button>
       </form>
-    </div>
+    </ElevatedCard>
   );
 }
