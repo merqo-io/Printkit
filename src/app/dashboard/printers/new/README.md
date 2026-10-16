@@ -10,6 +10,7 @@ The printer picker: choose a model for a booth from the catalog.
   development). With `?location=` it opens that booth or, when the vendor
   has no such active location, no picker at all; without it, the vendor's
   first booth.
+- `page.tsx` renders a `PageHeader` with a way back to Printers.
 - `page.dom.test.tsx` — the named booth, the no-parameter default, and that
   an unknown booth never opens another booth's picker.
 - `printer-picker.tsx` — filters (works with iPad alone, connection, label
@@ -20,6 +21,7 @@ The printer picker: choose a model for a booth from the catalog.
   last. Each card has a "Monthly cost" row with its own `InfoButton`.
   Above the filters it shows `PRINTER_CHOICE_ADVICE` and a "Read why" link
   to the Bluetooth guide.
+  Cards are `Panel`s. Sort stays a native `<select>` on purpose, so iPadOS opens its own touch picker; it is styled to match the shared select. Filter chips grow to 40px on touch screens.
 - `printer-picker.dom.test.tsx` — filtering, sorting, the opening advice and
   the Bluetooth warning.
 
