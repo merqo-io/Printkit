@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { decodeHistoryCursor, listPrintHistoryPage } from "./print-history";
+import {
+  decodeHistoryCursor,
+  isHistoryCursor,
+  listPrintHistoryPage,
+} from "./print-history";
 
 const rows = Array.from({ length: 51 }, (_, index) => ({
   id: "00000000-0000-4000-8000-" + String(100 - index).padStart(12, "0"),
@@ -104,3 +108,16 @@ it.each(["%%%", "x".repeat(513), Buffer.from("{}").toString("base64url")])(
     expect(() => decodeHistoryCursor(cursor)).toThrow("Invalid history cursor");
   },
 );
+
+it.each(["%%%", "x".repeat(513), Buffer.from("{}").toString("base64url"), ""])(
+  "does not accept invalid cursor %s",
+  (cursor) => {
+    expect(isHistoryCursor(cursor)).toBe(false);
+  },
+);
+
+it("accepts a cursor the previous page produced", async () => {
+  const { supabase } = client([rows.slice(0, 51)]);
+  const { nextCursor } = await listPrintHistoryPage(supabase, "vendor");
+  expect(isHistoryCursor(nextCursor!)).toBe(true);
+});

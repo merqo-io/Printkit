@@ -22,6 +22,14 @@ export function decodeHistoryCursor(value?: string): Cursor | null {
     throw new Error("Invalid history cursor");
   }
 }
+/** True when `value` decodes to a history cursor; false for any malformed one. */
+export function isHistoryCursor(value: string): boolean {
+  try {
+    return decodeHistoryCursor(value) !== null;
+  } catch {
+    return false;
+  }
+}
 function encodeCursor(row: PrintJob): string {
   return Buffer.from(
     JSON.stringify(
