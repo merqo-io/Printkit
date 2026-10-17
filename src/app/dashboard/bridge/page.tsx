@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { PageHeader } from "@/components/page-header";
 import { Panel } from "@/components/panel";
 import { BridgePanel } from "./bridge-panel";
 import { BridgeLocationGate } from "./bridge-location-gate";
+
+export const metadata: Metadata = {
+  title: "Bridge mode",
+};
 
 function BridgeBody({
   vendorId,

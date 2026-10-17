@@ -12,6 +12,7 @@ routes to it and, on `accept/`, records the vendor's acceptance with merqo.
   `@merqo/ui`'s `<LegalDocument doc="terms" />` (the component brings its own
   `mx-auto max-w-3xl` prose container, so there's no local layout).
 - `privacy/page.tsx` — `PrivacyPage`, the same for `<LegalDocument doc="privacy" />`.
+- Tab titles: "Terms of Service", "Privacy Policy" and "Accept the updated terms".
 - `accept/page.tsx` — `LegalAcceptPage`. The interstitial
   `getVendorSession` (`@/lib/vendor-session`) redirects a signed-in vendor to
   when their accepted terms/privacy versions are behind `@merqo/ui`'s

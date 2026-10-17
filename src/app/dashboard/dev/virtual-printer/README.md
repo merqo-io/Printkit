@@ -15,7 +15,7 @@ when `VERCEL_ENV === "production"`.
 
 - `page.tsx` — server page. Blocks production, loads the vendor's active
   locations, and explains what the page is. Shows a hint instead of the
-  panel when the vendor has no printing-enabled booth.
+  panel when the vendor has no printing-enabled booth. Tab title "Virtual printer".
 - `actions.ts` — `startVirtualPrinter(locationId)`. Blocks production,
   verifies the booth belongs to the caller, refuses a booth that already
   has a real printer, creates (or reuses) a `virtual` catalog printer for

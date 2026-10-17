@@ -6,7 +6,7 @@ The setup wizard for the chosen printer, one flow per kind of printer.
 
 ## Contents
 
-- `page.tsx` — resolves the booth and catalog entry, and renders a `PageHeader` with a way back to Printers. An unknown booth or model goes to the root `not-found.tsx`.
+- `page.tsx` — resolves the booth and catalog entry, and renders a `PageHeader` with a way back to Printers. The tab title is a static "Set up a printer"; the heading names the model. An unknown booth or model goes to the root `not-found.tsx`.
 - `setup-wizard.tsx` — compatibility exports for the connector components.
 - `setup-step.tsx` — re-exports `Step`/`Steps` from `@/components/steps` and owns `WaitingForPrinter`, the printer-state poll with teardown (announced as `role="status"`, success in `success-text`).
 - In `bridge-setup.tsx` the help icon after the helper-device buttons sits 4px

@@ -10,7 +10,7 @@ The public Terms of Service page.
   `@merqo/ui`'s `<LegalDocument doc="terms" kit="printkit" />`. The `kit`
   prop scopes the rendered Annex to printkit's own schedule only, not every
   sibling kit's. Content lives in `@merqo/ui`, not here — see the parent
-  README.
+  README. Tab title "Terms of Service".
 
 ## Parent
 

@@ -20,6 +20,7 @@ is online or it is not.
   status API's `manage_url` names so a calling kit's "manage this booth's
   printer" link lands on the right row, which is outlined while it is the
   link's target.
+  The tab title is "Printers"; the picker's is "Choose a printer" and setup's is "Set up a printer".
   Each booth is a `Panel` list item; "Untested with real hardware" is an outline `Badge`.
 - `new/page.tsx` and `new/printer-picker.tsx` — the picker. Cards come from
   the static catalog, filtered by "works with iPad alone" (on by default,

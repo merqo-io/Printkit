@@ -117,4 +117,18 @@ describe("DashboardPage", () => {
       "/dashboard/history?unrouted=1",
     );
   });
+
+  it.each([
+    [1, "1 unrouted print job needs a booth assigned before it can print."],
+    [3, "3 unrouted print jobs need a booth assigned before they can print."],
+  ])("agrees the callout with a count of %i", async (count, sentence) => {
+    vi.mocked(countUnroutedJobs).mockResolvedValue(count);
+    render(await DashboardPage());
+    expect(
+      screen.getByText(
+        (_content, element) =>
+          element?.tagName === "P" && element.textContent === sentence,
+      ),
+    ).toBeInTheDocument();
+  });
 });

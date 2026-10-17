@@ -6,7 +6,7 @@ import { Wordmark } from "@/components/wordmark";
 import { BLUETOOTH_WARNING } from "@/lib/printer-info-copy";
 
 export const metadata: Metadata = {
-  title: "Bluetooth printers | printkit",
+  title: "Bluetooth printers",
   description:
     "How to print labels with a Bluetooth printer, why it needs a second device, and what to do instead.",
 };

@@ -32,7 +32,7 @@ The authenticated vendor area (`/dashboard/*`).
   only feeds the avatar's initials) carries the visible vendor name — see
   `AccountMenuProps` in `@merqo/ui`. No plan/tier/tour concept exists in
   printkit yet, so those optional shared-component props are omitted.
-- `page.tsx` — the Overview: an unrouted-jobs `Notice` when any exist, one `PrinterStatusRow` per booth in a `Panel`, and the five most recent jobs. Its title matches the nav label.
+- `page.tsx` — the Overview: an unrouted-jobs `Notice` when any exist, one `PrinterStatusRow` per booth in a `Panel`, and the five most recent jobs. Its title (page heading and tab title) matches the nav label. The unrouted note says "1 job needs" or "N jobs need".
 - `dashboard-nav.dom.test.tsx` — RTL/jsdom test: renders the wordmark and
   vendor name.
 - `layout.dom.test.tsx` — RTL/jsdom test: renders the nav (mocked) with
