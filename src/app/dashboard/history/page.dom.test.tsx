@@ -8,7 +8,10 @@ vi.mock("@/lib/vendor-session", () => ({
     user: { id: "vendor-1" },
   }),
 }));
-vi.mock("@/lib/print-history", () => ({
+vi.mock("@/lib/print-history", async (importOriginal) => ({
+  isHistoryCursor: (
+    await importOriginal<typeof import("@/lib/print-history")>()
+  ).isHistoryCursor,
   listPrintHistoryPage: vi
     .fn()
     .mockImplementation(async (_client, _vendor, options) => ({
@@ -54,6 +57,13 @@ vi.mock("@/lib/print-locations", () => ({
 import { listPrintHistoryPage } from "@/lib/print-history";
 import HistoryPage from "./page";
 
+const validCursor = Buffer.from(
+  JSON.stringify({
+    createdAt: "2026-08-22T10:00:00Z",
+    id: "00000000-0000-4000-8000-000000000001",
+  }),
+).toString("base64url");
+
 describe("HistoryPage", () => {
   it("renders every row when the unrouted filter isn't applied", async () => {
     render(await HistoryPage({ searchParams: Promise.resolve({}) }));
@@ -87,7 +97,7 @@ it("preserves the unrouted filter when browsing older jobs", async () => {
 it("offers a return to the newest filtered page", async () => {
   render(
     await HistoryPage({
-      searchParams: Promise.resolve({ unrouted: "1", cursor: "current-page" }),
+      searchParams: Promise.resolve({ unrouted: "1", cursor: validCursor }),
     }),
   );
   expect(screen.getByRole("link", { name: "Newest jobs" })).toHaveAttribute(
@@ -96,7 +106,7 @@ it("offers a return to the newest filtered page", async () => {
   );
   expect(listPrintHistoryPage).toHaveBeenLastCalledWith({}, "vendor-1", {
     unrouted: true,
-    cursor: "current-page",
+    cursor: validCursor,
   });
 });
 
@@ -112,3 +122,22 @@ it("says when the unrouted filter is on and offers a way out", async () => {
     "/dashboard/history",
   );
 });
+
+it.each([{}, { unrouted: "1" }])(
+  "treats a malformed cursor as the newest page %o",
+  async (filter) => {
+    render(
+      await HistoryPage({
+        searchParams: Promise.resolve({ ...filter, cursor: "garbage" }),
+      }),
+    );
+    expect(listPrintHistoryPage).toHaveBeenLastCalledWith({}, "vendor-1", {
+      unrouted: "unrouted" in filter,
+      cursor: undefined,
+    });
+    expect(
+      screen.queryByRole("link", { name: "Newest jobs" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("No older jobs.")).not.toBeInTheDocument();
+  },
+);
