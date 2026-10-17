@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AboutMerqo } from "@merqo/ui";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { Wordmark } from "@/components/wordmark";
+
+export const metadata: Metadata = {
+  title: "About",
+};
 
 /** The footer's About link: the family's shared Merqo story, for printkit. */
 export default function AboutPage() {

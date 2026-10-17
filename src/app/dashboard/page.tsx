@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listPrintJobs, countUnroutedJobs } from "@/lib/print-jobs-list";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
@@ -7,6 +8,10 @@ import { Panel } from "@/components/panel";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { TextLink } from "@/components/text-link";
 import { JobHistoryTable } from "./history/job-history-table";
+
+export const metadata: Metadata = {
+  title: "Overview",
+};
 
 export default async function DashboardPage() {
   const { supabase, user } = await getVendorSession();
@@ -33,7 +38,9 @@ export default async function DashboardPage() {
                 {unroutedCount} unrouted print job
                 {unroutedCount === 1 ? "" : "s"}
               </TextLink>{" "}
-              need a booth assigned before they can print.
+              {unroutedCount === 1
+                ? "needs a booth assigned before it can print."
+                : "need a booth assigned before they can print."}
             </p>
           </Notice>
         )}

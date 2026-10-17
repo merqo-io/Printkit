@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { getCatalogEntry } from "@/lib/printer-catalog";
 import { PageHeader } from "@/components/page-header";
 import { CloudPollSetup, VendorCloudSetup, BridgeSetup } from "./setup-wizard";
+
+export const metadata: Metadata = {
+  title: "Set up a printer",
+};
 
 export default async function PrinterSetupPage({
   searchParams,

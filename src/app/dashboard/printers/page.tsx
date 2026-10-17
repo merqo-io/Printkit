@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
@@ -8,6 +9,10 @@ import { Panel } from "@/components/panel";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Printers",
+};
 
 const CONNECTOR_LABEL: Record<string, string> = {
   cloud_poll: "Cloud printer",

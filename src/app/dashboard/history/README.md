@@ -21,3 +21,5 @@ See [../README.md](../README.md).
 Reprint compares the observed terminal status and both sent/requeue timestamps
 in its conditional write. A delayed request from an earlier printed attempt
 cannot enqueue another print after a newer attempt reaches the same status.
+
+The page's tab title is "History", matching its heading.

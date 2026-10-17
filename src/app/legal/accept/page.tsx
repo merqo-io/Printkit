@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import { ElevatedCard } from "@/components/elevated-card";
 import { Wordmark } from "@/components/wordmark";
 import { AcceptForm } from "./accept-form";
 import { safeRedirectPath } from "@/lib/safe-redirect";
+
+export const metadata: Metadata = {
+  title: "Accept the updated terms",
+};
 
 export const revalidate = 0;
 

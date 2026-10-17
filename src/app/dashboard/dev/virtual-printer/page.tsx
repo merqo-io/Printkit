@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { VirtualPrinterPanel } from "./virtual-printer-panel";
+
+export const metadata: Metadata = {
+  title: "Virtual printer",
+};
 
 export default async function VirtualPrinterPage() {
   if (process.env.VERCEL_ENV === "production") notFound();

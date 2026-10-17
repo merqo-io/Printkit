@@ -147,4 +147,36 @@ describe("PrinterPicker", () => {
     const info = screen.getAllByRole("button", { name: /what does/i });
     expect(info.length).toBeGreaterThan(0);
   });
+
+  it.each([
+    ["Recommended"],
+    ["Works with iPad alone"],
+    ["Needs a helper device"],
+    ["Untested with real hardware"],
+  ])("keeps the %s badge and its info button on one line", (badge) => {
+    renderPicker();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Works with iPad alone" }),
+    );
+
+    const cards = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-printer]"),
+    );
+    const pairs = cards.flatMap((element) =>
+      within(element)
+        .queryAllByText(badge, { selector: "[data-slot=badge]" })
+        .map((found) => ({ element, found })),
+    );
+    expect(pairs.length).toBeGreaterThan(0);
+    for (const { found } of pairs) {
+      const group = found.parentElement as HTMLElement;
+      expect(group).toHaveClass("inline-flex");
+      expect(
+        within(group).getByRole("button", {
+          name: `What does "${badge}" mean?`,
+        }),
+      ).toBeInTheDocument();
+      expect(group.querySelectorAll("[data-slot=badge]")).toHaveLength(1);
+    }
+  });
 });

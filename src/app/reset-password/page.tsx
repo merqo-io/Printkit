@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { Wordmark } from "@/components/wordmark";
 import { ResetPasswordForm } from "./reset-password-form";
+
+export const metadata: Metadata = {
+  title: "Set a new password",
+};
 export default function ResetPasswordPage() {
   return (
     <main className="flex min-h-screen items-center justify-center p-5">

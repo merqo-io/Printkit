@@ -20,6 +20,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Every page has its own browser-tab title, named after its heading ("Printers | printkit", "Sign in | printkit"), instead of "Printkit | Vendor Label Printing" on every route. "printkit" stays lowercase.
+- The overview's unrouted-jobs note agrees with its count: "1 unrouted print job needs a booth assigned before it can print."
+- In the printer picker, each card badge and its "i" button wrap onto the next line together, instead of the button landing alone on a new line.
 - Bridge mode notices when the Bluetooth printer drops (switched off, out of range, or taken by another device), says so, and offers Reconnect. While no printer is paired, the booth no longer shows as online on the dashboard; before, Bridge mode being on was enough.
 - On a phone, a booth's printer status sits under its name instead of running off the edge of the card.
 - Bluetooth printer setup numbers its steps 1, 2, 3 before a helper device is chosen. It used to skip from 1 to 3.

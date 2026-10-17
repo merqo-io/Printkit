@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { PageHeader } from "@/components/page-header";
 import { TextLink } from "@/components/text-link";
 import { PrinterPicker } from "./printer-picker";
+
+export const metadata: Metadata = {
+  title: "Choose a printer",
+};
 
 export default async function NewPrinterPage({
   searchParams,

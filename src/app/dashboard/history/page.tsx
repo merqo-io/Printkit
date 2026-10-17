@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listPrintHistoryPage } from "@/lib/print-history";
@@ -7,6 +8,10 @@ import { PageHeader } from "@/components/page-header";
 import { TextLink } from "@/components/text-link";
 import { Button } from "@/components/ui/button";
 import { JobHistoryTable } from "./job-history-table";
+
+export const metadata: Metadata = {
+  title: "History",
+};
 
 export default async function HistoryPage({
   searchParams,

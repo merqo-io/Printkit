@@ -13,7 +13,7 @@ folder's job is entirely to collect the vendor's consent and forward it.
   `safeRedirectPath`, `@/lib/safe-redirect`) and renders the client form.
   Deliberately runs no legal-gate check itself — it is what the gate
   redirects to, so gating it would loop.
-  Laid out like the login page: `Wordmark` above an `ElevatedCard`, title in the display face.
+  Laid out like the login page: `Wordmark` above an `ElevatedCard`, title in the display face. Tab title "Accept the updated terms".
 - `accept-form.tsx` — `AcceptForm`, a client component wrapping `@merqo/ui`'s
   `TermsAcceptanceCheckbox` (just the agree checkbox — no typed name); the
   submit button is disabled until it's checked. Posts to `acceptLegalTerms`.

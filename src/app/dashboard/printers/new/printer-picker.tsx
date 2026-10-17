@@ -240,27 +240,27 @@ function PrinterCard({
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {isRecommended(entry) && (
-          <>
+          <span className="inline-flex items-center gap-1">
             <Badge>Recommended</Badge>
             <InfoButton topic="recommended" />
-          </>
+          </span>
         )}
         {needsHelper ? (
-          <>
+          <span className="inline-flex items-center gap-1">
             <Badge variant="outline">Needs a helper device</Badge>
             <InfoButton topic="helper_device" />
-          </>
+          </span>
         ) : (
-          <>
+          <span className="inline-flex items-center gap-1">
             <Badge variant="secondary">Works with iPad alone</Badge>
             <InfoButton topic="ipad_alone" />
-          </>
+          </span>
         )}
         {!entry.hardwareVerified && (
-          <>
+          <span className="inline-flex items-center gap-1">
             <Badge variant="outline">Untested with real hardware</Badge>
             <InfoButton topic="untested" />
-          </>
+          </span>
         )}
       </div>
 

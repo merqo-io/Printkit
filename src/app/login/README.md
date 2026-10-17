@@ -7,6 +7,7 @@ OAuth, plus password reset. Sign-up is a client-side toggle; `/reset-password` c
 
 ## Contents
 
+- `layout.tsx` — a pass-through server layout that sets the tab title "Sign in"; `page.tsx` is a client component and cannot export `metadata`.
 - `page.tsx` — `LoginPage()` wraps the actual `LoginForm` client component
   in `<Suspense>` (it reads `useSearchParams()` for `?error=oauth`).
   `LoginForm` handles:

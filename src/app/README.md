@@ -31,8 +31,9 @@ for this project.
 - `globals.css` — Tailwind v4 entry point: theme tokens, base layer, and custom utility classes; `@source` includes `node_modules/@merqo/ui/dist` so its components' Tailwind classes get compiled here too. Color tokens are named "Banknote Engrave" in the file's own header comment (engraved teal-green primary, warm-grey secondary — was steel-blue until 2026-08-24, changed since it read too close to the primary's own hue) — the cross-kit brand pick this repo was seeded with.
   Neutrals (`muted`, `accent`, `border`, `ring`) take the warm paper hue; `muted-foreground` and every `*-text` status token clear 4.5:1 on the page. `success`, `warning` and `info` each have a base (dots, fills, tints) and a `-text` variant (words). `mint` is the wordmark accent only.
 - `icon.tsx` — `Icon` route handler; renders `brandIcon(32)` as a 32×32 PNG favicon.
-- `layout.tsx` — `RootLayout`. Loads `Fraunces`/`Inter`/`JetBrains_Mono` via `next/font/google`, sets `metadata`, wraps children in `next-themes`' `ThemeProvider` (`attribute="class"`, system default), then `TooltipProvider` + `Toaster`.
+- `layout.tsx` — `RootLayout`. Loads `Fraunces`/`Inter`/`JetBrains_Mono` via `next/font/google`, sets `metadata` (title template `%s | printkit`, default `printkit`), wraps children in `next-themes`' `ThemeProvider` (`attribute="class"`, system default), then `TooltipProvider` + `Toaster`.
 - `login/` — combined sign-in/sign-up page, including the "Forgot password?" flow — see its own README.
+- `page-titles.test.ts` — checks every page exports its own `metadata.title`, matching its heading.
 - `page.tsx` — `Home`. Redirects to `/dashboard` (which `src/proxy.ts` bounces on to `/login` if unauthenticated) — printkit has no cold-acquisition funnel, so `/` is not a marketing landing page (see the design spec's "Internal Merqo product" section).
 
 ## Connectivity

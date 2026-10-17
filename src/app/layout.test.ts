@@ -9,7 +9,10 @@ vi.mock("next/font/google", () => ({
 const { metadata } = await import("./layout");
 
 describe("root layout metadata", () => {
-  it("sets the browser-tab title", () => {
-    expect(metadata.title).toBe("Printkit | Vendor Label Printing");
+  it("titles every page through a lowercase printkit template", () => {
+    expect(metadata.title).toEqual({
+      default: "printkit",
+      template: "%s | printkit",
+    });
   });
 });
