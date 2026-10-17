@@ -143,11 +143,16 @@ export async function claimBridgeJob(
  * location's lazy sweep, since a bridge beating is the one moment printkit
  * knows someone is watching this booth.
  */
-export async function bridgeHeartbeat(locationId: string): Promise<void> {
+export async function bridgeHeartbeat(
+  locationId: string,
+  printerPaired: boolean,
+): Promise<void> {
   const { user } = await getVendorSession();
   if (!(await ownedLocation(locationId, user.id))) return;
 
   await sweepLocation(locationId);
+  // Only a paired printer can print, so only then is it reachable.
+  if (z.boolean().parse(printerPaired) !== true) return;
   const printer = await getPrinterByLocation(locationId);
   if (printer) await touchPrinterSeen(printer);
 }

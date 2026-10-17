@@ -17,6 +17,7 @@ vi.mock("@/lib/niimbot-print", () => ({
   connectPrinter: vi.fn().mockResolvedValue({ deviceName: "B1" }),
   printLabel: vi.fn().mockResolvedValue(undefined),
   disconnectPrinter: vi.fn().mockResolvedValue(undefined),
+  onPrinterDisconnect: vi.fn().mockReturnValue(() => {}),
 }));
 vi.mock("@/lib/label-image", () => ({
   fetchLabelCanvas: vi.fn(),
@@ -35,6 +36,7 @@ import {
   connectPrinter,
   printLabel,
   disconnectPrinter,
+  onPrinterDisconnect,
 } from "@/lib/niimbot-print";
 import { fetchLabelCanvas, fetchSampleLabelCanvas } from "@/lib/label-image";
 import {
@@ -73,6 +75,9 @@ describe("BridgePanel", () => {
     vi.mocked(isBridgeModeEnabled).mockReturnValue(false);
     vi.mocked(setBridgeModeEnabled).mockReset();
     vi.mocked(disconnectPrinter).mockReset().mockResolvedValue(undefined);
+    vi.mocked(onPrinterDisconnect)
+      .mockReset()
+      .mockReturnValue(() => {});
     vi.mocked(connectPrinter).mockReset();
     vi.mocked(connectPrinter).mockResolvedValue({ deviceName: "B1" } as never);
     vi.mocked(printLabel).mockReset();
@@ -259,8 +264,37 @@ describe("BridgePanel", () => {
     fireEvent.click(screen.getByRole("switch"));
 
     await waitFor(() => {
-      expect(bridgeHeartbeat).toHaveBeenCalledWith("loc-1");
+      expect(bridgeHeartbeat).toHaveBeenCalledWith("loc-1", false);
     });
+  });
+
+  it("reports the printer as reachable only while it is paired", async () => {
+    await enableAndPair();
+    await waitFor(() => {
+      expect(bridgeHeartbeat).toHaveBeenLastCalledWith("loc-1", true);
+    });
+  });
+
+  it("tells the vendor when the printer drops and offers to reconnect", async () => {
+    let dropped!: () => void;
+    vi.mocked(onPrinterDisconnect).mockImplementationOnce((_client, cb) => {
+      dropped = cb;
+      return () => {};
+    });
+    await enableAndPair();
+
+    act(() => dropped());
+
+    expect(screen.queryByText("Connected")).not.toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      /printer disconnected/i,
+    );
+    vi.mocked(bridgeHeartbeat).mockClear();
+    fireEvent.click(screen.getByRole("button", { name: /reconnect/i }));
+    await waitFor(() => {
+      expect(screen.getByText("Connected")).toBeInTheDocument();
+    });
+    expect(connectPrinter).toHaveBeenCalledTimes(2);
   });
 
   it("sends no heartbeat while Bridge mode is off", () => {

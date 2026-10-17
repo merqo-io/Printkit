@@ -37,7 +37,12 @@ vi.mock("@mmote/niimbluelib", () => ({
   },
 }));
 
-import { connectPrinter, printLabel, disconnectPrinter } from "./niimbot-print";
+import {
+  connectPrinter,
+  printLabel,
+  disconnectPrinter,
+  onPrinterDisconnect,
+} from "./niimbot-print";
 import { ImageEncoder } from "@mmote/niimbluelib";
 
 describe("connectPrinter", () => {
@@ -148,5 +153,23 @@ describe("disconnectPrinter", () => {
     const client = await connectPrinter();
     await disconnectPrinter(client);
     expect(disconnectMock).toHaveBeenCalled();
+  });
+});
+
+describe("onPrinterDisconnect", () => {
+  it("calls back on the client's disconnect event until unsubscribed", () => {
+    const handlers = new Set<() => void>();
+    const client = {
+      on: (_event: string, fn: () => void) => handlers.add(fn),
+      off: (_event: string, fn: () => void) => handlers.delete(fn),
+    } as unknown as Parameters<typeof onPrinterDisconnect>[0];
+    const onDrop = vi.fn();
+
+    const unsubscribe = onPrinterDisconnect(client, onDrop);
+    handlers.forEach((fn) => fn());
+    expect(onDrop).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+    expect(handlers.size).toBe(0);
   });
 });
