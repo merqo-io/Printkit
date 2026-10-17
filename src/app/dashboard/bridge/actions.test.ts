@@ -304,16 +304,25 @@ describe("bridge job claiming and health", () => {
   it("sweeps the booth and records the printer as seen on a heartbeat", async () => {
     getPrinterByLocationMock.mockResolvedValue({ id: "printer-1" });
 
-    await bridgeHeartbeat("loc-1");
+    await bridgeHeartbeat("loc-1", true);
 
     expect(sweepLocationMock).toHaveBeenCalledWith("loc-1");
     expect(touchPrinterSeenMock).toHaveBeenCalledWith({ id: "printer-1" });
   });
 
+  it("sweeps but does not mark the printer seen while none is paired", async () => {
+    getPrinterByLocationMock.mockResolvedValue({ id: "printer-1" });
+
+    await bridgeHeartbeat("loc-1", false);
+
+    expect(sweepLocationMock).toHaveBeenCalledWith("loc-1");
+    expect(touchPrinterSeenMock).not.toHaveBeenCalled();
+  });
+
   it("ignores a heartbeat for a booth the vendor does not own", async () => {
     locationMaybeSingleMock.mockResolvedValue({ data: null, error: null });
 
-    await bridgeHeartbeat("loc-9");
+    await bridgeHeartbeat("loc-9", true);
 
     expect(sweepLocationMock).not.toHaveBeenCalled();
   });
