@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Bridge mode notices when the Bluetooth printer drops (switched off, out of range, or taken by another device), says so, and offers Reconnect. While no printer is paired, the booth no longer shows as online on the dashboard; before, Bridge mode being on was enough.
 - On a phone, a booth's printer status sits under its name instead of running off the edge of the card.
 - Bluetooth printer setup numbers its steps 1, 2, 3 before a helper device is chosen. It used to skip from 1 to 3.
 - Bridge mode shows "Try again" after a failed pairing. Before, the only way to retry was to turn Bridge mode off and on.

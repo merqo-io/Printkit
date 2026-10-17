@@ -9,6 +9,7 @@ import {
   connectPrinter,
   printLabel,
   disconnectPrinter,
+  onPrinterDisconnect,
 } from "@/lib/niimbot-print";
 import { fetchLabelCanvas, fetchSampleLabelCanvas } from "@/lib/label-image";
 import { useJobDelivery } from "./use-job-delivery";
@@ -22,7 +23,7 @@ import {
 } from "./actions";
 import type { NiimbotBluetoothClient } from "@mmote/niimbluelib";
 
-type PairState = "unpaired" | "connecting" | "connected" | "error";
+type PairState = "unpaired" | "connecting" | "connected" | "error" | "lost";
 
 const HEARTBEAT_MS = 20_000;
 
@@ -46,9 +47,12 @@ export function BridgePanel({
   const generationRef = useRef(0);
   const mountedRef = useRef(false);
   const drainingRef = useRef(false);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const disconnect = useCallback(() => {
     generationRef.current += 1;
+    unsubscribeRef.current?.();
+    unsubscribeRef.current = null;
     const client = clientRef.current;
     clientRef.current = null;
     if (client) disconnectPrinter(client).catch(() => {});
@@ -144,9 +148,11 @@ export function BridgePanel({
   useEffect(() => {
     if (!enabled) return;
     const beat = () => {
-      bridgeHeartbeat(locationId).catch((err: unknown) => {
-        console.error("Heartbeat failed", err);
-      });
+      bridgeHeartbeat(locationId, clientRef.current !== null).catch(
+        (err: unknown) => {
+          console.error("Heartbeat failed", err);
+        },
+      );
       printJob();
     };
     beat();
@@ -178,10 +184,21 @@ export function BridgePanel({
         return;
       }
       clientRef.current = client;
+      unsubscribeRef.current?.();
+      unsubscribeRef.current = onPrinterDisconnect(client, () => {
+        if (clientRef.current !== client) return;
+        disconnect();
+        setPairState("lost");
+        toast.error("Printer disconnected.");
+      });
       await ensureBridgePrinter(locationId);
       if (!isCurrent()) return;
       setPairState("connected");
       logBridgeEvent("printer_paired").catch(() => {});
+      // Show the booth online now, not at the next 20-second beat.
+      bridgeHeartbeat(locationId, true).catch((err: unknown) => {
+        console.error("Heartbeat failed", err);
+      });
       printJob();
     } catch (err) {
       if (!isCurrent()) return;
@@ -230,6 +247,15 @@ export function BridgePanel({
           <Button variant="outline" onClick={handleTestPrint}>
             Print test
           </Button>
+        </div>
+      )}
+      {enabled && pairState === "lost" && (
+        <div className="space-y-3">
+          <p role="alert" className="text-destructive text-sm">
+            Printer disconnected. Check it is switched on and within a few
+            metres of this device. Orders wait until it is back.
+          </p>
+          <Button onClick={handlePair}>Reconnect</Button>
         </div>
       )}
       {enabled && pairState === "error" && (

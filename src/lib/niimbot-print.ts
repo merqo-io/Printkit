@@ -77,6 +77,21 @@ export async function printLabel(
   }
 }
 
+/**
+ * Calls `onDrop` when the printer goes away by itself: switched off, out of
+ * range, or taken by another device. Returns the unsubscribe function.
+ */
+export function onPrinterDisconnect(
+  client: NiimbotBluetoothClient,
+  onDrop: () => void,
+): () => void {
+  const listener = () => onDrop();
+  client.on("disconnect", listener);
+  return () => {
+    client.off("disconnect", listener);
+  };
+}
+
 export async function disconnectPrinter(
   client: NiimbotBluetoothClient,
 ): Promise<void> {
