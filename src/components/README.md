@@ -9,7 +9,7 @@ else sits flat here.
 ## Contents
 
 - `printer-status-row.tsx` — `PrinterStatusRow({ label, printerName, state,
-lastSeenAt })`: one booth's printer and whether it is reachable. It renders
+lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the status sits under the booth name instead of beside it, so a long "Offline since" time wraps inside the card. It renders
   what the server already read from `printers.last_seen_at`, the health
   signal every connector shares, so no page needs a live subscription and a
   cloud printer, a 4G printer and a Bluetooth bridge all report the same

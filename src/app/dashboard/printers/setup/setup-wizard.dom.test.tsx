@@ -159,3 +159,14 @@ it.each(["address", "registration", "pairing"] as const)(
     expect(screen.getByRole("button", { name: label })).toBeEnabled();
   },
 );
+
+it("numbers the Bluetooth steps without a gap before a helper is chosen", () => {
+  render(<BridgeSetup locationId="location" boothRef="booth" />);
+  const numbers = screen
+    .getAllByRole("listitem")
+    .map((item) => item.querySelector("span")?.textContent);
+  expect(numbers).toEqual(["1", "2", "3"]);
+  expect(
+    screen.getByText("Choose the helper device above first."),
+  ).toBeVisible();
+});

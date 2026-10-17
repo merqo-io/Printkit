@@ -16,7 +16,7 @@ The setup wizard for the chosen printer, one flow per kind of printer.
   printer (SN and KEY), Bluetooth (a Chrome helper device: an Android
   phone, a Windows laptop or a Mac, never an iPad, or a Raspberry Pi
   pairing code), each ending in a live wait for the printer's first check-in.
-  The Bluetooth flow opens with a warning `Notice`.
+  The Bluetooth flow opens with a warning `Notice`. Until a helper device is chosen, its step 2 says to choose one, so the steps read 1, 2, 3 rather than skipping to 3.
 - `actions.ts` — the server actions behind each step. Each re-checks the
   booth belongs to the caller. The printer address needs an absolute
   origin (`@/lib/site-url`), and setup refuses rather than hand out a
