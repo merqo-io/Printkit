@@ -24,6 +24,7 @@ when `VERCEL_ENV === "production"`.
   downloads the PNG when a job is ready, renders it on screen and confirms
   it with a success code. One poll at a time, so a slow render cannot
   overlap the next tick. The token lives in component state only.
+  Its pending label uses the ellipsis character ("Starting…"), matching every other pending button.
 - `virtual-printer-panel.dom.test.tsx` — idle state, a full job round trip
   (poll, fetch, render, confirm), and the error path.
 

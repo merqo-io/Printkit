@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Notice } from "@/components/notice";
 import { Wordmark } from "@/components/wordmark";
 import { BLUETOOTH_WARNING } from "@/lib/printer-info-copy";
 
@@ -20,7 +21,7 @@ function Section({
 }) {
   return (
     <section id={id} className="scroll-mt-8">
-      <h2 className="mt-12 text-xl font-semibold tracking-tight">{title}</h2>
+      <h2 className="font-display mt-12 text-2xl font-semibold">{title}</h2>
       <div className="mt-3 space-y-3">{children}</div>
     </section>
   );
@@ -31,7 +32,7 @@ function Steps({ items }: { items: React.ReactNode[] }) {
     <ol className="space-y-3">
       {items.map((item, index) => (
         <li key={index} className="flex gap-3">
-          <span className="bg-muted text-muted-foreground mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-medium">
+          <span className="border-primary/40 text-primary mt-px flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold tabular-nums">
             {index + 1}
           </span>
           <div className="space-y-1">{item}</div>
@@ -51,21 +52,22 @@ function Command({ children }: { children: React.ReactNode }) {
 
 export default function BluetoothPrintersGuide() {
   return (
-    <main className="mx-auto max-w-2xl px-4 py-12">
-      <Link href="/" className="inline-block">
+    <main className="mx-auto max-w-2xl px-5 py-12">
+      <Link
+        href="/"
+        aria-label="printkit home"
+        className="focus-visible:ring-ring/50 inline-block rounded-sm text-2xl outline-none focus-visible:ring-[3px]"
+      >
         <Wordmark />
       </Link>
 
-      <h1 className="mt-8 text-3xl font-semibold tracking-tight">
+      <h1 className="font-display mt-8 text-4xl leading-tight font-semibold">
         Bluetooth printers
       </h1>
 
-      <div className="border-border bg-muted/40 mt-6 rounded-lg border p-4">
-        <p className="text-sm font-medium">Read this first</p>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {BLUETOOTH_WARNING}
-        </p>
-      </div>
+      <Notice tone="warning" title="Read this first" className="mt-6">
+        <p>{BLUETOOTH_WARNING}</p>
+      </Notice>
 
       <p className="text-muted-foreground mt-6 text-sm leading-relaxed">
         This page is for vendors who already own a Bluetooth label printer and

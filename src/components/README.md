@@ -24,6 +24,16 @@ lastSeenAt })`: one booth's printer and whether it is reachable. It renders
   shared raised-card container (rounded, bordered, soft shadow) used by the
   login page and the root error boundary, matching every other kit's
   login page.
+- `page-header.tsx` — `PageHeader({ title, description, back })`: the top of
+  every dashboard page, with the title in the display face and an optional
+  way back.
+- `panel.tsx` — `Panel({ as, className, children })`: the bordered container
+  dashboard content sits in. Panels are never nested.
+- `notice.tsx` — `Notice({ tone, title, children })`: a neutral, info or
+  warning callout, coloured from the status tokens.
+- `steps.tsx` — `Steps` and `Step({ number, title })`: the numbered sequence
+  used by every printer setup flow.
+- `text-link.tsx` — `TextLink`: the one inline link style.
 - `wordmark.tsx` — `Wordmark({ className })`: the "PrintKit" brand mark
   (mint-green "Print" + plain "Kit"). Used by the dashboard navigation, reset-password page, Bluetooth guide, `src/app/error.tsx` and
   `src/app/login/page.tsx`.

@@ -11,11 +11,11 @@ const STATUS_CONFIG: Record<
   },
   sent: {
     label: "Sent",
-    className: "text-flow border-flow/35 bg-flow/12",
+    className: "text-info-text border-info/35 bg-info/12",
   },
   printed: {
     label: "Printed",
-    className: "text-mint border-mint/35 bg-mint/12",
+    className: "text-success-text border-success/35 bg-success/12",
   },
   failed: {
     label: "Failed",

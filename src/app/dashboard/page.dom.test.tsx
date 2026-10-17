@@ -60,7 +60,7 @@ describe("DashboardPage", () => {
     expect(screen.getByText(/printer connected/i)).toBeInTheDocument();
     expect(screen.getByText("Ice Cream Cart")).toBeInTheDocument();
     expect(screen.getByText(/no printer yet/i)).toBeInTheDocument();
-    expect(screen.getByText(/connected to qkit/i)).toBeInTheDocument();
+    expect(screen.queryByText(/connected to qkit/i)).not.toBeInTheDocument();
   });
 
   it("reports a printer that has gone quiet as offline", async () => {

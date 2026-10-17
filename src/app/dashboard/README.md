@@ -15,6 +15,7 @@ The authenticated vendor area (`/dashboard/*`).
   a `<footer>` rendering `@merqo/ui`'s `LegalFooterLinks` — printkit has no
   public landing page for a marketing footer to live on, so the Terms/Privacy
   links live in the dashboard shell instead.
+- `loading.tsx` — the placeholder shown while a dashboard page reads printers and jobs on the server: header and two panel-shaped blocks, announced as `role="status"`.
 - `dashboard-nav.tsx` — `DashboardNav`: composes `@merqo/ui`'s shared
   `DashboardNav`/`AccountMenu` — same shared-component contract every
   sibling kit uses. Owns the printkit wordmark, the Overview/Printers/History
@@ -27,16 +28,18 @@ The authenticated vendor area (`/dashboard/*`).
   only feeds the avatar's initials) carries the visible vendor name — see
   `AccountMenuProps` in `@merqo/ui`. No plan/tier/tour concept exists in
   printkit yet, so those optional shared-component props are omitted.
+- `page.tsx` — the Overview: an unrouted-jobs `Notice` when any exist, one `PrinterStatusRow` per booth in a `Panel`, and the five most recent jobs. Its title matches the nav label.
 - `dashboard-nav.dom.test.tsx` — RTL/jsdom test: renders the wordmark and
   vendor name.
 - `layout.dom.test.tsx` — RTL/jsdom test: renders the nav (mocked) with
   the vendor's stall name, plus the page `children`.
 - `job-status-badge.tsx` / `job-status-badge.dom.test.tsx` — shared status
-  badge (queued/printing/done/failed) used by `history/`'s table. Renders via
+  badge (queued/sent/printed/failed) used by `history/`'s table. Renders via
   `@merqo/ui`'s shared `StatusBadge` (dot + bordered pill), replacing the old
   plain shadcn `Badge`; each status's `className` maps to this repo's own
   brand tokens (`mint`/`destructive`/`flow`/`secondary`) rather than raw
   Tailwind color literals.
+  Status colours: queued `secondary`, sent `info-text`, printed `success-text`, failed `destructive`.
 - `page.tsx` / `page.dom.test.tsx` — dashboard overview: fetches
   `listActiveLocations` (`@/lib/print-locations`) and renders one
   `PrinterStatusRow` per active location (empty-state message when there are

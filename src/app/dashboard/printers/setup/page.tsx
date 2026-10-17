@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { getCatalogEntry } from "@/lib/printer-catalog";
+import { PageHeader } from "@/components/page-header";
 import { CloudPollSetup, VendorCloudSetup, BridgeSetup } from "./setup-wizard";
 
 export default async function PrinterSetupPage({
@@ -22,25 +22,13 @@ export default async function PrinterSetupPage({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <p className="text-muted-foreground text-sm">
-        <Link
-          href="/dashboard/printers"
-          className="underline underline-offset-4"
-        >
-          Printers
-        </Link>{" "}
-        / {booth.label}
-      </p>
+      <PageHeader
+        back={{ href: "/dashboard/printers", label: "Printers" }}
+        title={`Set up the ${entry.brand} ${entry.model}`}
+        description={`Labels for ${booth.label}, ${entry.defaultLabelMm.width} mm by ${entry.defaultLabelMm.height} mm.`}
+      />
 
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight">
-        Set up the {entry.brand} {entry.model}
-      </h1>
-      <p className="text-muted-foreground mt-1 text-sm">
-        Labels for {booth.label}, {entry.defaultLabelMm.width} mm by{" "}
-        {entry.defaultLabelMm.height} mm.
-      </p>
-
-      <div className="mt-8">
+      <div>
         {entry.connector === "cloud_poll" && (
           <CloudPollSetup entry={entry} locationId={booth.id} />
         )}

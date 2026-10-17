@@ -3,29 +3,9 @@
 import { useEffect, useState } from "react";
 import { readPrinterState } from "./actions";
 
-const POLL_MS = 4000;
+export { Step, Steps } from "@/components/steps";
 
-export function Step({
-  number,
-  title,
-  children,
-}: {
-  number: number;
-  title: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <li className="flex gap-3">
-      <span className="bg-muted text-muted-foreground mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-medium">
-        {number}
-      </span>
-      <div className="space-y-2">
-        <p className="text-sm font-medium">{title}</p>
-        {children}
-      </div>
-    </li>
-  );
-}
+const POLL_MS = 4000;
 
 /**
  * Waits for the printer to say hello, so a vendor sees the connection land
@@ -57,13 +37,13 @@ export function WaitingForPrinter({ locationId }: { locationId: string }) {
 
   if (state === "online") {
     return (
-      <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+      <p role="status" className="text-success-text text-sm font-medium">
         Connected. Your next order will print here.
       </p>
     );
   }
   return (
-    <p className="text-muted-foreground text-sm">
+    <p role="status" className="text-muted-foreground text-sm">
       Waiting for your printer to connect. This page updates by itself.
     </p>
   );

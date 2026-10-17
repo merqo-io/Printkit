@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Bluetooth, Signal, Wifi } from "lucide-react";
+import { Bluetooth, ChevronDown, Signal, Wifi } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InfoButton } from "@/components/info-button";
+import { Panel } from "@/components/panel";
+import { TextLink } from "@/components/text-link";
 import {
   compareRecommended,
   isRecommended,
@@ -56,8 +58,8 @@ function Chip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "rounded-full border px-3 py-1.5 text-sm transition-colors",
-        "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
+        "inline-flex h-8 items-center rounded-full border px-3 text-sm transition-colors pointer-coarse:h-10 pointer-coarse:px-4",
+        "focus-visible:ring-ring/50 outline-none focus-visible:ring-[3px]",
         active
           ? "border-primary bg-primary text-primary-foreground"
           : "border-border hover:bg-accent",
@@ -116,12 +118,7 @@ export function PrinterPicker({
     <div className="space-y-6">
       <p className="text-muted-foreground text-sm">
         {PRINTER_CHOICE_ADVICE}{" "}
-        <Link
-          href="/guides/bluetooth-printers"
-          className="text-foreground underline underline-offset-4"
-        >
-          Read why
-        </Link>
+        <TextLink href="/guides/bluetooth-printers">Read why</TextLink>
       </p>
 
       <div className="space-y-3">
@@ -162,16 +159,23 @@ export function PrinterPicker({
           <label className="text-muted-foreground text-sm" htmlFor="sort">
             Sort
           </label>
-          <select
-            id="sort"
-            value={sort}
-            onChange={(event) => setSort(event.target.value as Sort)}
-            className="border-border bg-background rounded-md border px-2 py-1.5 text-sm"
-          >
-            <option value="recommended">Recommended</option>
-            <option value="setup">Easiest setup</option>
-            <option value="price">Lowest price</option>
-          </select>
+          {/* Native on purpose: iPadOS opens its own touch picker for it. */}
+          <span className="relative inline-flex">
+            <select
+              id="sort"
+              value={sort}
+              onChange={(event) => setSort(event.target.value as Sort)}
+              className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 appearance-none rounded-md border bg-transparent pr-8 pl-3 text-sm shadow-xs outline-none focus-visible:ring-[3px] pointer-coarse:h-10 dark:bg-input/30"
+            >
+              <option value="recommended">Recommended</option>
+              <option value="setup">Easiest setup</option>
+              <option value="price">Lowest price</option>
+            </select>
+            <ChevronDown
+              aria-hidden
+              className="text-muted-foreground pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2"
+            />
+          </span>
         </div>
       </div>
 
@@ -200,10 +204,7 @@ function PrinterCard({
   const needsHelper = !worksWithIpadAlone(entry);
 
   return (
-    <li
-      data-printer={entry.id}
-      className="border-border flex flex-col rounded-lg border p-4"
-    >
+    <Panel as="li" data-printer={entry.id} className="flex flex-col">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-muted-foreground text-xs tracking-wide uppercase">
@@ -297,16 +298,13 @@ function PrinterCard({
       {needsHelper && (
         <p className="border-border text-muted-foreground mt-4 border-t pt-3 text-sm">
           Not recommended: most setup.{" "}
-          <Link
-            href="/guides/bluetooth-printers"
-            className="text-foreground underline underline-offset-4"
-          >
+          <TextLink href="/guides/bluetooth-printers">
             Read what this needs first
-          </Link>
+          </TextLink>
         </p>
       )}
 
-      <div className="mt-4">
+      <div className="mt-auto pt-5">
         <Button asChild className="w-full">
           <Link
             href={`/dashboard/printers/setup?location=${encodeURIComponent(
@@ -317,6 +315,6 @@ function PrinterCard({
           </Link>
         </Button>
       </div>
-    </li>
+    </Panel>
   );
 }

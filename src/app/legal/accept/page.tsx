@@ -1,3 +1,5 @@
+import { ElevatedCard } from "@/components/elevated-card";
+import { Wordmark } from "@/components/wordmark";
 import { AcceptForm } from "./accept-form";
 import { safeRedirectPath } from "@/lib/safe-redirect";
 
@@ -15,14 +17,21 @@ export default async function LegalAcceptPage({
   const { next } = await searchParams;
 
   return (
-    <div className="mx-auto max-w-md px-5 py-16">
-      <h1 className="mb-4 text-xl font-semibold">
-        Our terms have been updated
-      </h1>
-      <p className="mb-6 text-sm text-muted-foreground">
-        Please review and accept before continuing.
-      </p>
-      <AcceptForm next={safeRedirectPath(next, "/dashboard")} />
-    </div>
+    <main className="flex min-h-screen items-center justify-center p-5">
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <Wordmark className="text-3xl" />
+        </div>
+        <ElevatedCard className="px-7 py-8">
+          <h1 className="font-display text-2xl leading-tight font-semibold">
+            Our terms have been updated
+          </h1>
+          <p className="mt-1.5 mb-6 text-sm text-muted-foreground">
+            Please review and accept before continuing.
+          </p>
+          <AcceptForm next={safeRedirectPath(next, "/dashboard")} />
+        </ElevatedCard>
+      </div>
+    </main>
   );
 }

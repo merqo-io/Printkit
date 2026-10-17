@@ -13,6 +13,7 @@ least recommended way to print, then gives complete steps.
   steps (install Node 24 and git, clone the public repo from the `merqo-io` organization, run
   `bridge-agent/install.sh`, pair, choose the printer, start the service),
   and a troubleshooting FAQ.
+  Headings use the display face; "Read this first" is a warning `Notice`; step numbers match the setup flows' `Step` marker.
 
 ## Parent
 

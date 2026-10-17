@@ -56,7 +56,7 @@ export function AssignLocationControl({
   return (
     <div className="flex items-center gap-2">
       <Select value={selected} onValueChange={setSelected}>
-        <SelectTrigger size="sm" className="h-8 w-36">
+        <SelectTrigger size="sm" className="w-36">
           <SelectValue placeholder="Choose booth" />
         </SelectTrigger>
         <SelectContent>
