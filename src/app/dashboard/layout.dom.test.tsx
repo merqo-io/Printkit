@@ -20,11 +20,12 @@ vi.mock("./dashboard-nav", () => ({
   ),
 }));
 vi.mock("@merqo/ui", () => ({
-  LegalFooterLinks: () => (
-    <nav>
+  Footer: ({ kitName }: { kitName: string }) => (
+    <footer>
+      <span>© 2026 {kitName}</span>
       <a href="/legal/terms">Terms</a>
       <a href="/legal/privacy">Privacy</a>
-    </nav>
+    </footer>
   ),
 }));
 
@@ -37,8 +38,9 @@ describe("DashboardLayout", () => {
     expect(screen.getByText("page content")).toBeInTheDocument();
   });
 
-  it("renders the legal footer links below main", async () => {
+  it("renders the shared family footer with the legal links", async () => {
     render(await DashboardLayout({ children: <p>page content</p> }));
+    expect(screen.getByText("© 2026 printkit")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Terms" })).toHaveAttribute(
       "href",
       "/legal/terms",

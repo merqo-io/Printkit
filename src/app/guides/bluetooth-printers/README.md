@@ -14,6 +14,7 @@ least recommended way to print, then gives complete steps.
   `bridge-agent/install.sh`, pair, choose the printer, start the service),
   and a troubleshooting FAQ.
   Headings use the display face; "Read this first" is a warning `Notice`; step numbers match the setup flows' `Step` marker.
+  Ends with `SiteFooter` (sign-in shown), like every public page.
 
 ## Parent
 

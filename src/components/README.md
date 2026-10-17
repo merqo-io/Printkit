@@ -34,6 +34,11 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
 - `steps.tsx` — `Steps` and `Step({ number, title })`: the numbered sequence
   used by every printer setup flow.
 - `text-link.tsx` — `TextLink`: the one inline link style.
+- `site-footer.tsx` — `SiteFooter({ showSignIn })`: `@merqo/ui`'s shared
+  family `Footer` with the printkit wordmark, tagline and copyright. The
+  dashboard hides the sign-in link (everyone there is signed in); the public
+  `/about` page and Bluetooth guide show it. Same adapter shape as
+  stockkit's `SiteFooter`.
 - `wordmark.tsx` — `Wordmark({ className })`: the "PrintKit" brand mark
   (mint-green "Print" + plain "Kit"). Used by the dashboard navigation, reset-password page, Bluetooth guide, `src/app/error.tsx` and
   `src/app/login/page.tsx`.
