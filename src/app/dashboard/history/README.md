@@ -6,7 +6,7 @@ Vendor-facing print job history — full list, newest first.
 
 ## Contents
 
-- `page.tsx` loads 50 jobs and an older-page cursor using `listPrintHistoryPage`. The validated created_at/id cursor preserves stable ordering; unrouted filtering happens in the database before the limit. Queries continue across lower server caps and errors propagate to the route error boundary.
+- `page.tsx` loads 50 jobs and an older-page cursor using `listPrintHistoryPage`. The validated created_at/id cursor preserves stable ordering; unrouted filtering happens in the database before the limit. Queries continue across lower server caps and errors propagate to the dashboard error boundary. A malformed, stale or edited `?cursor=` fails `isHistoryCursor` and shows the newest page, keeping `?unrouted=1`.
 - `page.tsx` also shows an info `Notice` while `?unrouted=1` is on, with a "Show all jobs" link, and passes an empty message that fits the view (no unrouted jobs, no older jobs). Paging links are outline buttons.
 - `job-history-table.tsx` — domain column adapter over shared `DataTable` for jobs (customer name, order #, booth, status badge, created time, action). The booth column shows the embedded `print_locations.label` for a routed job, or "Unrouted" plus an `AssignLocationControl` when `location_id` is null. The action column renders `ReprintButton` for `failed` or already-`printed` rows (a vendor who lost/peeled a good label can reprint it too, not just a genuine failure) — `queued`/`sent` stay excluded, since reprinting either would race an in-flight print. Empty state when there are no jobs yet.
   Takes an optional `emptyMessage`; the empty state is a dashed panel.

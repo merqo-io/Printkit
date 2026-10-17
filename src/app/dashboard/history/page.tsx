@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getVendorSession } from "@/lib/vendor-session";
-import { listPrintHistoryPage } from "@/lib/print-history";
+import { isHistoryCursor, listPrintHistoryPage } from "@/lib/print-history";
 import { listActiveLocations } from "@/lib/print-locations";
 import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
@@ -23,10 +23,12 @@ export default async function HistoryPage({
     searchParams,
   ]);
   const unrouted = params.unrouted === "1";
+  const cursor =
+    params.cursor && isHistoryCursor(params.cursor) ? params.cursor : undefined;
   const [{ jobs, nextCursor }, locations] = await Promise.all([
     listPrintHistoryPage(supabase, user.id, {
       unrouted,
-      cursor: params.cursor,
+      cursor,
     }),
     listActiveLocations(user.id),
   ]);
@@ -36,7 +38,7 @@ export default async function HistoryPage({
 
   let emptyMessage: string | undefined;
   if (unrouted) emptyMessage = "No unrouted jobs. Every job has a booth.";
-  else if (params.cursor) emptyMessage = "No older jobs.";
+  else if (cursor) emptyMessage = "No older jobs.";
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -57,12 +59,12 @@ export default async function HistoryPage({
         locations={locations}
         emptyMessage={emptyMessage}
       />
-      {(params.cursor || nextCursor) && (
+      {(cursor || nextCursor) && (
         <nav
           aria-label="Print history pages"
           className="mt-6 flex flex-wrap gap-3"
         >
-          {params.cursor && (
+          {cursor && (
             <Button asChild variant="outline" size="sm">
               <Link
                 href={

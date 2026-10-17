@@ -60,6 +60,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- A history link with a malformed, stale or edited `?cursor=` shows the newest jobs (still filtered when `?unrouted=1` is on). Before, it crashed to "Something went wrong".
+- A dashboard page that fails now shows its error inside the dashboard, with the navigation, "Try again" and a link back to the overview. Before, the whole page was replaced.
 - A signed-out vendor who opens a dashboard link, such as the printer picker for one booth, now lands on that page after signing in. Before, sign-in always ended on the dashboard overview. This works for password sign-in, Google sign-in and the sign-up confirmation link. Only a path on printkit itself is honoured; anything else falls back to the overview. A link to one booth's row (`#booth-<id>`) is kept as well.
 - On a phone or tablet, the help icon beside the helper-device buttons on Bluetooth setup no longer takes taps meant for the edge of the "Raspberry Pi" button. Its touch area overlapped that button by about 2px.
 - Restore login controls after unexpected authentication failures and display offline printer timestamps in the Singapore timezone.

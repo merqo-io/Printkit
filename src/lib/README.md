@@ -82,6 +82,7 @@ everything else sits flat here.
   `source_ref`, the calling kit's own opaque location id). All three fail open
   (`[]`/`null`/a `{ok:false}` result plus a logged error) on a query error,
   never throwing.
+- `print-history.ts` — `listPrintHistoryPage`: 50 jobs per page behind a validated `created_at`/`id` cursor; throws on query errors and on a cursor that does not advance. `isHistoryCursor` lets the history page drop a malformed cursor instead of throwing.
 - `print-jobs-list.ts` — `listPrintJobs(supabase, vendorId)`: the vendor's
   own job history, newest first, narrowed to the `PrintJob` type (`status`/
   `job_type` as real literal unions instead of the generated `string`),

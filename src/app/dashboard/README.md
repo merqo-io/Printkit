@@ -19,6 +19,7 @@ The authenticated vendor area (`/dashboard/*`).
   `SiteFooter`, so the footer sits at the bottom of short pages instead of
   under the content. Nav and footer are hidden when printing.
 - `loading.tsx` — the placeholder shown while a dashboard page reads printers and jobs on the server: header and two panel-shaped blocks, announced as `role="status"`.
+- `error.tsx` — the error fallback for dashboard pages. It renders inside the layout, so the nav stays, with "Try again" (`reset()`) and a link back to the overview, and logs the error with `console.error`.
 - `dashboard-nav.tsx` — `DashboardNav`: composes `@merqo/ui`'s shared
   `DashboardNav`/`AccountMenu` — same shared-component contract every
   sibling kit uses. Owns the printkit wordmark, the Overview/Printers/History
