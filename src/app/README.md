@@ -22,6 +22,7 @@ for this project.
   register/update a print location (e.g. one of qkit's booths) that a
   vendor can pair a bridge device to — see its own README.
 - `apple-icon.tsx` — `AppleIcon` route handler; renders `brandIcon(180)` as a 180×180 PNG for iOS home-screen touch icons.
+- `about/` — public `/about` page: the shared `AboutMerqo` story for printkit, the target of the footer's About link; see its own README.
 - `auth/callback/` — Supabase auth callback route (`GET`, OAuth code exchange via `exchangeCodeForSession`); redirects to `next` (same-origin only) or `/dashboard` on success, `/login?error=oauth` on failure or a missing code.
 - `dashboard/` — authenticated vendor area, gated by `layout.tsx`'s `getVendorSession()` and wrapped in `dashboard-nav.tsx`'s composed `@merqo/ui` `DashboardNav`/`AccountMenu` — see its own README.
 - `legal/` — public `/legal/terms` + `/legal/privacy` pages (rendered from `@merqo/ui`'s shared content) and the `/legal/accept` interstitial a signed-in vendor is bounced to when their accepted terms/privacy versions fall behind `@merqo/ui`'s `LEGAL_VERSIONS` — see `src/lib/legal-gate.ts` and its hook in `getVendorSession` (`@/lib/vendor-session`).

@@ -15,6 +15,9 @@ The authenticated vendor area (`/dashboard/*`).
   a `<footer>` rendering `@merqo/ui`'s `LegalFooterLinks` — printkit has no
   public landing page for a marketing footer to live on, so the Terms/Privacy
   links live in the dashboard shell instead.
+  The layout is a full-height column: nav, `main` (grows to fill), then
+  `SiteFooter`, so the footer sits at the bottom of short pages instead of
+  under the content. Nav and footer are hidden when printing.
 - `loading.tsx` — the placeholder shown while a dashboard page reads printers and jobs on the server: header and two panel-shaped blocks, announced as `role="status"`.
 - `dashboard-nav.tsx` — `DashboardNav`: composes `@merqo/ui`'s shared
   `DashboardNav`/`AccountMenu` — same shared-component contract every
