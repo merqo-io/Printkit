@@ -73,6 +73,14 @@ export function BridgeSetup({
           </div>
         </Step>
 
+        {helper === null && (
+          <Step number={2} title="Set up the helper device">
+            <p className="text-muted-foreground text-sm">
+              Choose the helper device above first.
+            </p>
+          </Step>
+        )}
+
         {helper === "android" && (
           <Step number={2} title="Set that device up next to the printer">
             <p className="text-muted-foreground text-sm">

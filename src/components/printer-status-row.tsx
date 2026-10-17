@@ -28,17 +28,20 @@ function describe(props: PrinterStatusRowProps): string {
  */
 export function PrinterStatusRow(props: PrinterStatusRowProps) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <div>
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <div className="min-w-0">
         <p className="font-medium">{props.label}</p>
         <p className="text-muted-foreground text-sm">
           {props.printerName ?? "No printer set up"}
         </p>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex items-start gap-2 sm:shrink-0 sm:items-center">
         <span
           aria-hidden
-          className={cn("size-2.5 rounded-full", TONE[props.state])}
+          className={cn(
+            "mt-1.5 size-2.5 shrink-0 rounded-full sm:mt-0",
+            TONE[props.state],
+          )}
         />
         <span
           className={cn(

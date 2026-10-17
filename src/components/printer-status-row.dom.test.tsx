@@ -15,3 +15,14 @@ it("pins an offline timestamp to Singapore across a UTC date boundary", () => {
     screen.getByText("Offline since 2 Jan 2026, 12:30 am"),
   ).toBeInTheDocument();
 });
+it("stacks the status under the booth on a narrow screen", () => {
+  const { container } = render(
+    <PrinterStatusRow
+      label="A"
+      printerName="B"
+      state="online"
+      lastSeenAt={null}
+    />,
+  );
+  expect(container.firstChild).toHaveClass("flex-col", "sm:flex-row");
+});
