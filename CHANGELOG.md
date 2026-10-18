@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Bridge mode's "Print test" prints one label per press. Tapping it repeatedly used to queue and print one label per tap; the button now reads "Printing test…" and is disabled until the label is done.
 - Every page has its own browser-tab title, named after its heading ("Printers | printkit", "Sign in | printkit"), instead of "Printkit | Vendor Label Printing" on every route. "printkit" stays lowercase.
 - The overview's unrouted-jobs note agrees with its count: "1 unrouted print job needs a booth assigned before it can print."
 - In the printer picker, each card badge and its "i" button wrap onto the next line together, instead of the button landing alone on a new line.

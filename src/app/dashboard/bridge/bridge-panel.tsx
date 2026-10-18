@@ -48,9 +48,15 @@ export function BridgePanel({
   const mountedRef = useRef(false);
   const drainingRef = useRef(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  // A ref, not only state, so clicks in the same frame see it at once.
+  const testPrintingRef = useRef(false);
+  const [testPrinting, setTestPrinting] = useState(false);
 
   const disconnect = useCallback(() => {
     generationRef.current += 1;
+    // A queued test print from the old connection is skipped, not run.
+    testPrintingRef.current = false;
+    if (mountedRef.current) setTestPrinting(false);
     unsubscribeRef.current?.();
     unsubscribeRef.current = null;
     const client = clientRef.current;
@@ -209,11 +215,14 @@ export function BridgePanel({
     }
   };
 
-  const handleTestPrint = () =>
+  const handleTestPrint = () => {
+    if (testPrintingRef.current) return;
+    testPrintingRef.current = true;
+    setTestPrinting(true);
     enqueue(async (isCurrent) => {
       const client = clientRef.current;
-      if (!client) return;
       try {
+        if (!client) return;
         const canvas = await fetchSampleLabelCanvas(locationId);
         if (!isCurrent()) return;
         await printLabel(client, canvas);
@@ -221,8 +230,12 @@ export function BridgePanel({
       } catch (err) {
         console.error("Test print failed", err);
         toast.error("Test print failed.");
+      } finally {
+        testPrintingRef.current = false;
+        if (mountedRef.current) setTestPrinting(false);
       }
     });
+  };
 
   return (
     <div className="space-y-6">
@@ -244,8 +257,12 @@ export function BridgePanel({
       {pairState === "connected" && (
         <div className="space-y-3">
           <p className="text-success-text text-sm font-medium">Connected</p>
-          <Button variant="outline" onClick={handleTestPrint}>
-            Print test
+          <Button
+            variant="outline"
+            onClick={handleTestPrint}
+            disabled={testPrinting}
+          >
+            {testPrinting ? "Printing test…" : "Print test"}
           </Button>
         </div>
       )}

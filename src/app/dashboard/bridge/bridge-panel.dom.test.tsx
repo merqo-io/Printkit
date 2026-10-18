@@ -320,6 +320,58 @@ describe("BridgePanel", () => {
     expect(printLabel).toHaveBeenCalled();
   });
 
+  it("prints one test label however many times Print test is clicked", async () => {
+    await enableAndPair();
+    vi.mocked(printLabel).mockClear();
+    let finish!: () => void;
+    vi.mocked(printLabel).mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const button = screen.getByRole("button", { name: /print test/i });
+
+    fireEvent.click(button);
+    fireEvent.click(button);
+    fireEvent.click(button);
+    await waitFor(() => expect(printLabel).toHaveBeenCalledTimes(1));
+    expect(
+      screen.getByRole("button", { name: /printing test/i }),
+    ).toBeDisabled();
+
+    await act(async () => finish());
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /print test/i })).toBeEnabled(),
+    );
+    expect(printLabel).toHaveBeenCalledTimes(1);
+  });
+
+  it("re-enables Print test after reconnecting when the printer dropped mid-print", async () => {
+    let dropped!: () => void;
+    vi.mocked(onPrinterDisconnect).mockImplementation((_client, cb) => {
+      dropped = cb;
+      return () => {};
+    });
+    await enableAndPair();
+    vi.mocked(printLabel).mockImplementationOnce(
+      () => new Promise<void>(() => {}),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /print test/i }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /printing test/i }),
+      ).toBeDisabled(),
+    );
+
+    act(() => dropped());
+    fireEvent.click(screen.getByRole("button", { name: /reconnect/i }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /print test/i })).toBeEnabled(),
+    );
+  });
+
   describe("auto-print via job delivery", () => {
     it("claims the job, prints the server-rendered label and reports success", async () => {
       await enableAndPair();
