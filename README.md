@@ -77,6 +77,16 @@ secondary) — see `src/app/globals.css`'s own header comment.
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
 
+`/reset-password` shows its form only to the session a fresh reset link
+created, within 15 minutes, through a signed recovery-window cookie set by
+`/auth/callback`. Any other signed-in session gets the expired card. See
+`src/app/reset-password/README.md`.
+
+Every Supabase `redirectTo` is the bare `/auth/callback` URL, since the
+shared project honours only an exact allowed Redirect URL. The login page's
+return path travels in the `printkit_auth_next` cookie; see
+`src/app/auth/callback/README.md`.
+
 `e2e/` holds the Playwright public smoke and auth-guard specs, run with `pnpm test:e2e` (see its own README).
 
 A signed-out vendor who opens a dashboard link is returned to it after

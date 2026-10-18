@@ -150,7 +150,7 @@ describe("LoginPage", () => {
       expect(resetPasswordForEmailMock).toHaveBeenCalledWith(
         "vendor@example.com",
         expect.objectContaining({
-          redirectTo: expect.stringContaining("/reset-password"),
+          redirectTo: `${window.location.origin}/auth/callback`,
         }),
       );
     });
@@ -219,6 +219,27 @@ describe("LoginPage", () => {
 
 describe("LoginPage return path", () => {
   const DEEP_LINK = "/dashboard/printers/new?location=loc-1";
+  let cookieWrites: string[];
+
+  beforeEach(() => {
+    cookieWrites = [];
+    vi.spyOn(document, "cookie", "set").mockImplementation((value) => {
+      cookieWrites.push(value);
+    });
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  function savedNext(): string | null {
+    const write = cookieWrites.findLast((c) =>
+      c.startsWith("printkit_auth_next="),
+    );
+    if (!write) return null;
+    expect(write).toMatch(/Path=\/auth/);
+    expect(write).toMatch(/SameSite=Lax/);
+    if (/Max-Age=0;/.test(write)) return null;
+    expect(write).toMatch(/Max-Age=600/);
+    return decodeURIComponent(write.split(";")[0]!.split("=")[1]!);
+  }
 
   function withNext(next: string) {
     useSearchParamsMock.mockReturnValue(new URLSearchParams({ next }));
@@ -253,13 +274,25 @@ describe("LoginPage return path", () => {
     expect(push).toHaveBeenCalledWith(DEEP_LINK);
   });
 
-  it("carries a valid next through the Google callback URL", async () => {
+  it("sends the bare callback URL to Google and saves next in a cookie", async () => {
     withNext(DEEP_LINK);
 
     const redirectTo = await googleRedirectTo();
 
-    expect(redirectTo.pathname).toBe("/auth/callback");
-    expect(redirectTo.searchParams.get("next")).toBe(DEEP_LINK);
+    expect(redirectTo.toString()).toBe(
+      `${window.location.origin}/auth/callback`,
+    );
+    expect(savedNext()).toBe(DEEP_LINK);
+  });
+
+  it("clears any saved next when there is none", async () => {
+    const redirectTo = await googleRedirectTo();
+
+    expect(redirectTo.search).toBe("");
+    expect(cookieWrites.some((c) => c.startsWith("printkit_auth_next="))).toBe(
+      true,
+    );
+    expect(savedNext()).toBeNull();
   });
 
   const UNSAFE_NEXT = [
@@ -288,6 +321,7 @@ describe("LoginPage return path", () => {
 
       expect(redirectTo.pathname).toBe("/auth/callback");
       expect(redirectTo.search).toBe("");
+      expect(savedNext()).toBeNull();
     },
   );
 
@@ -312,10 +346,9 @@ describe("LoginPage return path", () => {
 
       const redirectTo = await googleRedirectTo();
 
-      expect(redirectTo.searchParams.get("next")).toBe(
-        "/dashboard/printers#booth-loc-1",
-      );
+      expect(redirectTo.search).toBe("");
       expect(redirectTo.hash).toBe("");
+      expect(savedNext()).toBe("/dashboard/printers#booth-loc-1");
     });
 
     it("drops the fragment when next is unsafe", async () => {
@@ -327,7 +360,7 @@ describe("LoginPage return path", () => {
     });
   });
 
-  it("carries a valid next through the sign-up confirmation link", async () => {
+  it("sends the bare callback URL for the sign-up confirmation link", async () => {
     withNext(DEEP_LINK);
     signUpMock.mockResolvedValue({ data: { session: null }, error: null });
     const user = userEvent.setup();
@@ -344,8 +377,10 @@ describe("LoginPage return path", () => {
     const emailRedirectTo = new URL(
       signUpMock.mock.calls[0][0].options.emailRedirectTo,
     );
-    expect(emailRedirectTo.pathname).toBe("/auth/callback");
-    expect(emailRedirectTo.searchParams.get("next")).toBe(DEEP_LINK);
+    expect(emailRedirectTo.toString()).toBe(
+      `${window.location.origin}/auth/callback`,
+    );
+    expect(savedNext()).toBe(DEEP_LINK);
   });
 });
 
