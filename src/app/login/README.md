@@ -22,17 +22,23 @@ OAuth, plus password reset. Sign-up is a client-side toggle; `/reset-password` c
   - "Forgot password?" (sign-in mode only) calls
     `supabase.auth.resetPasswordForEmail`, toasting an error if the email
     field is empty or the call fails, and a success toast otherwise. The
-    reset link lands on `/auth/callback`, which establishes a recovery
-    session and forwards to `/reset-password`, which validates the session and offers a new-password form.
+    reset link lands on the bare `/auth/callback` URL, which recognises the
+    recovery exchange, opens a 15-minute recovery window and forwards to
+    `/reset-password`.
   - `Wordmark` (`@/components/wordmark`) and `GoogleMark`
     (`@merqo/ui`) brand the card; the card container is `ElevatedCard`
     (`@/components/elevated-card`), matching every other kit's login page.
   - The return path. `returnPath()` reads `?next=` through
     `safeRedirectPath` (`@/lib/safe-redirect`), so an absolute URL, a
     `//host` or a backslash path falls back to `/dashboard`. Password
-    sign-in pushes to it; Google sign-in and the sign-up confirmation link
-    carry it as `next` on the `/auth/callback` URL (`authCallbackUrl()`),
-    where it is checked again. A fragment on the login URL
+    sign-in pushes to it. Google sign-in and the sign-up confirmation link
+    send the bare `/auth/callback` URL as `redirectTo`/`emailRedirectTo`
+    (`authCallbackUrl()`): Supabase honours only an exact allowed Redirect
+    URL, and with a query string it fell back to the shared project's Site
+    URL (merqo). The return path rides in the `printkit_auth_next` cookie
+    instead (`@/lib/auth-return`: `Path=/auth`, ten minutes, `SameSite=Lax`,
+    `Secure` on https), which the callback checks again. Without a `next`
+    the cookie is cleared. A fragment on the login URL
     (`#booth-<id>`) is put back on a valid `next`: the server never sees a
     fragment, but the browser keeps it across the proxy's redirect here.
 - `page.test.tsx` — RTL/jsdom tests: the `?error=oauth` banner, the
@@ -40,8 +46,10 @@ OAuth, plus password reset. Sign-up is a client-side toggle; `/reset-password` c
   "Back to sign in"), the redirect-on-session-present path, and the Forgot
   password flow (visible only in sign-in mode, sends a reset email, toasts
   an error on an empty email or a failed reset call). Also the return
-  path: a valid `next` is honoured by password sign-in, Google sign-in and
-  sign-up, an unsafe one falls back to `/dashboard`, and a fragment is kept.
+  path: a valid `next` is honoured by password sign-in and saved in the
+  cookie for Google sign-in and sign-up, every flow (reset included) sends
+  the bare callback URL, an unsafe `next` falls back to `/dashboard` and
+  saves nothing, and a fragment is kept.
 - `login-page.dom.test.tsx` — RTL/jsdom test asserting the page renders a
   single top-level heading alongside the Google and email/password form.
 

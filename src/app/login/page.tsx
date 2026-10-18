@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { safeRedirectPath } from "@/lib/safe-redirect";
+import { authNextCookie } from "@/lib/auth-return";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,11 +56,15 @@ function LoginForm() {
     return safeRedirectPath(next + window.location.hash, next);
   }
 
+  // Supabase only honours an exact allowed Redirect URL, so the callback URL
+  // stays bare and the return path rides in a short-lived cookie instead.
   function authCallbackUrl(): string {
-    const url = new URL("/auth/callback", window.location.origin);
     const next = returnPath();
-    if (next !== DEFAULT_RETURN_PATH) url.searchParams.set("next", next);
-    return url.toString();
+    document.cookie = authNextCookie(
+      next === DEFAULT_RETURN_PATH ? null : next,
+      window.location.protocol === "https:",
+    );
+    return `${window.location.origin}/auth/callback`;
   }
 
   async function signInWithGoogle() {
@@ -83,7 +88,7 @@ function LoginForm() {
     }
   }
 
-  // The callback establishes the recovery session before opening the form.
+  // The callback recognises the reset link's code exchange and opens the form.
   async function sendReset() {
     if (!email) {
       toast.error("Enter your email first");
@@ -94,7 +99,7 @@ function LoginForm() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       });
       if (error) {
         toast.error(error.message);
