@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Pin `@merqo/ui` to commit `7b386558af36a1cbf008a9b4c4073c07ffc105ba` (tag `v0.34.2`). Signing out no longer flashes a "NEXT_REDIRECT" error under the Sign out item: the shared `useAsyncAction` now treats a Next.js `redirect()` as navigation. The bump also brings v0.33.0–v0.34.1 (`DataCollectionNotice`, a BackButton styling fix), none of which printkit uses.
 - Bridge mode's "Print test" prints one label per press. Tapping it repeatedly used to queue and print one label per tap; the button now reads "Printing test…" and is disabled until the label is done.
 - Every page has its own browser-tab title, named after its heading ("Printers | printkit", "Sign in | printkit"), instead of "Printkit | Vendor Label Printing" on every route. "printkit" stays lowercase.
 - The overview's unrouted-jobs note agrees with its count: "1 unrouted print job needs a booth assigned before it can print."
