@@ -87,7 +87,7 @@ shared project honours only an exact allowed Redirect URL. The login page's
 return path travels in the `printkit_auth_next` cookie; see
 `src/app/auth/callback/README.md`.
 
-`e2e/` holds the Playwright public smoke and auth-guard specs, run with `pnpm test:e2e` (see its own README).
+`e2e/` holds the Playwright public smoke, auth-guard and dashboard-states specs, run with `pnpm test:e2e` (see its own README).
 
 A signed-out vendor who opens a dashboard link is returned to it after
 sign-in: the proxy records the path as `next` on `/login`, and the login
