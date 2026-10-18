@@ -19,7 +19,7 @@ The authenticated vendor area (`/dashboard/*`).
   `SiteFooter`, so the footer sits at the bottom of short pages instead of
   under the content. Nav and footer are hidden when printing.
 - `loading.tsx` — the placeholder shown while a dashboard page reads printers and jobs on the server: header and two panel-shaped blocks, announced as `role="status"`.
-- `error.tsx` — the error fallback for dashboard pages. It renders inside the layout, so the nav stays, with "Try again" (`reset()`) and a link back to the overview, and logs the error with `console.error`.
+- `error.tsx` — the error fallback for dashboard pages. It renders inside the layout, so the nav and footer stay, with "Try again" and a link back to the overview, and logs the error with `console.error`. "Try again" calls `retry()`, which re-fetches the failed segment from the server; `reset()` only re-renders the cached payload, so a Server Component error would come straight back. It does not catch an error thrown by `layout.tsx` itself: that reaches the root `src/app/error.tsx`. Proven in a real browser by `e2e/dashboard-states.spec.ts` through `src/app/dev/ui-states/`.
 - `dashboard-nav.tsx` — `DashboardNav`: composes `@merqo/ui`'s shared
   `DashboardNav`/`AccountMenu` — same shared-component contract every
   sibling kit uses. Owns the printkit wordmark, the Overview/Printers/History
@@ -32,7 +32,8 @@ The authenticated vendor area (`/dashboard/*`).
   only feeds the avatar's initials) carries the visible vendor name — see
   `AccountMenuProps` in `@merqo/ui`. No plan/tier/tour concept exists in
   printkit yet, so those optional shared-component props are omitted.
-- `page.tsx` — the Overview: an unrouted-jobs `Notice` when any exist, one `PrinterStatusRow` per booth in a `Panel`, and the five most recent jobs. Its title (page heading and tab title) matches the nav label. The unrouted note says "1 job needs" or "N jobs need".
+- `page.tsx` — the Overview: an unrouted-jobs `Notice` when any exist, one `PrinterStatusRow` per booth in a `Panel`, and the five most recent jobs. Its title (page heading and tab title) matches the nav label. The unrouted note is `unrouted-jobs-notice.tsx` and says "1 job needs" or "N jobs need".
+- `unrouted-jobs-notice.tsx` / `unrouted-jobs-notice.dom.test.tsx` — `UnroutedJobsNotice`: the warning `Notice` whose linked "N unrouted print job(s)" leads to `/dashboard/history?unrouted=1`, followed by the rest of the sentence. Renders nothing for a count of zero. Also rendered by `src/app/dev/ui-states/unrouted/` for the e2e check.
 - `dashboard-nav.dom.test.tsx` — RTL/jsdom test: renders the wordmark and
   vendor name.
 - `layout.dom.test.tsx` — RTL/jsdom test: renders the nav (mocked) with

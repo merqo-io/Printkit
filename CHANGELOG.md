@@ -12,11 +12,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - A branded "Page not found" page and a loading placeholder for dashboard pages, so a stale setup link no longer lands on Next's default 404 and a slow page no longer shows nothing.
 - Shared page parts in `src/components/` (`PageHeader`, `Panel`, `Notice`, `Steps`, `TextLink`) so every dashboard page has the same header, containers, callouts, numbered steps and link style.
 - The history page says when it is showing only unrouted jobs and offers "Show all jobs".
+- A real-browser check (`e2e/dashboard-states.spec.ts`) of the overview's unrouted-jobs note and the dashboard error page, through development-only `/dev/ui-states/` routes that return 404 in production.
 
 - Playwright end-to-end smoke tests (`e2e/`, `pnpm test:e2e`): a public smoke spec and a signed-out auth-guard spec, run in CI as `e2e (public smoke)` against `pnpm dev` with dummy Supabase values. The job name and baseline match qkit, loopkit and merqo, so every kit can require the same check. `@playwright/test` is pinned to `1.61.1`.
 - `GET /api/v1/print-locations/status` returns `manage_url`: the printkit page for that location (the picker when it has no printer, its row on the printers list when it has one). A calling kit links to it and no longer needs to know printkit's routes. The row such a link names is outlined on the printers list.
 - The printer picker opens with a short note on which printers work with an iPad alone and what a Bluetooth-only printer needs, with a link to the guide. qkit drops its own copy of this advice in its matching change. A picker link that names a booth printkit cannot find no longer opens another booth's picker.
 - The print-status callback body carries `source_ref` beside `order_id`, both holding the calling kit's reference. `order_id` will be removed in a later release, once calling kits read `source_ref`.
+
+### Fixed
+
+- "Try again" on the dashboard error page now re-fetches the page from the server. It used to re-render the failed result, so an error from the server came straight back.
 
 ### Changed
 

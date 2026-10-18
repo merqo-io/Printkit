@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 /** Error fallback for dashboard pages, shown inside the dashboard layout. */
 export default function DashboardError({
   error,
-  reset,
+  retry,
 }: {
-  error: Error & { digest?: string };
+  error: unknown;
+  retry: () => void;
   reset: () => void;
 }) {
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function DashboardError({
           overview if it keeps happening.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <Button type="button" onClick={() => reset()}>
+          <Button type="button" onClick={() => retry()}>
             Try again
           </Button>
           <Button asChild variant="outline">
