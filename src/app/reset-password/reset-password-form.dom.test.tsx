@@ -8,22 +8,20 @@ import {
   waitFor,
 } from "@testing-library/react";
 
-const { auth, push, refresh, toast } = vi.hoisted(() => ({
-  auth: { getUser: vi.fn(), updateUser: vi.fn() },
+const { updatePasswordAction, push, refresh, toast } = vi.hoisted(() => ({
+  updatePasswordAction: vi.fn(),
   push: vi.fn(),
   refresh: vi.fn(),
   toast: { success: vi.fn(), error: vi.fn() },
 }));
-const client = { auth };
-vi.mock("@/lib/supabase/client", () => ({ createClient: () => client }));
+vi.mock("./actions", () => ({ updatePasswordAction }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 vi.mock("sonner", () => ({ toast }));
 import { ResetPasswordForm } from "./reset-password-form";
 
 beforeEach(() => {
   vi.clearAllMocks();
-  auth.getUser.mockResolvedValue({ data: { user: { id: "recovering-user" } } });
-  auth.updateUser.mockResolvedValue({ error: null });
+  updatePasswordAction.mockResolvedValue({ success: true });
 });
 
 async function enterPasswords(
@@ -40,40 +38,48 @@ async function enterPasswords(
 }
 
 describe("password recovery", () => {
-  it("does not expose the password form before session validation", async () => {
-    let resolve!: (value: { data: { user: null } }) => void;
-    auth.getUser.mockReturnValue(
-      new Promise((done) => {
-        resolve = done;
-      }),
-    );
-    render(<ResetPasswordForm />);
-    expect(screen.getByText(/checking your reset link/i)).toBeInTheDocument();
-    expect(screen.queryByLabelText("New password")).not.toBeInTheDocument();
-    await act(async () => resolve({ data: { user: null } }));
+  it("shows the expired card, never the form, without a recovery window", () => {
+    render(<ResetPasswordForm initialState="expired" />);
     expect(
       screen.getByRole("heading", { name: "This link has expired" }),
     ).toBeInTheDocument();
+    expect(screen.queryByLabelText("New password")).not.toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Back to sign in" }),
     ).toHaveAttribute("href", "/login");
   });
 
-  it("rejects mismatched passwords before the auth API", async () => {
-    render(<ResetPasswordForm />);
+  it("shows a recoverable error when the session could not be checked", () => {
+    render(<ResetPasswordForm initialState="failed" />);
+    expect(
+      screen.getByText(/could not check your reset link/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("New password")).not.toBeInTheDocument();
+  });
+
+  it("rejects mismatched passwords before the server", async () => {
+    render(<ResetPasswordForm initialState="ready" />);
     await enterPasswords("long-password", "different-password");
-    expect(auth.updateUser).not.toHaveBeenCalled();
+    expect(updatePasswordAction).not.toHaveBeenCalled();
     expect(screen.getByText(/passwords.*match/i)).toBeInTheDocument();
   });
 
+  it("blocks short passwords before the server", async () => {
+    render(<ResetPasswordForm initialState="ready" />);
+    await enterPasswords("short");
+    expect(screen.getByRole("alert")).toHaveTextContent(/at least 8/);
+    expect(updatePasswordAction).not.toHaveBeenCalled();
+  });
+
   it("shows update errors and permits a retry without redirecting", async () => {
-    auth.updateUser.mockResolvedValue({
-      error: { message: "Recovery session expired" },
+    updatePasswordAction.mockResolvedValue({
+      success: false,
+      error: "Password is too weak",
     });
-    render(<ResetPasswordForm />);
+    render(<ResetPasswordForm initialState="ready" />);
     await enterPasswords();
     await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Recovery session expired"),
+      expect(toast.error).toHaveBeenCalledWith("Password is too weak"),
     );
     expect(push).not.toHaveBeenCalled();
     expect(
@@ -81,82 +87,60 @@ describe("password recovery", () => {
     ).toBeEnabled();
   });
 
-  it("updates the authenticated password before routing to the dashboard", async () => {
-    render(<ResetPasswordForm />);
+  it("switches to the expired card when the server finds the window closed", async () => {
+    updatePasswordAction.mockResolvedValue({
+      success: false,
+      expired: true,
+      error: "This reset link has expired.",
+    });
+    render(<ResetPasswordForm initialState="ready" />);
+    await enterPasswords();
+    expect(
+      await screen.findByRole("heading", { name: "This link has expired" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("New password")).not.toBeInTheDocument();
+    expect(push).not.toHaveBeenCalled();
+  });
+
+  it("updates the password before routing to the dashboard", async () => {
+    render(<ResetPasswordForm initialState="ready" />);
     await enterPasswords();
     await waitFor(() => expect(push).toHaveBeenCalledWith("/dashboard"));
-    expect(auth.updateUser).toHaveBeenCalledWith({
+    expect(updatePasswordAction).toHaveBeenCalledWith({
       password: "new-password-123",
+      confirm: "new-password-123",
     });
     expect(toast.success).toHaveBeenCalledWith("Password updated");
     expect(refresh).toHaveBeenCalledOnce();
   });
 
-  it("shows a recoverable error if session validation rejects", async () => {
-    auth.getUser.mockRejectedValue(new Error("Network unavailable"));
-    render(<ResetPasswordForm />);
+  it("recovers controls after the action rejects", async () => {
+    updatePasswordAction.mockRejectedValue(new Error("network"));
+    render(<ResetPasswordForm initialState="ready" />);
+    await enterPasswords();
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Could not update your password. Please try again.",
+      ),
+    );
     expect(
-      await screen.findByText(/could not check your reset link/i),
-    ).toBeInTheDocument();
-    expect(auth.updateUser).not.toHaveBeenCalled();
-    expect(
-      screen.getByRole("link", { name: "Back to sign in" }),
-    ).toHaveAttribute("href", "/login");
+      screen.getByRole("button", { name: "Update password" }),
+    ).toBeEnabled();
+    expect(push).not.toHaveBeenCalled();
   });
-});
 
-it("fails closed on returned session errors even with user data", async () => {
-  auth.getUser.mockResolvedValue({
-    data: { user: { id: "stale" } },
-    error: { message: "Auth unavailable" },
+  it("prevents duplicate updates while the request is pending", async () => {
+    let resolve!: (result: { success: true }) => void;
+    updatePasswordAction.mockReturnValue(
+      new Promise((done) => {
+        resolve = done;
+      }),
+    );
+    render(<ResetPasswordForm initialState="ready" />);
+    await enterPasswords();
+    expect(screen.getByRole("button", { name: "Updating…" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Updating…" }));
+    expect(updatePasswordAction).toHaveBeenCalledTimes(1);
+    await act(async () => resolve({ success: true }));
   });
-  render(<ResetPasswordForm />);
-  expect(
-    await screen.findByText(/could not check your reset link/i),
-  ).toBeInTheDocument();
-  expect(screen.queryByLabelText("New password")).not.toBeInTheDocument();
-});
-it("blocks short passwords before updateUser", async () => {
-  render(<ResetPasswordForm />);
-  await enterPasswords("short");
-  expect(screen.getByRole("alert")).toHaveTextContent(/at least 8/);
-  expect(auth.updateUser).not.toHaveBeenCalled();
-});
-it("recovers controls after updateUser rejects", async () => {
-  auth.updateUser.mockRejectedValue(new Error("network"));
-  render(<ResetPasswordForm />);
-  await enterPasswords();
-  await waitFor(() =>
-    expect(toast.error).toHaveBeenCalledWith(
-      "Could not update your password. Please try again.",
-    ),
-  );
-  expect(screen.getByRole("button", { name: "Update password" })).toBeEnabled();
-  expect(push).not.toHaveBeenCalled();
-});
-it("prevents duplicate updates while the request is pending", async () => {
-  let resolve!: (result: { error: null }) => void;
-  auth.updateUser.mockReturnValue(
-    new Promise((done) => {
-      resolve = done;
-    }),
-  );
-  render(<ResetPasswordForm />);
-  await enterPasswords();
-  expect(screen.getByRole("button", { name: "Updating…" })).toBeDisabled();
-  fireEvent.click(screen.getByRole("button", { name: "Updating…" }));
-  expect(auth.updateUser).toHaveBeenCalledTimes(1);
-  await act(async () => resolve({ error: null }));
-});
-it("ignores a session response after unmount", async () => {
-  let resolve!: (value: { data: { user: null } }) => void;
-  auth.getUser.mockReturnValue(
-    new Promise((done) => {
-      resolve = done;
-    }),
-  );
-  const view = render(<ResetPasswordForm />);
-  view.unmount();
-  await act(async () => resolve({ data: { user: null } }));
-  expect(auth.updateUser).not.toHaveBeenCalled();
 });

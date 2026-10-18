@@ -12,11 +12,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - A branded "Page not found" page and a loading placeholder for dashboard pages, so a stale setup link no longer lands on Next's default 404 and a slow page no longer shows nothing.
 - Shared page parts in `src/components/` (`PageHeader`, `Panel`, `Notice`, `Steps`, `TextLink`) so every dashboard page has the same header, containers, callouts, numbered steps and link style.
 - The history page says when it is showing only unrouted jobs and offers "Show all jobs".
+- A real-browser check (`e2e/dashboard-states.spec.ts`) of the overview's unrouted-jobs note and the dashboard error page, through development-only `/dev/ui-states/` routes that return 404 in production.
 
 - Playwright end-to-end smoke tests (`e2e/`, `pnpm test:e2e`): a public smoke spec and a signed-out auth-guard spec, run in CI as `e2e (public smoke)` against `pnpm dev` with dummy Supabase values. The job name and baseline match qkit, loopkit and merqo, so every kit can require the same check. `@playwright/test` is pinned to `1.61.1`.
 - `GET /api/v1/print-locations/status` returns `manage_url`: the printkit page for that location (the picker when it has no printer, its row on the printers list when it has one). A calling kit links to it and no longer needs to know printkit's routes. The row such a link names is outlined on the printers list.
 - The printer picker opens with a short note on which printers work with an iPad alone and what a Bluetooth-only printer needs, with a link to the guide. qkit drops its own copy of this advice in its matching change. A picker link that names a booth printkit cannot find no longer opens another booth's picker.
 - The print-status callback body carries `source_ref` beside `order_id`, both holding the calling kit's reference. `order_id` will be removed in a later release, once calling kits read `source_ref`.
+
+### Fixed
+
+- "Try again" on the dashboard error page now re-fetches the page from the server. It used to re-render the failed result, so an error from the server came straight back.
 
 ### Changed
 
@@ -61,6 +66,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- `/reset-password` only lets someone set a new password within 15 minutes of opening a fresh reset link, on the session that link created. Before, any signed-in session (such as a stall iPad left signed in) could set a new password without the current one. `/auth/callback` now sets a signed, httpOnly recovery-window cookie only after a reset link's code exchange (Supabase's `redirectType: "recovery"`); the page and the new `updatePasswordAction` check it on the server, and a successful update clears it. Anyone else sees "This link has expired".
+- Google sign-in from `/login?next=...` returns to printkit. Before, it landed on the merqo site: Supabase honours a `redirectTo` only when it matches an allowed Redirect URL exactly, and the `?next=` on the callback URL made it fall back to the shared project's Site URL. Google sign-in, the sign-up confirmation link and the password reset link now all use the bare `/auth/callback` URL. The return path rides in a ten-minute `printkit_auth_next` cookie, which the callback checks with `safeRedirectPath` and clears. A `?next=` on the callback still works.
 - A history link with a malformed, stale or edited `?cursor=` shows the newest jobs (still filtered when `?unrouted=1` is on). Before, it crashed to "Something went wrong".
 - A dashboard page that fails now shows its error inside the dashboard, with the navigation, "Try again" and a link back to the overview. Before, the whole page was replaced.
 - A signed-out vendor who opens a dashboard link, such as the printer picker for one booth, now lands on that page after signing in. Before, sign-in always ended on the dashboard overview. This works for password sign-in, Google sign-in and the sign-up confirmation link. Only a path on printkit itself is honoured; anything else falls back to the overview. A link to one booth's row (`#booth-<id>`) is kept as well.

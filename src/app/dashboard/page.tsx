@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listPrintJobs, countUnroutedJobs } from "@/lib/print-jobs-list";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
-import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { Panel } from "@/components/panel";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { TextLink } from "@/components/text-link";
 import { JobHistoryTable } from "./history/job-history-table";
+import { UnroutedJobsNotice } from "./unrouted-jobs-notice";
 
 export const metadata: Metadata = {
   title: "Overview",
@@ -31,19 +31,7 @@ export default async function DashboardPage() {
       />
 
       <div className="space-y-8">
-        {unroutedCount > 0 && (
-          <Notice tone="warning">
-            <p>
-              <TextLink href="/dashboard/history?unrouted=1">
-                {unroutedCount} unrouted print job
-                {unroutedCount === 1 ? "" : "s"}
-              </TextLink>{" "}
-              {unroutedCount === 1
-                ? "needs a booth assigned before it can print."
-                : "need a booth assigned before they can print."}
-            </p>
-          </Notice>
-        )}
+        <UnroutedJobsNotice count={unroutedCount} />
 
         <section aria-labelledby="booths-heading">
           <div className="flex items-baseline justify-between gap-4">

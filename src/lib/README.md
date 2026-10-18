@@ -29,6 +29,18 @@ everything else sits flat here.
   character, falling back otherwise. The open-redirect guard for every
   `next` search param: the `/legal/accept` flow, the login page and
   `/auth/callback`.
+- `auth-return.ts` — `authNextCookie(next, secure)`: the `document.cookie`
+  string that saves the login page's return path as `printkit_auth_next`
+  (`Path=/auth`, `Max-Age=600`, `SameSite=Lax`, `Secure` on https), or
+  clears it for a null `next`. `/auth/callback` reads and clears it.
+- `recovery-window.ts` — the password-reset recovery window.
+  `mintRecoveryWindow(sessionId)` returns `<expiresAt>.<hmac>`, an
+  HMAC-SHA256 (keyed by `SUPABASE_SECRET_KEY`) over the Supabase session id
+  and a 15-minute expiry. `verifyRecoveryWindow` checks it with a
+  timing-safe compare. `getRecoveryState(supabase)` reads the verified
+  session id from `getClaims()` and the `printkit_recovery` cookie, then
+  returns `ready`, `expired` or `failed`. `recoveryWindowCookieOptions`
+  sets httpOnly, secure, `sameSite=lax`, `path=/reset-password`.
 - `legal-gate.ts` — `checkLegalAcceptance(email)`/
   `requireCurrentLegalAcceptance(email)`. printkit owns no acceptance
   record — merqo does — so currency is a bearer-authed (`MERQO_CUSTOMER_SECRET`)

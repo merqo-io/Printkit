@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -8,45 +8,28 @@ import { ElevatedCard } from "@/components/elevated-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction, navigatingAway } from "@/hooks/use-async-action";
 import { passwordChangeSchema } from "@/lib/password-change";
-
-type SessionState = "checking" | "ready" | "no-session" | "failed";
+import type { RecoveryState } from "@/lib/recovery-window";
+import { updatePasswordAction } from "./actions";
 
 /**
- * Sets a new password on the recovery session established by /auth/callback
- * (the reset link exchanges its code there, then forwards here). If no session
- * is present the link was already used or expired, so we route the user back to
- * sign in rather than showing a form that would fail.
+ * Sets a new password once the server has confirmed a recovery window: the
+ * reset link's code was exchanged at /auth/callback for this session within
+ * the last few minutes. A plain signed-in session, or a used or expired link,
+ * gets the expired card and a route back to sign in instead of the form.
  */
-export function ResetPasswordForm() {
+export function ResetPasswordForm({
+  initialState,
+}: {
+  initialState: RecoveryState;
+}) {
   const router = useRouter();
-  const [supabase] = useState(createClient);
-  const [state, setState] = useState<SessionState>("checking");
+  const [state, setState] = useState<RecoveryState>(initialState);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { pending, run } = useAsyncAction();
-
-  useEffect(() => {
-    let active = true;
-    void (async () => {
-      try {
-        const { data, error: sessionError } = await supabase.auth.getUser();
-        if (active) {
-          if (sessionError) setState("failed");
-          else if (data.user) setState("ready");
-          else setState("no-session");
-        }
-      } catch {
-        if (active) setState("failed");
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [supabase]);
 
   function submit() {
     if (state !== "ready" || pending) return;
@@ -58,11 +41,10 @@ export function ResetPasswordForm() {
     setError(null);
     return run(async () => {
       try {
-        const { error: updateError } = await supabase.auth.updateUser({
-          password: parsed.data.password,
-        });
-        if (updateError) {
-          toast.error(updateError.message);
+        const result = await updatePasswordAction(parsed.data);
+        if (!result.success) {
+          if (result.expired) setState("expired");
+          else toast.error(result.error);
           return;
         }
         toast.success("Password updated");
@@ -75,17 +57,7 @@ export function ResetPasswordForm() {
     });
   }
 
-  if (state === "checking") {
-    return (
-      <ElevatedCard className="px-7 py-8">
-        <p className="text-center text-sm text-muted-foreground">
-          Checking your reset link…
-        </p>
-      </ElevatedCard>
-    );
-  }
-
-  if (state === "no-session" || state === "failed") {
+  if (state === "expired" || state === "failed") {
     return (
       <ElevatedCard className="px-7 py-8">
         <h1 className="font-display text-2xl font-semibold leading-tight">

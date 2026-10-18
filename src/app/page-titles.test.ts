@@ -27,6 +27,16 @@ const PAGES: [string, () => Promise<MetadataModule>, string][] = [
     () => import("./dashboard/dev/virtual-printer/page"),
     "Virtual printer",
   ],
+  [
+    "/dev/ui-states/unrouted",
+    () => import("./dev/ui-states/unrouted/page"),
+    "Unrouted jobs preview",
+  ],
+  [
+    "/dev/ui-states/error",
+    () => import("./dev/ui-states/error/page"),
+    "Error page preview",
+  ],
   ["/about", () => import("./about/page"), "About"],
   ["/login", () => import("./login/layout"), "Sign in"],
   [
