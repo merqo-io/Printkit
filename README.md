@@ -77,7 +77,7 @@ secondary) — see `src/app/globals.css`'s own header comment.
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
 
-`e2e/` holds the Playwright public smoke and auth-guard specs, run with `pnpm test:e2e` (see its own README).
+`e2e/` holds the Playwright public smoke, auth-guard and dashboard-states specs, run with `pnpm test:e2e` (see its own README).
 
 A signed-out vendor who opens a dashboard link is returned to it after
 sign-in: the proxy records the path as `next` on `/login`, and the login
