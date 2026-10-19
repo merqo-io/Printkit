@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - The printer picker opens with a short note on which printers work with an iPad alone and what a Bluetooth-only printer needs, with a link to the guide. qkit drops its own copy of this advice in its matching change. A picker link that names a booth printkit cannot find no longer opens another booth's picker.
 - The print-status callback body carries `source_ref` beside `order_id`, both holding the calling kit's reference. `order_id` will be removed in a later release, once calling kits read `source_ref`.
 
+### Changed (shared UI)
+
+- The public pages (`/about`, the Bluetooth guide) open with `@merqo/ui`'s `LandingNav` (new `SiteNav`) instead of a bare wordmark, and the guide has the shared `BackToTop` button. A dashboard page's way back ("Printers") is the shared `BackButton`, not a text link, like qkit, loopkit, paykit and stockkit. Not adopted: a landing page (`/` redirects to the dashboard; vendors arrive from qkit), `DashboardTour`, `Section`, `StatTile`, `AuditLogTable` (no matching screen).
+
 ### Fixed
 
 - "Try again" on the dashboard error page now re-fetches the page from the server. It used to re-render the failed result, so an error from the server came straight back.

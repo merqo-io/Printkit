@@ -24,9 +24,10 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
   shared raised-card container (rounded, bordered, soft shadow) used by the
   login page and the root error boundary, matching every other kit's
   login page.
+- `site-nav.tsx` — `SiteNav()`: `@merqo/ui`'s `LandingNav` with the printkit wordmark, About and a Dashboard button, the top bar of the public pages (`/about`, the Bluetooth guide).
 - `page-header.tsx` — `PageHeader({ title, description, back })`: the top of
   every dashboard page, with the title in the display face and an optional
-  way back.
+  way back, drawn as the shared `BackButton`.
 - `panel.tsx` — `Panel({ as, className, children })`: the bordered container
   dashboard content sits in. Panels are never nested.
 - `notice.tsx` — `Notice({ tone, title, children })`: a neutral, info or

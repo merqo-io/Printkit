@@ -9,7 +9,7 @@ printkit, the same way qkit and loopkit do, so that link never lands on the
 
 ## Contents
 
-- `page.tsx` — `AboutPage`: printkit wordmark, `AboutMerqo kitName="printkit"`
+- `page.tsx` — `AboutPage`: `SiteNav` (shared `LandingNav`), `AboutMerqo kitName="printkit"`
   with a "Set up a printer" button to `/dashboard/printers` (signed-out
   visitors are sent to sign in first by `src/proxy.ts`), and `SiteFooter`
   with the sign-in link shown. Its tab title is "About".
