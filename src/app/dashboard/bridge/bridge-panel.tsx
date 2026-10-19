@@ -14,6 +14,7 @@ import {
 import { fetchLabelCanvas, fetchSampleLabelCanvas } from "@/lib/label-image";
 import { useJobDelivery } from "./use-job-delivery";
 import { useWakeLock } from "./use-wake-lock";
+import { useLeaveGuard } from "./use-leave-guard";
 import {
   reportPrintResult,
   logBridgeEvent,
@@ -76,6 +77,7 @@ export function BridgePanel({
   }, [disconnect]);
 
   useWakeLock(enabled);
+  useLeaveGuard(enabled && pairState === "connected");
 
   const enqueue = useCallback(
     (task: (isCurrent: () => boolean) => Promise<void>) => {

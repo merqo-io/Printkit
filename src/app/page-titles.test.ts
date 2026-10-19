@@ -58,9 +58,16 @@ const PAGES: [string, () => Promise<MetadataModule>, string][] = [
   ],
 ];
 
+// Each case imports a whole page module cold, which can pass 10s on a busy machine.
+const IMPORT_TIMEOUT_MS = 30_000;
+
 describe("page titles", () => {
-  it.each(PAGES)("%s has its own title", async (_route, load, title) => {
-    const { metadata } = await load();
-    expect(metadata?.title).toBe(title);
-  });
+  it.each(PAGES)(
+    "%s has its own title",
+    async (_route, load, title) => {
+      const { metadata } = await load();
+      expect(metadata?.title).toBe(title);
+    },
+    IMPORT_TIMEOUT_MS,
+  );
 });

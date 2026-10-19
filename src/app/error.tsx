@@ -9,9 +9,10 @@ import { Wordmark } from "@/components/wordmark";
 /** Branded fallback for route errors, with retry and home navigation. */
 export default function RootError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
+  retry: () => void;
   reset: () => void;
 }) {
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function RootError({
           <div className="mt-7 flex flex-col gap-2.5">
             <Button
               type="button"
-              onClick={() => reset()}
+              onClick={() => retry()}
               className="h-11 w-full rounded-xl"
             >
               Try again
