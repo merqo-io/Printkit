@@ -17,7 +17,7 @@ describe("RootError", () => {
 
   it("shows the branded error message and logs the caught error", () => {
     const error = Object.assign(new Error("boom"), { digest: "xyz789" });
-    render(<RootError error={error} reset={vi.fn()} />);
+    render(<RootError error={error} retry={vi.fn()} reset={vi.fn()} />);
 
     expect(
       screen.getByRole("heading", { name: /something went wrong/i }),
@@ -31,13 +31,15 @@ describe("RootError", () => {
     );
   });
 
-  it("calls reset() when Try again is clicked, and links back home", async () => {
+  it("calls retry(), not reset(), when Try again is clicked, and links back home", async () => {
+    const retry = vi.fn();
     const reset = vi.fn();
     const user = userEvent.setup();
-    render(<RootError error={new Error("boom")} reset={reset} />);
+    render(<RootError error={new Error("boom")} retry={retry} reset={reset} />);
 
     await user.click(screen.getByRole("button", { name: /try again/i }));
-    expect(reset).toHaveBeenCalledTimes(1);
+    expect(retry).toHaveBeenCalledTimes(1);
+    expect(reset).not.toHaveBeenCalled();
 
     const homeLink = screen.getByRole("link", { name: /back to home/i });
     expect(homeLink).toHaveAttribute("href", "/");

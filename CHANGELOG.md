@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Leaving Bridge mode while a printer is paired now asks first. Following a dashboard link, reloading or closing the tab used to drop the Bluetooth connection silently, and orders stopped printing until someone came back and paired again. The browser back button still leaves without asking.
+- "Try again" on the site-wide error page (sign-in, guides, every page outside the dashboard) re-fetches the page from the server, matching the dashboard error page. It used to re-render the failed result.
 - "Try again" on the dashboard error page now re-fetches the page from the server. It used to re-render the failed result, so an error from the server came straight back.
 
 ### Changed
