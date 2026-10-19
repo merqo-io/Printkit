@@ -15,6 +15,18 @@ vi.mock("@merqo/ui", () => ({
       {children}
     </article>
   ),
+  LandingNav: ({
+    wordmark,
+    end,
+  }: {
+    wordmark: React.ReactNode;
+    end: React.ReactNode;
+  }) => (
+    <header>
+      {wordmark}
+      {end}
+    </header>
+  ),
   Footer: ({ showSignIn }: { showSignIn?: boolean }) => (
     <footer>{showSignIn ? "sign-in shown" : "sign-in hidden"}</footer>
   ),

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { BackToTop } from "@merqo/ui";
 import { Notice } from "@/components/notice";
 import { SiteFooter } from "@/components/site-footer";
-import { Wordmark } from "@/components/wordmark";
+import { SiteNav } from "@/components/site-nav";
 import { BLUETOOTH_WARNING } from "@/lib/printer-info-copy";
 
 export const metadata: Metadata = {
@@ -54,16 +54,9 @@ function Command({ children }: { children: React.ReactNode }) {
 export default function BluetoothPrintersGuide() {
   return (
     <>
+      <SiteNav />
       <main className="mx-auto max-w-2xl px-5 py-12">
-        <Link
-          href="/"
-          aria-label="printkit home"
-          className="focus-visible:ring-ring/50 inline-block rounded-sm text-2xl outline-none focus-visible:ring-[3px]"
-        >
-          <Wordmark />
-        </Link>
-
-        <h1 className="font-display mt-8 text-4xl leading-tight font-semibold">
+        <h1 className="font-display text-4xl leading-tight font-semibold">
           Bluetooth printers
         </h1>
 
@@ -275,6 +268,7 @@ export default function BluetoothPrintersGuide() {
         </p>
       </main>
       <SiteFooter showSignIn />
+      <BackToTop />
     </>
   );
 }

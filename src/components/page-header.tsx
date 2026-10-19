@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { TextLink } from "@/components/text-link";
+import Link from "next/link";
+import { BackButton } from "@merqo/ui";
 
 /**
  * The top of every dashboard page: an optional way back, the title in the
@@ -17,9 +18,13 @@ export function PageHeader({
   return (
     <header className="mb-8">
       {back && (
-        <p className="mb-3 text-sm">
-          <TextLink href={back.href}>{back.label}</TextLink>
-        </p>
+        <div className="mb-3 -ml-3">
+          <BackButton
+            href={back.href}
+            label={back.label}
+            LinkComponent={Link}
+          />
+        </div>
       )}
       <h1 className="font-display text-3xl leading-tight font-semibold text-balance">
         {title}
