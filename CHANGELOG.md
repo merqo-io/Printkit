@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Staging: Vercel `Preview` deployments use the shared staging Supabase project, and the `staging` branch is served at `printkit-staging.merqo.io`. `docs/DEPLOY.md` gains a Staging section (printkit's `Preview` values including `PRINTKIT_PUBLIC_URL`, Deployment Protection off, the staging-first gate for PRs that add a migration) and no longer says printkit has its own Supabase project. New `scripts/staging-migrate.sh` loads migrations into staging with psql (the kits share one migration history table with overlapping version numbers, so `supabase db push` cannot). `supabase/seed/staging-kit-keys.sql` registers qkit's staging key and callback. The `staging sync` workflow keeps `staging` on `main` and triggers the Vercel deploy hook. Full setup: merqo's `docs/STAGING.md`.
 - The family footer (`@merqo/ui` `Footer`: wordmark, tagline, copyright, About and legal links) on the dashboard, the Bluetooth guide and a new public `/about` page, replacing the bare "Terms · Privacy" line. The dashboard footer sits at the bottom of short pages.
 - A branded "Page not found" page and a loading placeholder for dashboard pages, so a stale setup link no longer lands on Next's default 404 and a slow page no longer shows nothing.
 - Shared page parts in `src/components/` (`PageHeader`, `Panel`, `Notice`, `Steps`, `TextLink`) so every dashboard page has the same header, containers, callouts, numbered steps and link style.
