@@ -27,6 +27,14 @@ secret scan, dependency audit).
   `main`, every PR, and a weekly cron.
   The gitleaks job installs the pinned release binary and checks its SHA-256, because gitleaks-action needs a paid license on organization-owned repos. It scans the PR commits, or the pushed range on `main`.
 
+- `staging-sync.yml`: on push to `main` (or a manual run), fast-forwards the
+  `staging` branch to `main`, then POSTs the project's Vercel deploy hook (repo
+  secret `VERCEL_STAGING_DEPLOY_HOOK`) so `printkit-staging.merqo.io` runs main's
+  code; Vercel does not git-deploy a commit it already built for production.
+  Fast-forward only: a diverged `staging` fails the job instead of being
+  overwritten. Without the secret it only warns. Only this job gets
+  `contents: write`.
+
 ## Connectivity
 
 `ci.yml`'s `test` job depends on `.claude/verify-harness.sh` and

@@ -1,6 +1,8 @@
 # docs
 
-- `DEPLOY.md` — Supabase/Vercel deployment runbook, including the
+- `DEPLOY.md` — Supabase/Vercel deployment runbook (on the shared Merqo
+  project), with a Staging section for printkit's `Preview` values on the
+  shared staging project and the staging-first migration gate, including the
   per-calling-kit callback config migration note (env vars → `kit_api_keys`
   columns). Repo links point at the `merqo-io` GitHub organization.
 - `meta/` — standing backlog / cross-cutting project-management docs.
