@@ -4,7 +4,7 @@ import { verifyKitAuth } from "@/lib/kit-auth";
 import { createOrUpdatePrintLocation } from "@/lib/print-locations";
 
 const bodySchema = z.object({
-  vendor_id: z.string().uuid(),
+  vendor_id: z.uuid(),
   source_ref: z.string().min(1),
   label: z.string().min(1),
   active: z.boolean(),

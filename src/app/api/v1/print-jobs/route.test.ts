@@ -50,7 +50,7 @@ describe("POST /api/v1/print-jobs", () => {
 
     const res = await POST(
       requestWith({
-        vendor_id: "11111111-1111-1111-1111-111111111111",
+        vendor_id: "11111111-1111-1111-8111-111111111111",
         payload: { customer_name: "Ada", order_number: "0007" },
         source_ref: "order-uuid-1",
         location_ref: "booth-1",
@@ -59,7 +59,7 @@ describe("POST /api/v1/print-jobs", () => {
 
     expect(res.status).toBe(201);
     expect(createPrintJobMock).toHaveBeenCalledWith({
-      vendorId: "11111111-1111-1111-1111-111111111111",
+      vendorId: "11111111-1111-1111-8111-111111111111",
       payload: { customer_name: "Ada", order_number: "0007" },
       sourceKit: "qkit",
       sourceRef: "order-uuid-1",
@@ -73,7 +73,7 @@ describe("POST /api/v1/print-jobs", () => {
 
     const res = await POST(
       requestWith({
-        vendor_id: "11111111-1111-1111-1111-111111111111",
+        vendor_id: "11111111-1111-1111-8111-111111111111",
         payload: { customer_name: "Ada", order_number: "0007" },
         source_ref: "order-uuid-1",
       }),
@@ -83,7 +83,7 @@ describe("POST /api/v1/print-jobs", () => {
     const body = await res.json();
     expect(body).toEqual({ id: "job-1" });
     expect(createPrintJobMock).toHaveBeenCalledWith({
-      vendorId: "11111111-1111-1111-1111-111111111111",
+      vendorId: "11111111-1111-1111-8111-111111111111",
       payload: { customer_name: "Ada", order_number: "0007" },
       sourceKit: "qkit",
       sourceRef: "order-uuid-1",
@@ -97,7 +97,7 @@ describe("POST /api/v1/print-jobs", () => {
 
     const res = await POST(
       requestWith({
-        vendor_id: "11111111-1111-1111-1111-111111111111",
+        vendor_id: "11111111-1111-1111-8111-111111111111",
         payload: { customer_name: "Ada", order_number: "0007" },
         source_ref: "order-uuid-1",
         job_type: "label",
@@ -120,7 +120,7 @@ describe("POST /api/v1/print-jobs", () => {
 
     const res = await POST(
       requestWith({
-        vendor_id: "11111111-1111-1111-1111-111111111111",
+        vendor_id: "11111111-1111-1111-8111-111111111111",
         payload: {},
         source_ref: "order-uuid-1",
       }),

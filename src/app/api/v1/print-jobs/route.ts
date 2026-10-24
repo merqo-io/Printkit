@@ -4,7 +4,7 @@ import { verifyKitAuth } from "@/lib/kit-auth";
 import { createPrintJob } from "@/lib/print-jobs";
 
 const bodySchema = z.object({
-  vendor_id: z.string().uuid(),
+  vendor_id: z.uuid(),
   payload: z.record(z.string(), z.unknown()),
   source_ref: z.string().min(1),
   location_ref: z.string().optional(),
