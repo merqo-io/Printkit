@@ -97,9 +97,11 @@ function shouldReconcile(
 async function resolveSentJob(
   row: SweepRow,
   printer: PrinterRow | null,
-  now: number,
-  budget: number,
-  locationId: string,
+  {
+    now,
+    budget,
+    locationId,
+  }: { now: number; budget: number; locationId: string },
 ): Promise<boolean> {
   if (!row.sent_at) return false;
   const age = now - new Date(row.sent_at).getTime();
@@ -175,7 +177,11 @@ export async function sweepLocation(locationId: string): Promise<void> {
     }
     if (row.status !== "sent") continue;
 
-    const spent = await resolveSentJob(row, printer, now, budget, locationId);
+    const spent = await resolveSentJob(row, printer, {
+      now,
+      budget,
+      locationId,
+    });
     if (spent) budget -= 1;
   }
 }

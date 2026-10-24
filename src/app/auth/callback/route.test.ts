@@ -76,37 +76,17 @@ describe("GET /auth/callback", () => {
     expect(res.headers.get("location")).toBe("http://localhost/dashboard");
   });
 
-  it("falls back to /dashboard when ?next= is an absolute URL", async () => {
+  it.each([
+    ["an absolute URL", "https://evil.com"],
+    ["a backslash path", "/\\evil.com"],
+    ["a control character", "/\t/evil.com"],
+  ])("falls back to /dashboard when ?next= is %s", async (_label, next) => {
     exchangeCodeForSessionMock.mockResolvedValue({ error: null });
     const { GET } = await import("./route");
     const res = await GET(
       req(
         "http://localhost/auth/callback?code=abc&next=" +
-          encodeURIComponent("https://evil.com"),
-      ),
-    );
-    expect(res.headers.get("location")).toBe("http://localhost/dashboard");
-  });
-
-  it("falls back to /dashboard when ?next= is a backslash path", async () => {
-    exchangeCodeForSessionMock.mockResolvedValue({ error: null });
-    const { GET } = await import("./route");
-    const res = await GET(
-      req(
-        "http://localhost/auth/callback?code=abc&next=" +
-          encodeURIComponent("/\\evil.com"),
-      ),
-    );
-    expect(res.headers.get("location")).toBe("http://localhost/dashboard");
-  });
-
-  it("falls back to /dashboard when ?next= carries a control character", async () => {
-    exchangeCodeForSessionMock.mockResolvedValue({ error: null });
-    const { GET } = await import("./route");
-    const res = await GET(
-      req(
-        "http://localhost/auth/callback?code=abc&next=" +
-          encodeURIComponent("/\t/evil.com"),
+          encodeURIComponent(next),
       ),
     );
     expect(res.headers.get("location")).toBe("http://localhost/dashboard");

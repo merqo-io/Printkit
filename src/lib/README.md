@@ -79,7 +79,7 @@ everything else sits flat here.
   `source_kit`, kit-agnostic — no longer hardcoded to qkit. Called by
   `history/actions.ts`'s `reprintJob` and `bridge/actions.ts`'s
   `reportPrintResult`, both of which check the calling vendor owns the job
-  first.
+  first. Its optional write conditions are applied by `applyConditions`.
 - `print-locations.ts` — `print_locations` CRUD via the service client
   (RLS is bypassed, so each function's `.eq(...)` vendor/id scoping is the
   real authorization boundary, not defense in depth).
