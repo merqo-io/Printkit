@@ -6,7 +6,7 @@ import { buildLabelLayout } from "@/lib/label-layout";
 import { rasterizeLayout } from "@/lib/label-raster";
 import { getCatalogEntry } from "@/lib/printer-catalog";
 
-const querySchema = z.object({ location: z.string().uuid() });
+const querySchema = z.object({ location: z.uuid() });
 
 /**
  * A sample label at a booth's own label size, for the test print during

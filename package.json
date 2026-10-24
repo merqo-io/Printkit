@@ -36,7 +36,7 @@
     "react-dom": "^19.2.7",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
-    "zod": "^3.25.76"
+    "zod": "4.6.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

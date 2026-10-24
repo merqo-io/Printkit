@@ -38,7 +38,7 @@ describe("POST /api/v1/print-locations", () => {
 
     const res = await POST(
       req({
-        vendor_id: "11111111-1111-1111-1111-111111111111",
+        vendor_id: "11111111-1111-1111-8111-111111111111",
         source_ref: "booth-1",
         label: "Kopitiam Cart",
         active: true,
@@ -48,7 +48,7 @@ describe("POST /api/v1/print-locations", () => {
     expect(res.status).toBe(201);
     expect(await res.json()).toEqual({ id: "loc-1" });
     expect(createOrUpdatePrintLocation).toHaveBeenCalledWith({
-      vendorId: "11111111-1111-1111-1111-111111111111",
+      vendorId: "11111111-1111-1111-8111-111111111111",
       sourceKit: "qkit",
       sourceRef: "booth-1",
       label: "Kopitiam Cart",
@@ -66,7 +66,7 @@ describe("POST /api/v1/print-locations", () => {
 
     const res = await POST(
       req({
-        vendor_id: "11111111-1111-1111-1111-111111111111",
+        vendor_id: "11111111-1111-1111-8111-111111111111",
         source_ref: "booth-1",
         label: "Kopitiam Cart",
         active: true,
