@@ -157,7 +157,7 @@ export function VirtualPrinterPanel({
       <div className="grid gap-4 sm:grid-cols-2">
         {printed.map((label) => (
           <figure key={label.src} className="rounded-lg border p-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- data-URL label preview, nothing for next/image to optimise */}
             <img
               src={label.src}
               alt={`Label for job ${label.jobId}`}

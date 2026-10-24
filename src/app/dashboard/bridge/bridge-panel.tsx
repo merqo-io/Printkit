@@ -67,8 +67,7 @@ export function BridgePanel({
 
   useEffect(() => {
     mountedRef.current = true;
-    // Read browser storage after hydration.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- browser storage is only readable after hydration
     setEnabled(isBridgeModeEnabled());
     return () => {
       mountedRef.current = false;
