@@ -12,3 +12,5 @@ The label PNG for a job the agent has already claimed.
 ## Parent
 
 [bridge-agent](../../../README.md)
+
+The job id is parsed as a UUID before the read.
