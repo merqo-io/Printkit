@@ -15,3 +15,5 @@ browser.
 ## Parent
 
 [bridge](../../../README.md)
+
+A job id that is not a UUID is a 404 without a database read.

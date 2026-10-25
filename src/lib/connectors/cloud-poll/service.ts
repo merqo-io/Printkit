@@ -9,6 +9,7 @@ import {
   cloudPollJobToken,
   type CloudPollRevision,
 } from "./job-token";
+import { PRINT_JOB_COLUMNS } from "@/lib/columns";
 
 /**
  * Resolves the device's URL token to its printer. The token is the whole
@@ -43,7 +44,7 @@ export async function readCloudPollJob(
   const supabase = await createServiceClient();
   const { data, error } = await supabase
     .from("print_jobs")
-    .select("*")
+    .select(PRINT_JOB_COLUMNS)
     .eq("id", jobId)
     .eq("location_id", locationId)
     .maybeSingle();

@@ -49,3 +49,5 @@ Driven by `src/app/api/cloudprnt/[token]/route.ts`. Depends on
 ## Parent
 
 [connectors](../README.md)
+
+The job read lists its columns (`PRINT_JOB_COLUMNS` in `@/lib/columns`).

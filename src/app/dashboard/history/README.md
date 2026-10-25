@@ -23,3 +23,5 @@ in its conditional write. A delayed request from an earlier printed attempt
 cannot enqueue another print after a newer attempt reaches the same status.
 
 The page's tab title is "History", matching its heading.
+
+`reprintJob` and `assignPrintLocation` parse their job and booth ids as UUIDs before any session or database call.

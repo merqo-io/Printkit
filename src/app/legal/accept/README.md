@@ -36,3 +36,5 @@ folder's job is entirely to collect the vendor's consent and forward it.
 [legal](../README.md)
 
 Regression fixtures restore environment and transport mocks between tests so missing-configuration and failure cases cannot leak state into later cases.
+
+The `next` form field is length-checked by Zod before `safeRedirectPath` runs.

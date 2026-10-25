@@ -18,6 +18,7 @@ import { sweepLocation } from "@/lib/job-dispatch";
 import { cloudPollJobToken } from "@/lib/connectors/cloud-poll/job-token";
 import { updatePrintJobStatus } from "@/lib/print-jobs";
 import type { CloudPollDriver } from "@/lib/connectors/types";
+import { deviceTokenSchema } from "@/lib/schemas";
 
 type RouteContext = { params: Promise<{ token: string }> };
 
@@ -32,8 +33,9 @@ const unauthorized = () =>
  * work happens.
  */
 async function openDevice(context: RouteContext): Promise<Device | null> {
-  const { token } = await context.params;
-  const printer = await resolveDevice(token);
+  const token = deviceTokenSchema.safeParse((await context.params).token);
+  if (!token.success) return null;
+  const printer = await resolveDevice(token.data);
   if (!printer) return null;
 
   const driver = getCloudPollDriver(printer.driver);
@@ -100,8 +102,12 @@ export async function GET(request: Request, context: RouteContext) {
   const device = await openDevice(context);
   if (!device) return unauthorized();
 
-  const token = new URL(request.url).searchParams.get("token");
-  const revision = await readCloudPollJob(token, device.printer.location_id);
+  const token = deviceTokenSchema.safeParse(
+    new URL(request.url).searchParams.get("token"),
+  );
+  const revision = token.success
+    ? await readCloudPollJob(token.data, device.printer.location_id)
+    : null;
   if (!revision || revision.status !== "queued")
     return NextResponse.json(
       { error: "Unknown job revision" },

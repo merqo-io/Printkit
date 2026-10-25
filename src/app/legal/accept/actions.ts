@@ -3,9 +3,11 @@
 import { createHash } from "node:crypto";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+// eslint-disable-next-line no-restricted-imports -- RLS has no client policy for this write; the caller is verified first
 import { createServerClient, createServiceClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@/lib/safe-redirect";
 import { getLegalDocSource, LEGAL_VERSIONS } from "@merqo/ui/legal";
+import { z } from "zod";
 
 const DOC_TYPES = ["terms", "privacy"] as const;
 
@@ -96,5 +98,6 @@ export async function acceptLegalTerms(formData: FormData): Promise<void> {
     is_current: true,
   });
 
-  redirect(safeRedirectPath(String(formData.get("next") || ""), "/dashboard"));
+  const next = z.string().max(512).catch("").parse(formData.get("next"));
+  redirect(safeRedirectPath(next, "/dashboard"));
 }

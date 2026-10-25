@@ -67,3 +67,5 @@ marketing footer. No `admin/` directory exists yet.
 [src](../README.md)
 
 Request boundaries use bounded body parsing before privileged work. Pending form states and bridge wake-lock cleanup are covered by component regressions.
+
+`robots.ts` disallows crawling except on production. The login layout forces per-request rendering so the nonce CSP reaches its scripts.

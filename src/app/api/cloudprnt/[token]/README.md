@@ -41,3 +41,5 @@ support. Its [confirmation reference](https://star-m.jp/products/s_print/sdk/Sta
 requires the same token as GET and describes confirmation retries.
 
 Authenticated poll JSON is capped at 64 KiB of streamed bytes and returns 413 when oversized. Empty or malformed small poll bodies retain the existing protocol fallback.
+
+The URL token and the `token` query value are parsed with `deviceTokenSchema`; an invalid one is treated like an unknown device.

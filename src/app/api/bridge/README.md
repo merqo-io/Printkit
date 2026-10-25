@@ -26,3 +26,5 @@ token-authenticated endpoints under `../v1/bridge-agent/`.
 ## Parent
 
 [api](../README.md)
+
+The job id in `jobs/[id]/label` is parsed as a UUID before the read.

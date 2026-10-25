@@ -25,3 +25,5 @@ both the current sent state and the signed driver reference atomically, so a
 callback cannot settle a different delivery attempt after the lookup.
 
 Callback form bodies are capped at 16 KiB of streamed bytes before RSA verification or database lookup. Both multipart and URL-encoded forms retain their signature semantics; oversized input returns 413 regardless of Content-Length.
+
+The `orderId`, `status` and `sign` form fields are parsed with `feieCallbackFieldsSchema` before the signature check.

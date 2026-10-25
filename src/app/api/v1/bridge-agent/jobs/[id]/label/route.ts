@@ -3,6 +3,7 @@ import { resolveAgent } from "@/lib/agent-auth";
 import { renderJobForPrinter } from "@/lib/render-job";
 import { createServiceClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/types";
+import { uuidSchema } from "@/lib/schemas";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -17,7 +18,11 @@ export async function GET(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await context.params;
+  const parsed = uuidSchema.safeParse((await context.params).id);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Unknown job" }, { status: 404 });
+  }
+  const id = parsed.data;
   const supabase = await createServiceClient();
   const { data: job, error } = await supabase
     .from("print_jobs")

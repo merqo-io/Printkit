@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-10-25
+## [0.3.0] - 2026-10-25
 
 ### Changed
 
@@ -16,6 +16,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - `globals.contrast.test.ts` asserts WCAG AA for the key token pairs in both themes.
+
+## [0.2.0] - 2026-10-24
+
+### Security
+
+- Nonce-based CSP (`script-src` without `unsafe-inline`) on per-request routes (`/dashboard`, `/auth`, `/login`, `/reset-password`, `/legal/accept`), set in `proxy.ts` from `@merqo/ui/security`. Static pages get the static policy from the same builder. The `@merqo/ui` pin moves to v0.35.0. The login layout forces per-request rendering.
+- `X-Robots-Tag: noindex, nofollow` and a disallow-all `robots.txt` on every non-production deployment.
+- Duplicate host-only auth cookies are cleared on every request (public paths included) instead of never; printkit had no cleanup before.
+- The CSP allows the Vercel toolbar origin outside production. In the nonce policy the toolbar script itself stays blocked (`strict-dynamic` ignores host allow-lists), so turn the toolbar off for preview in Vercel.
+- Zod parsing for job ids (both label routes, reprint, assign), booth and catalog ids and cloud-printer credentials (setup actions, virtual printer), the CloudPRNT URL token and job-revision token, the Feie callback fields and the legal-accept redirect. Malformed input is refused before any session or database call.
+- The 4 `select("*")` calls (3 on `printers`, 1 on `print_jobs`) now list columns (`src/lib/columns.ts`).
+- `no-restricted-imports` keeps the service-role client to `src/lib` and `src/app/api`; every other import states why.
+
+### Added
+
+- CSP e2e spec and a signed-in render smoke (against a small Supabase stand-in, so it sees empty data); CI e2e serves the production build.
+- `docs/security/2026-10-24-data-inventory.md`.
 
 ## [0.1.2] - 2026-10-24
 

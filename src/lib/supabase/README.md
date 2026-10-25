@@ -44,3 +44,5 @@ call `createClient`.
 ## Parent
 
 [lib](../README.md)
+
+`middleware.ts` clears the host-only copy of any auth cookie the browser sends twice (host-only plus `.merqo.io`) on every request, with no one-time marker, so a re-created duplicate cannot send the vendor back to /login.
