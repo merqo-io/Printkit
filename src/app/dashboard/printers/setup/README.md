@@ -27,3 +27,5 @@ The setup wizard for the chosen printer, one flow per kind of printer.
 [printers](../README.md)
 
 Wizard regressions cover pending actions, pairing failure and safe retry behavior. Pairing uses an expiring opaque code and does not expose a standing device credential.
+
+Every setup action parses its booth id, catalog id and cloud-printer credentials with a Zod schema first.

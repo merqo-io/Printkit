@@ -2,7 +2,9 @@
 import { getVendorSession } from "@/lib/vendor-session";
 import { createPrinter, getPrinterByLocation } from "@/lib/printers";
 import { mintDeviceCredential } from "@/lib/device-credentials";
+// eslint-disable-next-line no-restricted-imports -- RLS has no client policy for this write; the caller is verified first
 import { createServiceClient } from "@/lib/supabase/server";
+import { uuidSchema } from "@/lib/schemas";
 
 export type StartVirtualPrinterResult =
   { ok: true; token: string; printerId: string } | { ok: false; error: string };
@@ -14,11 +16,14 @@ export type StartVirtualPrinterResult =
  * browser tab is a test fixture, not a product.
  */
 export async function startVirtualPrinter(
-  locationId: string,
+  locationInput: string,
 ): Promise<StartVirtualPrinterResult> {
   if (process.env.VERCEL_ENV === "production") {
     return { ok: false, error: "Not available in production." };
   }
+  const parsedLocation = uuidSchema.safeParse(locationInput);
+  if (!parsedLocation.success) return { ok: false, error: "Unknown booth." };
+  const locationId = parsedLocation.data;
 
   const { user } = await getVendorSession();
   const service = await createServiceClient();

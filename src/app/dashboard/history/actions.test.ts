@@ -100,7 +100,7 @@ describe("reprintJob", () => {
   it("returns an error when the job doesn't belong to this vendor", async () => {
     maybeSingleMock.mockResolvedValue({ data: null, error: null });
 
-    const result = await reprintJob("job-1");
+    const result = await reprintJob("11111111-1111-4111-8111-111111111111");
 
     expect(result).toEqual({ success: false, error: "Print job not found" });
     expect(updatePrintJobStatusMock).not.toHaveBeenCalled();
@@ -113,7 +113,7 @@ describe("reprintJob", () => {
       error: null,
     });
 
-    const result = await reprintJob("job-1");
+    const result = await reprintJob("11111111-1111-4111-8111-111111111111");
 
     expect(result).toEqual({
       success: false,
@@ -128,10 +128,10 @@ describe("reprintJob", () => {
     });
     updatePrintJobStatusMock.mockResolvedValue({ ok: true });
 
-    const result = await reprintJob("job-1");
+    const result = await reprintJob("11111111-1111-4111-8111-111111111111");
 
     expect(updatePrintJobStatusMock).toHaveBeenCalledWith(
-      "job-1",
+      "11111111-1111-4111-8111-111111111111",
       "queued",
       undefined,
       { expectedStatus: "failed", sentAt: ATTEMPT, requeuedAt: null },
@@ -140,7 +140,7 @@ describe("reprintJob", () => {
       expect.objectContaining({
         admin_id: "vendor-1",
         action: "manual_reprint_triggered",
-        target_id: "job-1",
+        target_id: "11111111-1111-4111-8111-111111111111",
       }),
     );
     expect(result).toEqual({ success: true });
@@ -154,10 +154,10 @@ describe("reprintJob", () => {
     });
     updatePrintJobStatusMock.mockResolvedValue({ ok: true });
 
-    const result = await reprintJob("job-1");
+    const result = await reprintJob("11111111-1111-4111-8111-111111111111");
 
     expect(updatePrintJobStatusMock).toHaveBeenCalledWith(
-      "job-1",
+      "11111111-1111-4111-8111-111111111111",
       "queued",
       undefined,
       { expectedStatus: "printed", sentAt: ATTEMPT, requeuedAt: null },
@@ -177,7 +177,9 @@ it("preserves a successful requeue when the audit request rejects", async () => 
   });
   updatePrintJobStatusMock.mockResolvedValue({ ok: true });
   insertMock.mockRejectedValueOnce(new Error("audit offline"));
-  expect(await reprintJob("job-1")).toEqual({ success: true });
+  expect(await reprintJob("11111111-1111-4111-8111-111111111111")).toEqual({
+    success: true,
+  });
   expect(revalidatePathMock).toHaveBeenCalledWith("/dashboard/history");
 });
 
@@ -212,18 +214,21 @@ describe("assignPrintLocation", () => {
 
   it("assigns an unrouted queued job without changing its status", async () => {
     locationMaybeSingleMock.mockResolvedValue({
-      data: { id: "loc-1" },
+      data: { id: "22222222-2222-4222-8222-222222222222" },
       error: null,
     });
     jobUpdateSingleMock.mockResolvedValue({
-      data: { id: "job-1" },
+      data: { id: "11111111-1111-4111-8111-111111111111" },
       error: null,
     });
 
-    const result = await assignPrintLocation("job-1", "loc-1");
+    const result = await assignPrintLocation(
+      "11111111-1111-4111-8111-111111111111",
+      "22222222-2222-4222-8222-222222222222",
+    );
 
     expect(jobUpdateMock).toHaveBeenCalledWith({
-      location_id: "loc-1",
+      location_id: "22222222-2222-4222-8222-222222222222",
       requeued_at: expect.any(String),
     });
     expect(jobUpdateMock).not.toHaveBeenCalledWith(
@@ -234,48 +239,63 @@ describe("assignPrintLocation", () => {
 
   it("scopes the print_locations ownership lookup by exact id and vendor_id", async () => {
     locationMaybeSingleMock.mockResolvedValue({
-      data: { id: "loc-1" },
+      data: { id: "22222222-2222-4222-8222-222222222222" },
       error: null,
     });
     jobUpdateSingleMock.mockResolvedValue({
-      data: { id: "job-1" },
+      data: { id: "11111111-1111-4111-8111-111111111111" },
       error: null,
     });
 
-    await assignPrintLocation("job-1", "loc-1");
+    await assignPrintLocation(
+      "11111111-1111-4111-8111-111111111111",
+      "22222222-2222-4222-8222-222222222222",
+    );
 
     expect(locationSelectMock).toHaveBeenCalledWith("id");
-    expect(locationEqIdMock).toHaveBeenCalledWith("id", "loc-1");
+    expect(locationEqIdMock).toHaveBeenCalledWith(
+      "id",
+      "22222222-2222-4222-8222-222222222222",
+    );
     expect(locationEqVendorMock).toHaveBeenCalledWith("vendor_id", "vendor-1");
   });
 
   it("scopes the print_jobs update by exact id and vendor_id", async () => {
     locationMaybeSingleMock.mockResolvedValue({
-      data: { id: "loc-1" },
+      data: { id: "22222222-2222-4222-8222-222222222222" },
       error: null,
     });
     jobUpdateSingleMock.mockResolvedValue({
-      data: { id: "job-1" },
+      data: { id: "11111111-1111-4111-8111-111111111111" },
       error: null,
     });
 
-    await assignPrintLocation("job-1", "loc-1");
+    await assignPrintLocation(
+      "11111111-1111-4111-8111-111111111111",
+      "22222222-2222-4222-8222-222222222222",
+    );
 
-    expect(jobUpdateEqIdMock).toHaveBeenCalledWith("id", "job-1");
+    expect(jobUpdateEqIdMock).toHaveBeenCalledWith(
+      "id",
+      "11111111-1111-4111-8111-111111111111",
+    );
     expect(jobUpdateEqVendorMock).toHaveBeenCalledWith("vendor_id", "vendor-1");
   });
 
   it("writes through the service-role client, not the session-scoped client", async () => {
     locationMaybeSingleMock.mockResolvedValue({
-      data: { id: "loc-1" },
+      data: { id: "22222222-2222-4222-8222-222222222222" },
       error: null,
     });
     jobUpdateSingleMock.mockResolvedValue({
-      data: { id: "job-1" },
+      data: { id: "11111111-1111-4111-8111-111111111111" },
       error: null,
     });
 
-    await assignPrintLocation("job-1", "loc-1");
+    await assignPrintLocation(
+      "11111111-1111-4111-8111-111111111111",
+      "22222222-2222-4222-8222-222222222222",
+    );
 
     // print_jobs has no UPDATE grant/policy for `authenticated` — only the
     // service client can write it. The session client is never touched.
@@ -287,7 +307,10 @@ describe("assignPrintLocation", () => {
   it("rejects a locationId that doesn't belong to the calling vendor", async () => {
     locationMaybeSingleMock.mockResolvedValue({ data: null, error: null });
 
-    const result = await assignPrintLocation("job-1", "someone-elses-loc");
+    const result = await assignPrintLocation(
+      "11111111-1111-4111-8111-111111111111",
+      "44444444-4444-4444-8444-444444444444",
+    );
 
     expect(result).toEqual({
       ok: false,
@@ -298,7 +321,7 @@ describe("assignPrintLocation", () => {
 
   it("returns an error result on a database failure", async () => {
     locationMaybeSingleMock.mockResolvedValue({
-      data: { id: "loc-1" },
+      data: { id: "22222222-2222-4222-8222-222222222222" },
       error: null,
     });
     jobUpdateSingleMock.mockResolvedValue({
@@ -306,7 +329,10 @@ describe("assignPrintLocation", () => {
       error: { message: "boom" },
     });
 
-    const result = await assignPrintLocation("job-1", "loc-1");
+    const result = await assignPrintLocation(
+      "11111111-1111-4111-8111-111111111111",
+      "22222222-2222-4222-8222-222222222222",
+    );
 
     expect(result).toEqual({
       ok: false,
@@ -316,15 +342,18 @@ describe("assignPrintLocation", () => {
 
   it("checks the unrouted queued state atomically in the update", async () => {
     locationMaybeSingleMock.mockResolvedValue({
-      data: { id: "loc-1" },
+      data: { id: "22222222-2222-4222-8222-222222222222" },
       error: null,
     });
     jobUpdateSingleMock.mockResolvedValue({
-      data: { id: "job-1" },
+      data: { id: "11111111-1111-4111-8111-111111111111" },
       error: null,
     });
 
-    await assignPrintLocation("job-1", "loc-1");
+    await assignPrintLocation(
+      "11111111-1111-4111-8111-111111111111",
+      "22222222-2222-4222-8222-222222222222",
+    );
 
     expect(maybeSingleMock).not.toHaveBeenCalled();
     expect(updatePrintJobStatusMock).not.toHaveBeenCalled();
@@ -334,11 +363,16 @@ describe("assignPrintLocation", () => {
 
   it("does not dispatch or claim success when a competing assignment won", async () => {
     locationMaybeSingleMock.mockResolvedValue({
-      data: { id: "loc-1" },
+      data: { id: "22222222-2222-4222-8222-222222222222" },
       error: null,
     });
     jobUpdateSingleMock.mockResolvedValue({ data: null, error: null });
-    expect(await assignPrintLocation("job-1", "loc-1")).toEqual({
+    expect(
+      await assignPrintLocation(
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222",
+      ),
+    ).toEqual({
       ok: false,
       error: "This job is no longer waiting for a booth.",
     });
@@ -372,7 +406,7 @@ it("refuses a delayed reprint after another attempt returned to printed", async 
   dispatchJobMock.mockClear();
   insertMock.mockReset().mockResolvedValue({ error: null });
   revalidatePathMock.mockClear();
-  expect(await reprintJob("job-1")).toEqual({
+  expect(await reprintJob("11111111-1111-4111-8111-111111111111")).toEqual({
     success: false,
     error: "Print attempt changed",
   });
@@ -380,6 +414,31 @@ it("refuses a delayed reprint after another attempt returned to printed", async 
   expect(insertMock).not.toHaveBeenCalled();
   expect(revalidatePathMock).not.toHaveBeenCalled();
   maybeSingleMock.mockResolvedValue({ data: current, error: null });
-  expect(await reprintJob("job-1")).toEqual({ success: true });
-  expect(dispatchJobMock).toHaveBeenCalledExactlyOnceWith("job-1");
+  expect(await reprintJob("11111111-1111-4111-8111-111111111111")).toEqual({
+    success: true,
+  });
+  expect(dispatchJobMock).toHaveBeenCalledExactlyOnceWith(
+    "11111111-1111-4111-8111-111111111111",
+  );
+});
+
+describe("malformed ids", () => {
+  it("rejects a reprint of a job id that is not a UUID before any session or database call", async () => {
+    getVendorSessionMock.mockClear();
+    const result = await reprintJob("not-a-uuid");
+
+    expect(result).toEqual({ success: false, error: "Unknown job" });
+    expect(getVendorSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects assigning a booth id that is not a UUID before any session or database call", async () => {
+    getVendorSessionMock.mockClear();
+    const result = await assignPrintLocation(
+      "11111111-1111-4111-8111-111111111111",
+      "../etc",
+    );
+
+    expect(result).toEqual({ ok: false, error: "Unknown job or booth." });
+    expect(getVendorSessionMock).not.toHaveBeenCalled();
+  });
 });

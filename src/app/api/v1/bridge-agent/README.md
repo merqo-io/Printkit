@@ -34,3 +34,5 @@ The agent program itself lives in `bridge-agent/` at the repo root.
 [v1](../README.md)
 
 Pairing bodies are size bounded. Result reports conditionally match the current sent attempt and location; persistence failure returns a retryable server error rather than a successful acknowledgement.
+
+The job id in `jobs/[id]/label` is parsed as a UUID before the read.

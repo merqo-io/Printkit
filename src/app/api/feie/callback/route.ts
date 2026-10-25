@@ -3,6 +3,7 @@ import { readBoundedForm, RequestBodyError } from "@/lib/bounded-json";
 import { createVerify } from "node:crypto";
 import { updatePrintJobStatus } from "@/lib/print-jobs";
 import { createServiceClient } from "@/lib/supabase/server";
+import { feieCallbackFieldsSchema } from "@/lib/schemas";
 
 /**
  * Feie's documented string to sign: every posted field except `sign` and
@@ -85,13 +86,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid body" }, { status });
   }
 
-  const orderId = String(form.get("orderId") ?? "");
-  const status = String(form.get("status") ?? "");
-  const signature = String(form.get("sign") ?? "");
-
-  if (!orderId || !signature) {
+  const fields = feieCallbackFieldsSchema.safeParse({
+    orderId: String(form.get("orderId") ?? ""),
+    status: String(form.get("status") ?? ""),
+    sign: String(form.get("sign") ?? ""),
+  });
+  if (!fields.success) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const { orderId, status, sign: signature } = fields.data;
+
   if (!verifySignature(signingString(form), signature)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

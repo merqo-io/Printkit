@@ -3,15 +3,21 @@ import { revalidatePath } from "next/cache";
 import { getVendorSession } from "@/lib/vendor-session";
 import { updatePrintJobStatus } from "@/lib/print-jobs";
 import { dispatchJob } from "@/lib/job-dispatch";
+// eslint-disable-next-line no-restricted-imports -- RLS has no client policy for this write; the caller is verified first
 import { createServiceClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/action-result";
+import { z } from "zod";
+import { uuidSchema } from "@/lib/schemas";
 
 /**
  * The session-scoped read enforces vendor RLS. Only failed or printed jobs may
  * be requeued; comparing status and attempt prevents stale concurrent reprints.
  * Audit failure must not disguise a successful requeue as a failed request.
  */
-export async function reprintJob(jobId: string): Promise<ActionResult> {
+export async function reprintJob(input: string): Promise<ActionResult> {
+  const parsedId = uuidSchema.safeParse(input);
+  if (!parsedId.success) return { success: false, error: "Unknown job" };
+  const jobId = parsedId.data;
   const { supabase, user } = await getVendorSession();
   const service = await createServiceClient();
 
@@ -67,9 +73,14 @@ export async function reprintJob(jobId: string): Promise<ActionResult> {
  * update print_jobs. The destination must also belong to the acting vendor.
  */
 export async function assignPrintLocation(
-  jobId: string,
-  locationId: string,
+  jobIdInput: string,
+  locationIdInput: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
+  const ids = z
+    .object({ jobId: uuidSchema, locationId: uuidSchema })
+    .safeParse({ jobId: jobIdInput, locationId: locationIdInput });
+  if (!ids.success) return { ok: false, error: "Unknown job or booth." };
+  const { jobId, locationId } = ids.data;
   const { user } = await getVendorSession();
   const service = await createServiceClient();
 
