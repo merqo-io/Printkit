@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- `.claude/skill-usage.log` is git-ignored, matching qkit, merqo and loopkit (the skill-usage hook writes it locally on every skill call).
+
 ## [0.3.0] - 2026-10-25
 
 ### Changed
