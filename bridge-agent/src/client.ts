@@ -42,19 +42,23 @@ function checkedSentAt(value: unknown): string {
       value,
     );
   if (!parts) throw new Error("Invalid print attempt timestamp.");
-  const [, year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0] =
-    parts.map(Number);
-  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if (
-    day < 1 ||
-    day > (days[month - 1] ?? 0) ||
-    hour > 23 ||
-    minute > 59 ||
-    second > 59
-  )
+  if (!isRealCalendarTime(parts.map(Number)))
     throw new Error("Invalid print attempt timestamp.");
   return value;
+}
+
+function isRealCalendarTime(parts: number[]): boolean {
+  const [, year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0] =
+    parts;
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return (
+    day >= 1 &&
+    day <= (days[month - 1] ?? 0) &&
+    hour <= 23 &&
+    minute <= 59 &&
+    second <= 59
+  );
 }
 
 export class UnauthorizedError extends Error {

@@ -23,6 +23,7 @@ export default defineConfig({
     include: [
       "test/**/*.{test,spec}.{ts,tsx}",
       "src/**/*.test.{ts,tsx}",
+      "eslint.config.test.ts",
       "bridge-agent/src/**/*.test.ts",
     ],
     coverage: {

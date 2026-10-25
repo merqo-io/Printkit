@@ -48,7 +48,7 @@ describe("feie: request signing", () => {
     const body = lastBody(fetchMock);
     const stime = body.get("stime") as string;
     expect(body.get("sig")).toBe(
-      // eslint-disable-next-line sonarjs/hashing
+      // eslint-disable-next-line sonarjs/hashing -- Feie requires SHA-1 signatures
       createHash("sha1")
         .update(`merqo@test.dev${"ukey-123"}${stime}`, "utf8")
         .digest("hex"),

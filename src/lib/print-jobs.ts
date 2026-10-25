@@ -133,6 +133,47 @@ export type PrintJobFailureReason =
 export type UpdatePrintJobStatusResult =
   { ok: true } | { ok: false; error: string };
 
+type Conditions = {
+  locationId?: string;
+  expectedStatus?: PrintJobStatus;
+  driverRef?: string;
+  sentAt?: string | null;
+  requeuedAt?: string | null;
+};
+
+type Filterable<Q> = {
+  eq(column: string, value: string): Q;
+  is(column: string, value: null): Q;
+};
+
+function matchNullable<Q extends Filterable<Q>>(
+  query: Q,
+  column: string,
+  value: string | null,
+): Q {
+  return value === null ? query.is(column, null) : query.eq(column, value);
+}
+
+// Recheck device authority and delivery state in the write itself.
+function applyConditions<Q extends Filterable<Q>>(
+  query: Q,
+  conditions: Conditions | undefined,
+): Q {
+  let q = query;
+  if (conditions?.locationId !== undefined)
+    q = q.eq("location_id", conditions.locationId);
+  if (conditions?.expectedStatus !== undefined)
+    q = q.eq("status", conditions.expectedStatus);
+  if (conditions?.driverRef !== undefined)
+    q = q.eq("driver_ref", conditions.driverRef);
+  // A status may recur after reprint; match the observed attempt as well.
+  if (conditions?.sentAt !== undefined)
+    q = matchNullable(q, "sent_at", conditions.sentAt);
+  if (conditions?.requeuedAt !== undefined)
+    q = matchNullable(q, "requeued_at", conditions.requeuedAt);
+  return q;
+}
+
 /**
  * The single choke point for changing a print_jobs row's status — every
  * caller (manual reprint, the bridge's print-result handler) is a thin
@@ -143,13 +184,7 @@ export async function updatePrintJobStatus(
   jobId: string,
   status: PrintJobStatus,
   failureReason?: PrintJobFailureReason,
-  conditions?: {
-    locationId?: string;
-    expectedStatus?: PrintJobStatus;
-    driverRef?: string;
-    sentAt?: string | null;
-    requeuedAt?: string | null;
-  },
+  conditions?: Conditions,
 ): Promise<UpdatePrintJobStatusResult> {
   const supabase = await createServiceClient();
   let query = supabase
@@ -168,29 +203,7 @@ export async function updatePrintJobStatus(
     })
     .eq("id", jobId);
 
-  // Recheck device authority and delivery state in the write itself.
-  if (conditions?.locationId !== undefined) {
-    query = query.eq("location_id", conditions.locationId);
-  }
-  if (conditions?.expectedStatus !== undefined) {
-    query = query.eq("status", conditions.expectedStatus);
-  }
-  if (conditions?.driverRef !== undefined) {
-    query = query.eq("driver_ref", conditions.driverRef);
-  }
-  // A status may recur after reprint; match the observed attempt as well.
-  if (conditions?.sentAt !== undefined) {
-    query =
-      conditions.sentAt === null
-        ? query.is("sent_at", null)
-        : query.eq("sent_at", conditions.sentAt);
-  }
-  if (conditions?.requeuedAt !== undefined) {
-    query =
-      conditions.requeuedAt === null
-        ? query.is("requeued_at", null)
-        : query.eq("requeued_at", conditions.requeuedAt);
-  }
+  query = applyConditions(query, conditions);
   const { data, error } = await query
     .select("source_kit, source_ref, sent_at, requeued_at, created_at")
     .single();

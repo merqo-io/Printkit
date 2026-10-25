@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-24
+
+### Changed
+
+- Lint config now consumes the shared `@merqo/ui/eslint` preset (`@merqo/ui` v0.35.0): comment and directive hygiene, size and complexity limits, and a ban on colour literals in `src`. `eslint-plugin-sonarjs` 4.2.2 and `@eslint-community/eslint-plugin-eslint-comments` 4.8.1 pinned. `eslint.config.test.ts` asserts the key rules resolve to `error`.
+- `updatePrintJobStatus`, `resolveSentJob` and the bridge agent's timestamp check split into smaller helpers to meet the complexity and parameter limits. No behaviour change.
+
 ## [0.1.1] - 2026-10-24
 
 ### Security
