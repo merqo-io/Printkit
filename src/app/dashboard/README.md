@@ -42,7 +42,7 @@ The authenticated vendor area (`/dashboard/*`).
   badge (queued/sent/printed/failed) used by `history/`'s table. Renders via
   `@merqo/ui`'s shared `StatusBadge` (dot + bordered pill), replacing the old
   plain shadcn `Badge`; each status's `className` maps to this repo's own
-  brand tokens (`mint`/`destructive`/`flow`/`secondary`) rather than raw
+  brand tokens (`magenta`/`destructive`/`flow`/`secondary`) rather than raw
   Tailwind color literals.
   Status colours: queued `secondary`, sent `info-text`, printed `success-text`, failed `destructive`.
 - `page.tsx` / `page.dom.test.tsx` — dashboard overview: fetches

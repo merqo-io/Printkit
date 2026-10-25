@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-25
+
+### Changed
+
+- printkit has its own colour palette, "Ink and paper", replacing the "Banknote Engrave" theme it shared with paykit. Black-ink primary on receipt-paper background, inverted in dark mode. Process magenta is the one accent, kept to small marks (the wordmark, the icon dot). The warm-grey secondary stays. The `mint` token is now `magenta` / `magenta-text` / `magenta-foreground`, the mint wash behind the page is gone, and `chart-1..5` and `sidebar-*` tokens are defined.
+- Favicon and apple-touch icon are a paper "P" on ink with a magenta dot.
+
+### Added
+
+- `globals.contrast.test.ts` asserts WCAG AA for the key token pairs in both themes.
+
 ## [0.2.0] - 2026-10-24
 
 ### Security

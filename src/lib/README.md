@@ -183,12 +183,11 @@ everything else sits flat here.
   every pull and status read instead of a cron. `dispatchJob` pushes to the
   maker's cloud for `vendor_cloud` printers and is a no-op for the pull
   connectors, which wait for the device to ask.
-- `brand-icon.tsx` — `brandIcon(size)` + `BRAND_MINT`/`BRAND_INK`: the
-  printkit "P" mark as a `ReactElement` for `ImageResponse`-generated icons
-  (favicon, apple-touch) — hex literals, not theme tokens, since
-  `ImageResponse` needs concrete CSS colors. Tracks the "Banknote
-  Engrave" theme's dark-mode brighter primary, so the dark-ink text on top
-  stays legible.
+- `brand-icon.tsx` — `brandIcon(size)` + `BRAND_INK`/`BRAND_PAPER`/`BRAND_MAGENTA`: the
+  printkit "P" mark (paper letter on ink, magenta dot) as a `ReactElement` for
+  `ImageResponse`-generated icons (favicon, apple-touch). Hex literals, not
+  theme tokens, since `ImageResponse` needs concrete CSS colors; its test
+  checks they equal the light-theme tokens in `globals.css`.
 - `action-result.ts` — `ActionResult<T>`: the discriminated
   `{success:true,...T} | {success:false,error}` shape every Server Action
   returns.
