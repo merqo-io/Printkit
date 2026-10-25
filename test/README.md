@@ -9,6 +9,7 @@ that don't fit that shape.
 
 ## Contents
 
+- `color.ts` — OKLCH to sRGB hex and WCAG contrast-ratio helpers, shared by the palette contrast test and the brand-icon test.
 - `setup.ts` — Vitest global setup: a `ResizeObserver` stub (jsdom has none,
   Radix primitives read element size on mount), a guarded `scrollIntoView`
   stub (same reasoning — jsdom has none, the shadcn `Select` used by

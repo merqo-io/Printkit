@@ -74,8 +74,8 @@ previously every kit's `/legal/terms` page showed the full multi-kit annex
 since none passed kit context. `legal/accept/actions.ts`'s recorded
 `doc_sha256` hashes that same scoped content.
 
-Brand theme is "Banknote Engrave" (engraved teal-green primary, warm-grey
-secondary) — see `src/app/globals.css`'s own header comment.
+Brand theme is "Ink and paper" (black-ink primary on receipt paper, warm-grey
+secondary, process-magenta accent) — see `src/app/globals.css`'s own header comment.
 
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.

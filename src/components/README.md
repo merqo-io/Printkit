@@ -41,7 +41,7 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
   `/about` page and Bluetooth guide show it. Same adapter shape as
   stockkit's `SiteFooter`.
 - `wordmark.tsx` — `Wordmark({ className })`: the "PrintKit" brand mark
-  (mint-green "Print" + plain "Kit"). Used by the dashboard navigation, reset-password page, Bluetooth guide, `src/app/error.tsx` and
+  (magenta "Print" + plain "Kit"). Used by the dashboard navigation, reset-password page, Bluetooth guide, `src/app/error.tsx` and
   `src/app/login/page.tsx`.
 
 ## Connectivity
