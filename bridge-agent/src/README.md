@@ -7,7 +7,7 @@ The Raspberry Pi agent's source, built to `../dist/` by `npm run build`.
 ## Contents
 
 - `cli.ts` — `pair`, `use`, `run`.
-- `client.ts` — printkit's agent endpoints.
+- `client.ts` — printkit's agent endpoints, including the strict check of the print-attempt timestamp (`checkedSentAt`, `isRealCalendarTime`).
 - `loop.ts` — poll, print, report, with backoff.
 - `config.ts` — the token and chosen printer, stored with mode 600.
 - `printer.ts` — the NIIMBOT adapter over `@mmote/niimblue-node`.

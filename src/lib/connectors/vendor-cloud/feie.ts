@@ -52,7 +52,7 @@ function credentials(): { user: string; ukey: string; base: string } | null {
  * stores or protects anything at rest.
  */
 function sign(user: string, ukey: string, stime: string): string {
-  // eslint-disable-next-line sonarjs/hashing
+  // eslint-disable-next-line sonarjs/hashing -- Feie requires SHA-1 signatures
   return createHash("sha1")
     .update(`${user}${ukey}${stime}`, "utf8")
     .digest("hex");
