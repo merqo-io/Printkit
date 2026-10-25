@@ -2,6 +2,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { getCatalogEntry } from "@/lib/printer-catalog";
 import { JOB_EXPIRY_MS } from "@/lib/job-expiry";
 import type { Database } from "@/lib/types";
+import { PRINTER_COLUMNS } from "@/lib/columns";
 
 export type PrinterRow = Database["printkit"]["Tables"]["printers"]["Row"];
 
@@ -34,7 +35,7 @@ export async function getPrinterByLocation(
   const supabase = await createServiceClient();
   const { data, error } = await supabase
     .from("printers")
-    .select("*")
+    .select(PRINTER_COLUMNS)
     .eq("location_id", locationId)
     .maybeSingle();
 
@@ -56,7 +57,7 @@ export async function getPrinterByTokenHash(
   const supabase = await createServiceClient();
   const { data, error } = await supabase
     .from("device_credentials")
-    .select("printers(*)")
+    .select(`printers(${PRINTER_COLUMNS})` as const)
     .eq("token_hash", tokenHash)
     .maybeSingle();
 
@@ -104,7 +105,7 @@ export async function createPrinter(input: {
       label_width_mm: entry.defaultLabelMm.width,
       label_height_mm: entry.defaultLabelMm.height,
     })
-    .select("*")
+    .select(PRINTER_COLUMNS)
     .single();
 
   if (error) {

@@ -58,7 +58,11 @@ vi.mock("@/lib/supabase/server", () => ({
           select: () => query,
           eq: () => query,
           maybeSingle: () =>
-            Promise.resolve({ data: ownsLocation ? { id: "loc-1" } : null }),
+            Promise.resolve({
+              data: ownsLocation
+                ? { id: "22222222-2222-4222-8222-222222222222" }
+                : null,
+            }),
         };
         return query;
       },
@@ -94,11 +98,14 @@ beforeEach(() => {
 
 describe("createPrinterUrl", () => {
   it("creates the printer and returns its absolute address", async () => {
-    const result = await createPrinterUrl("loc-1", "star-mc-label2");
+    const result = await createPrinterUrl(
+      "22222222-2222-4222-8222-222222222222",
+      "star-mc-label2",
+    );
 
     expect(createPrinterMock).toHaveBeenCalledWith({
       vendorId: "vendor-1",
-      locationId: "loc-1",
+      locationId: "22222222-2222-4222-8222-222222222222",
       catalogId: "star-mc-label2",
     });
     expect(mintDeviceCredentialMock).toHaveBeenCalledWith(
@@ -114,7 +121,10 @@ describe("createPrinterUrl", () => {
   it("reuses the booth's printer when it is the same model", async () => {
     getPrinterByLocationMock.mockResolvedValue(starPrinter);
 
-    await createPrinterUrl("loc-1", "star-mc-label2");
+    await createPrinterUrl(
+      "22222222-2222-4222-8222-222222222222",
+      "star-mc-label2",
+    );
 
     expect(createPrinterMock).not.toHaveBeenCalled();
   });
@@ -122,7 +132,10 @@ describe("createPrinterUrl", () => {
   it("refuses another vendor's booth", async () => {
     ownsLocation = false;
 
-    const result = await createPrinterUrl("loc-9", "star-mc-label2");
+    const result = await createPrinterUrl(
+      "33333333-3333-4333-8333-333333333333",
+      "star-mc-label2",
+    );
 
     expect(result.ok).toBe(false);
     expect(mintDeviceCredentialMock).not.toHaveBeenCalled();
@@ -134,7 +147,10 @@ describe("createPrinterUrl", () => {
       catalog_id: "feie-fp-n20h",
     });
 
-    const result = await createPrinterUrl("loc-1", "star-mc-label2");
+    const result = await createPrinterUrl(
+      "22222222-2222-4222-8222-222222222222",
+      "star-mc-label2",
+    );
 
     expect(result).toEqual({
       ok: false,
@@ -146,7 +162,10 @@ describe("createPrinterUrl", () => {
     siteUrl = null;
     vi.spyOn(console, "error").mockImplementation(() => undefined);
 
-    const result = await createPrinterUrl("loc-1", "star-mc-label2");
+    const result = await createPrinterUrl(
+      "22222222-2222-4222-8222-222222222222",
+      "star-mc-label2",
+    );
 
     expect(result.ok).toBe(false);
     expect(mintDeviceCredentialMock).not.toHaveBeenCalled();
@@ -155,7 +174,14 @@ describe("createPrinterUrl", () => {
   it("fails when the credential cannot be minted", async () => {
     mintDeviceCredentialMock.mockResolvedValue(null);
 
-    expect((await createPrinterUrl("loc-1", "star-mc-label2")).ok).toBe(false);
+    expect(
+      (
+        await createPrinterUrl(
+          "22222222-2222-4222-8222-222222222222",
+          "star-mc-label2",
+        )
+      ).ok,
+    ).toBe(false);
   });
 });
 
@@ -174,7 +200,7 @@ describe("registerBrandCloudPrinter", () => {
     registerPrinterMock.mockResolvedValue({ ok: true, deviceRef: "SN1" });
 
     const result = await registerBrandCloudPrinter(
-      "loc-1",
+      "22222222-2222-4222-8222-222222222222",
       "feie-fp-n20h",
       "SN1",
       "KEY1",
@@ -196,7 +222,7 @@ describe("registerBrandCloudPrinter", () => {
     });
 
     const result = await registerBrandCloudPrinter(
-      "loc-1",
+      "22222222-2222-4222-8222-222222222222",
       "feie-fp-n20h",
       "SN1",
       "BAD",
@@ -211,7 +237,7 @@ describe("registerBrandCloudPrinter", () => {
 
   it("refuses a model with no brand-cloud driver", async () => {
     const result = await registerBrandCloudPrinter(
-      "loc-1",
+      "22222222-2222-4222-8222-222222222222",
       "star-mc-label2",
       "SN1",
       "KEY1",
@@ -227,7 +253,7 @@ describe("registerBrandCloudPrinter", () => {
     ownsLocation = false;
 
     const result = await registerBrandCloudPrinter(
-      "loc-9",
+      "33333333-3333-4333-8333-333333333333",
       "feie-fp-n20h",
       "SN1",
       "KEY1",
@@ -241,7 +267,7 @@ describe("registerBrandCloudPrinter", () => {
     getPrinterByLocationMock.mockResolvedValue(starPrinter);
 
     const result = await registerBrandCloudPrinter(
-      "loc-1",
+      "22222222-2222-4222-8222-222222222222",
       "feie-fp-n20h",
       "SN1",
       "KEY1",
@@ -257,7 +283,7 @@ describe("registerBrandCloudPrinter", () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     const result = await registerBrandCloudPrinter(
-      "loc-1",
+      "22222222-2222-4222-8222-222222222222",
       "feie-fp-n20h",
       "SN1",
       "KEY1",
@@ -276,7 +302,9 @@ describe("createBridgePairingCode", () => {
   });
 
   it("returns a formatted single-use code", async () => {
-    expect(await createBridgePairingCode("loc-1")).toEqual({
+    expect(
+      await createBridgePairingCode("22222222-2222-4222-8222-222222222222"),
+    ).toEqual({
       ok: true,
       code: "ABCD-2345",
     });
@@ -285,20 +313,28 @@ describe("createBridgePairingCode", () => {
   it("refuses another vendor's booth", async () => {
     ownsLocation = false;
 
-    expect((await createBridgePairingCode("loc-9")).ok).toBe(false);
+    expect(
+      (await createBridgePairingCode("33333333-3333-4333-8333-333333333333"))
+        .ok,
+    ).toBe(false);
     expect(createPairingCodeMock).not.toHaveBeenCalled();
   });
 
   it("refuses a booth that already has a different printer", async () => {
     getPrinterByLocationMock.mockResolvedValue(starPrinter);
 
-    expect((await createBridgePairingCode("loc-1")).ok).toBe(false);
+    expect(
+      (await createBridgePairingCode("22222222-2222-4222-8222-222222222222"))
+        .ok,
+    ).toBe(false);
   });
 
   it("fails when no code could be created", async () => {
     createPairingCodeMock.mockResolvedValue(null);
 
-    expect(await createBridgePairingCode("loc-1")).toEqual({
+    expect(
+      await createBridgePairingCode("22222222-2222-4222-8222-222222222222"),
+    ).toEqual({
       ok: false,
       error: "Could not create a pairing code.",
     });
@@ -312,24 +348,33 @@ describe("readPrinterState", () => {
       last_seen_at: "2026-09-22T00:00:00.000Z",
     });
 
-    expect(await readPrinterState("loc-1")).toBe("online");
+    expect(await readPrinterState("22222222-2222-4222-8222-222222222222")).toBe(
+      "online",
+    );
   });
 
   it("reports not set up for a booth with no printer", async () => {
-    expect(await readPrinterState("loc-1")).toBe("not_set_up");
+    expect(await readPrinterState("22222222-2222-4222-8222-222222222222")).toBe(
+      "not_set_up",
+    );
   });
 
   it("reveals nothing about another vendor's booth", async () => {
     ownsLocation = false;
     getPrinterByLocationMock.mockResolvedValue(starPrinter);
 
-    expect(await readPrinterState("loc-9")).toBe("not_set_up");
+    expect(await readPrinterState("33333333-3333-4333-8333-333333333333")).toBe(
+      "not_set_up",
+    );
   });
 });
 
 it("refuses URL credentials for a bridge or brand-cloud model", async () => {
   for (const model of ["niimbot-b1", "feie-fp-n20h"]) {
-    expect((await createPrinterUrl("loc-1", model)).ok).toBe(false);
+    expect(
+      (await createPrinterUrl("22222222-2222-4222-8222-222222222222", model))
+        .ok,
+    ).toBe(false);
   }
   expect(mintDeviceCredentialMock).not.toHaveBeenCalled();
 });
@@ -337,10 +382,41 @@ it("refuses URL credentials for a bridge or brand-cloud model", async () => {
 it("does not expose a virtual printer through the production setup action", async () => {
   vi.stubEnv("VERCEL_ENV", "production");
   try {
-    expect((await createPrinterUrl("loc-1", "virtual")).ok).toBe(false);
+    expect(
+      (
+        await createPrinterUrl(
+          "22222222-2222-4222-8222-222222222222",
+          "virtual",
+        )
+      ).ok,
+    ).toBe(false);
     expect(createPrinterMock).not.toHaveBeenCalled();
     expect(mintDeviceCredentialMock).not.toHaveBeenCalled();
   } finally {
     vi.unstubAllEnvs();
   }
+});
+
+describe("malformed input", () => {
+  it("refuses a booth id that is not a UUID without looking up the booth", async () => {
+    const result = await createPrinterUrl("not-a-uuid", "star-mc-label2");
+
+    expect(result).toEqual({
+      ok: false,
+      error: "Check the details and try again.",
+    });
+    expect(createPrinterMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses an oversized serial number", async () => {
+    const result = await registerBrandCloudPrinter(
+      "22222222-2222-4222-8222-222222222222",
+      "feie-fp-n20h",
+      "x".repeat(65),
+      "key",
+    );
+
+    expect(result.ok).toBe(false);
+    expect(createPrinterMock).not.toHaveBeenCalled();
+  });
 });

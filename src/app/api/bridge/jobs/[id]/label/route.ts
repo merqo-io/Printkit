@@ -3,6 +3,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { getPrinterByLocation } from "@/lib/printers";
 import { renderJobForPrinter } from "@/lib/render-job";
 import type { Json } from "@/lib/types";
+import { uuidSchema } from "@/lib/schemas";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -16,7 +17,9 @@ const notFound = () =>
  * this is rather than a filter written here.
  */
 export async function GET(_request: Request, context: RouteContext) {
-  const { id } = await context.params;
+  const parsed = uuidSchema.safeParse((await context.params).id);
+  if (!parsed.success) return notFound();
+  const id = parsed.data;
   const supabase = await createServerClient();
 
   const {

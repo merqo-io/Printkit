@@ -53,7 +53,7 @@ import { POST as result } from "./jobs/[id]/result/route";
 const printer = {
   id: "printer-1",
   vendor_id: "vendor-1",
-  location_id: "loc-1",
+  location_id: "22222222-2222-4222-8222-222222222222",
   catalog_id: "niimbot-b1",
   connector: "bridge",
   driver: "niimbot",
@@ -66,7 +66,9 @@ const printer = {
 };
 
 const ATTEMPT = "2026-10-08T00:00:00.123456+00:00";
-const context = { params: Promise.resolve({ id: "job-1" }) };
+const context = {
+  params: Promise.resolve({ id: "11111111-1111-4111-8111-111111111111" }),
+};
 
 function agentRequest(init?: RequestInit) {
   return new Request("https://printkit.test/api/v1/bridge-agent/next-job", {
@@ -164,17 +166,27 @@ describe("GET /api/v1/bridge-agent/next-job", () => {
     const res = await nextJob(agentRequest());
 
     expect(res.status).toBe(204);
-    expect(sweepLocationMock).toHaveBeenCalledWith("loc-1");
+    expect(sweepLocationMock).toHaveBeenCalledWith(
+      "22222222-2222-4222-8222-222222222222",
+    );
     expect(touchPrinterSeenMock).toHaveBeenCalledWith(printer);
   });
 
   it("claims one job at the agent's own booth", async () => {
-    claimJobMock.mockResolvedValue({ id: "job-1", sent_at: ATTEMPT });
+    claimJobMock.mockResolvedValue({
+      id: "11111111-1111-4111-8111-111111111111",
+      sent_at: ATTEMPT,
+    });
 
     const res = await nextJob(agentRequest());
 
-    expect(claimJobMock).toHaveBeenCalledWith("loc-1");
-    expect(await res.json()).toEqual({ job_id: "job-1", sent_at: ATTEMPT });
+    expect(claimJobMock).toHaveBeenCalledWith(
+      "22222222-2222-4222-8222-222222222222",
+    );
+    expect(await res.json()).toEqual({
+      job_id: "11111111-1111-4111-8111-111111111111",
+      sent_at: ATTEMPT,
+    });
   });
 });
 
@@ -185,7 +197,11 @@ describe("GET /api/v1/bridge-agent/jobs/[id]/label", () => {
   });
 
   it("serves the label for a job this agent claimed", async () => {
-    jobReturns({ id: "job-1", payload: {}, status: "sent" });
+    jobReturns({
+      id: "11111111-1111-4111-8111-111111111111",
+      payload: {},
+      status: "sent",
+    });
 
     const res = await label(agentRequest(), context);
 
@@ -199,7 +215,11 @@ describe("GET /api/v1/bridge-agent/jobs/[id]/label", () => {
   });
 
   it("404s a job this agent has not claimed", async () => {
-    jobReturns({ id: "job-1", payload: {}, status: "queued" });
+    jobReturns({
+      id: "11111111-1111-4111-8111-111111111111",
+      payload: {},
+      status: "queued",
+    });
     expect((await label(agentRequest(), context)).status).toBe(404);
   });
 });
@@ -207,7 +227,7 @@ describe("GET /api/v1/bridge-agent/jobs/[id]/label", () => {
 describe("POST /api/v1/bridge-agent/jobs/[id]/result", () => {
   function resultRequest(body: Record<string, unknown>) {
     return new Request(
-      "https://printkit.test/api/v1/bridge-agent/jobs/job-1/result",
+      "https://printkit.test/api/v1/bridge-agent/jobs/11111111-1111-4111-8111-111111111111/result",
       {
         method: "POST",
         headers: { authorization: "Bearer agent-token" },
@@ -224,33 +244,53 @@ describe("POST /api/v1/bridge-agent/jobs/[id]/result", () => {
   });
 
   it("records a successful print", async () => {
-    jobReturns({ id: "job-1", status: "sent", sent_at: ATTEMPT });
+    jobReturns({
+      id: "11111111-1111-4111-8111-111111111111",
+      status: "sent",
+      sent_at: ATTEMPT,
+    });
 
     await result(resultRequest({ result: "printed" }), context);
 
     expect(updatePrintJobStatusMock).toHaveBeenCalledWith(
-      "job-1",
+      "11111111-1111-4111-8111-111111111111",
       "printed",
       undefined,
-      { locationId: "loc-1", expectedStatus: "sent", sentAt: ATTEMPT },
+      {
+        locationId: "22222222-2222-4222-8222-222222222222",
+        expectedStatus: "sent",
+        sentAt: ATTEMPT,
+      },
     );
   });
 
   it("records a failure with its reason", async () => {
-    jobReturns({ id: "job-1", status: "sent", sent_at: ATTEMPT });
+    jobReturns({
+      id: "11111111-1111-4111-8111-111111111111",
+      status: "sent",
+      sent_at: ATTEMPT,
+    });
 
     await result(resultRequest({ result: "failed" }), context);
 
     expect(updatePrintJobStatusMock).toHaveBeenCalledWith(
-      "job-1",
+      "11111111-1111-4111-8111-111111111111",
       "failed",
       "device_reported_error",
-      { locationId: "loc-1", expectedStatus: "sent", sentAt: ATTEMPT },
+      {
+        locationId: "22222222-2222-4222-8222-222222222222",
+        expectedStatus: "sent",
+        sentAt: ATTEMPT,
+      },
     );
   });
 
   it("only settles a job that is still waiting for its result", async () => {
-    jobReturns({ id: "job-1", status: "sent", sent_at: ATTEMPT });
+    jobReturns({
+      id: "11111111-1111-4111-8111-111111111111",
+      status: "sent",
+      sent_at: ATTEMPT,
+    });
 
     await result(resultRequest({ result: "printed" }), context);
 
@@ -268,7 +308,11 @@ describe("POST /api/v1/bridge-agent/jobs/[id]/result", () => {
   });
 
   it("rejects an unknown outcome", async () => {
-    jobReturns({ id: "job-1", status: "sent", sent_at: ATTEMPT });
+    jobReturns({
+      id: "11111111-1111-4111-8111-111111111111",
+      status: "sent",
+      sent_at: ATTEMPT,
+    });
 
     const res = await result(resultRequest({ result: "maybe" }), context);
 
@@ -278,7 +322,11 @@ describe("POST /api/v1/bridge-agent/jobs/[id]/result", () => {
 });
 
 it("does not acknowledge an agent result when persistence fails", async () => {
-  jobReturns({ id: "job-1", status: "sent", sent_at: ATTEMPT });
+  jobReturns({
+    id: "11111111-1111-4111-8111-111111111111",
+    status: "sent",
+    sent_at: ATTEMPT,
+  });
   updatePrintJobStatusMock.mockResolvedValueOnce({
     ok: false,
     error: "Could not update print job status.",
@@ -299,7 +347,11 @@ it("does not acknowledge an agent result when persistence fails", async () => {
 it.each(["printed", "failed"] as const)(
   "acknowledges same-attempt %s retries without writing",
   async (status) => {
-    jobReturns({ id: "job-1", status, sent_at: ATTEMPT });
+    jobReturns({
+      id: "11111111-1111-4111-8111-111111111111",
+      status,
+      sent_at: ATTEMPT,
+    });
     const response = await result(
       agentRequest({
         method: "POST",
@@ -314,7 +366,7 @@ it.each(["printed", "failed"] as const)(
 
 it("rejects a stale agent report after the same job is reclaimed", async () => {
   const current = {
-    id: "job-1",
+    id: "11111111-1111-4111-8111-111111111111",
     status: "sent",
     sent_at: "2026-10-08T00:00:01.123456+00:00",
   };
@@ -347,10 +399,14 @@ it("rejects a stale agent report after the same job is reclaimed", async () => {
   );
   expect(fresh.status).toBe(200);
   expect(updatePrintJobStatusMock).toHaveBeenCalledWith(
-    "job-1",
+    "11111111-1111-4111-8111-111111111111",
     "printed",
     undefined,
-    { locationId: "loc-1", expectedStatus: "sent", sentAt: current.sent_at },
+    {
+      locationId: "22222222-2222-4222-8222-222222222222",
+      expectedStatus: "sent",
+      sentAt: current.sent_at,
+    },
   );
 });
 
@@ -373,7 +429,11 @@ it.each([
 });
 
 it("refuses the opposite terminal result within the same attempt", async () => {
-  jobReturns({ id: "job-1", status: "printed", sent_at: ATTEMPT });
+  jobReturns({
+    id: "11111111-1111-4111-8111-111111111111",
+    status: "printed",
+    sent_at: ATTEMPT,
+  });
   const response = await result(
     agentRequest({
       method: "POST",

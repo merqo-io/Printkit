@@ -70,3 +70,5 @@ into.
 [printkit](../../../README.md)
 
 Unexpected OAuth or password request failures restore the controls and retain credentials for retry. Successful navigation retains the pending state while leaving the page; signup without a session displays email confirmation.
+
+`layout.tsx` also forces per-request rendering so the nonce CSP from `proxy.ts` reaches this page's scripts.

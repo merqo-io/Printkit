@@ -23,9 +23,11 @@ vi.mock("@/lib/label-raster", () => ({
 
 import { GET } from "./route";
 
-const context = { params: Promise.resolve({ id: "job-1" }) };
+const context = {
+  params: Promise.resolve({ id: "11111111-1111-4111-8111-111111111111" }),
+};
 const request = new Request(
-  "https://printkit.test/api/bridge/jobs/job-1/label",
+  "https://printkit.test/api/bridge/jobs/11111111-1111-4111-8111-111111111111/label",
 );
 
 const printer = {
@@ -46,10 +48,23 @@ beforeEach(() => {
   selectMock.mockReset();
   getPrinterByLocationMock.mockReset().mockResolvedValue(printer);
   rasterizeLayoutMock.mockReset().mockResolvedValue(Buffer.from([1, 2, 3]));
-  jobReturns({ id: "job-1", payload: {}, location_id: "loc-1" });
+  jobReturns({
+    id: "11111111-1111-4111-8111-111111111111",
+    payload: {},
+    location_id: "22222222-2222-4222-8222-222222222222",
+  });
 });
 
 describe("GET /api/bridge/jobs/[id]/label", () => {
+  it("404s a job id that is not a UUID without reading the database", async () => {
+    const response = await GET(request, {
+      params: Promise.resolve({ id: "not-a-uuid" }),
+    });
+
+    expect(response.status).toBe(404);
+    expect(selectMock).not.toHaveBeenCalled();
+  });
+
   it("rejects a signed-out caller", async () => {
     getUserMock.mockResolvedValue({ data: { user: null } });
     expect((await GET(request, context)).status).toBe(401);
@@ -77,7 +92,11 @@ describe("GET /api/bridge/jobs/[id]/label", () => {
   });
 
   it("404s a job that has no booth yet", async () => {
-    jobReturns({ id: "job-1", payload: {}, location_id: null });
+    jobReturns({
+      id: "11111111-1111-4111-8111-111111111111",
+      payload: {},
+      location_id: null,
+    });
     expect((await GET(request, context)).status).toBe(404);
   });
 

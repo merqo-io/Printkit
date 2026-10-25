@@ -38,3 +38,7 @@ not pick these files up: its `include` covers `test/`, `src/` and
 ## Parent
 
 [printkit](../README.md)
+
+- `csp.spec.ts`: in CI (production build) `/login` serves a nonce CSP with nonced scripts and no violations, and a static guide page keeps the static policy.
+- `signed-in-smoke.spec.ts`: signed in as a vendor, `renderSmoke` over every dashboard page, failing on a 5xx, error boundary, page error, CSP violation or 404. It starts the stand-in below itself and runs in its own Playwright project after the others. It sees empty data, not seeded rows.
+- `mock-supabase.ts`: not a spec; a small `http` server standing in for GoTrue and PostgREST, plus `signedInCookie()`, which builds the Supabase auth cookie for a signed-in session.

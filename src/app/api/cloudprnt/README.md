@@ -40,3 +40,5 @@ screen that hands a vendor this URL is `dashboard/printers/setup`.
 ## Parent
 
 [api](../README.md)
+
+The URL token and the `token` query value are parsed with `deviceTokenSchema`; an invalid one is treated like an unknown device.

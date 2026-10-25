@@ -1,0 +1,21 @@
+# printkit personal-data inventory (2026-10-24)
+
+Source: `supabase/migrations` on `origin/main`. Nothing is dropped by this PR. "Candidate to drop" rows need owner approval, then a follow-up migration PR. This closes the "pending necessity review" note from the 10-08 audit.
+
+| Table                  | Column                         | Purpose                                                               | Read by                      | Retention today              | Verdict                                                                                                   |
+| ---------------------- | ------------------------------ | --------------------------------------------------------------------- | ---------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `print_jobs`           | `payload`                      | The label content, which includes the customer's name and order lines | Label renderer, history page | Kept forever                 | Required while the job is open; purge after printing is X-26 (candidate to drop the payload once printed) |
+| `print_jobs`           | `source_kit`, `source_ref`     | Which kit and order asked for the print                               | History page                 | Kept                         | Required                                                                                                  |
+| `print_jobs`           | `failure_reason`, `driver_ref` | Why a print failed; the connector's job reference                     | History page, support        | Kept                         | Required; retention period to set in X-26                                                                 |
+| `print_locations`      | `name`                         | The vendor's booth name                                               | Dashboard                    | Life of account              | Required                                                                                                  |
+| `printers`             | `device_ref`                   | Printer serial or address (for Feie, the SN)                          | Connectors                   | Life of account              | Required                                                                                                  |
+| `device_credentials`   | `token_hash`                   | Authenticates a bridge or CloudPRNT device (hashed)                   | Device routes                | Until revoked                | Required                                                                                                  |
+| `bridge_pairing_codes` | `code_hash`, `printer_id`      | One-time bridge pairing                                               | Pairing route                | No purge: expired codes stay | Required while live; purge is X-26                                                                        |
+| `kit_api_keys`         | key hash                       | A kit's access to printkit                                            | Kit API routes               | Until revoked                | Required                                                                                                  |
+| `legal_check_state`    | `email`                        | Cache of merqo's legal answer                                         | Legal gate                   | Life of account              | Required                                                                                                  |
+| `admin_audit`          | `admin_id`, `detail`           | Audit trail (printkit has an `admins` table but no admin console yet) | Not read                     | Kept                         | Required if an admin console is added; candidate to drop `admins` and `admin_audit` if none is planned    |
+
+## Proposed drop list (owner approval needed)
+
+1. `printkit.print_jobs.payload` after a job is printed (and past the reprint window): a purge or null-out, not a column drop (X-26). It holds customer names.
+2. `printkit.admins` and `printkit.admin_audit`, only if no admin console is planned for printkit.
