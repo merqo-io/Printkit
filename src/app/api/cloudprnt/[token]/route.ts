@@ -19,6 +19,13 @@ import { cloudPollJobToken } from "@/lib/connectors/cloud-poll/job-token";
 import { updatePrintJobStatus } from "@/lib/print-jobs";
 import type { CloudPollDriver } from "@/lib/connectors/types";
 import { deviceTokenSchema } from "@/lib/schemas";
+import { hashDeviceToken } from "@/lib/device-credentials";
+import {
+  rateLimit,
+  CLOUDPRNT_LIMIT,
+  RATE_WINDOW_SECONDS,
+} from "@/lib/rate-limit";
+import { createServiceClient } from "@/lib/supabase/server";
 
 type RouteContext = { params: Promise<{ token: string }> };
 
@@ -26,6 +33,20 @@ type Device = { printer: PrinterRow; driver: CloudPollDriver };
 
 const unauthorized = () =>
   NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+const tooMany = () =>
+  NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
+// Keyed by the token's hash so the limiter table never holds a usable token.
+async function withinLimit(context: RouteContext): Promise<boolean> {
+  const token = (await context.params).token;
+  return rateLimit(
+    await createServiceClient(),
+    `cloudprnt:${hashDeviceToken(token)}`,
+    CLOUDPRNT_LIMIT,
+    RATE_WINDOW_SECONDS,
+  );
+}
 
 /**
  * Shared entry for all three methods: the URL token names the printer, the
@@ -73,6 +94,7 @@ async function deviceMatches(
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  if (!(await withinLimit(context))) return tooMany();
   const device = await openDevice(context);
   if (!device) return unauthorized();
 
@@ -99,6 +121,7 @@ export async function POST(request: Request, context: RouteContext) {
 }
 
 export async function GET(request: Request, context: RouteContext) {
+  if (!(await withinLimit(context))) return tooMany();
   const device = await openDevice(context);
   if (!device) return unauthorized();
 
@@ -123,6 +146,7 @@ export async function GET(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(request: Request, context: RouteContext) {
+  if (!(await withinLimit(context))) return tooMany();
   const device = await openDevice(context);
   if (!device) return unauthorized();
 

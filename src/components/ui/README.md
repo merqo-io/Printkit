@@ -1,7 +1,8 @@
 # ui
 
-Local shadcn primitives used by Printkit: `badge`, `button`, `input`, `label`,
-`select`, `switch` and `tooltip`.
+Local shadcn primitives used by Printkit: `alert`, `badge`, `button`, `input`,
+`label`, `select`, `switch` and `tooltip`. `alert` carries the Bridge page's
+unsupported-device message.
 
 Feature components import these directly by name. `select` supports history
 location assignment; `switch` controls bridge mode; printer setup explanations use shared InfoTooltip. Account menus and help drawers use the shared Merqo UI

@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-29
+
+### Added
+
+- The Bridge page tells iPhone and iPad users that Bluetooth printing cannot work there (Apple blocks Web Bluetooth in every iOS browser) and offers an Android phone, a computer with Chrome or Edge, or a cloud printer instead. Other browsers without Web Bluetooth, and non-https pages, get their own message. None of them shows a pair button that cannot work.
+
+### Security
+
+- Rate limits on the public Pi pairing route (10 per IP per minute) and on each CloudPRNT printer URL (120 per token per minute), backed by a new `printkit.rate_limits` table and service-role-only `check_rate_limit` (migration `0012`). The limiter fails open.
+
 ### Changed
 
 - `.claude/skill-usage.log` is git-ignored, matching qkit, merqo and loopkit (the skill-usage hook writes it locally on every skill call).

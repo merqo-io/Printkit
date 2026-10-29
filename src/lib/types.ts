@@ -296,12 +296,22 @@ export type Database = {
         };
         Relationships: [];
       };
+      rate_limits: {
+        Row: { count: number; key: string; window_start: string };
+        Insert: { count?: number; key: string; window_start: string };
+        Update: { count?: number; key?: string; window_start?: string };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
       is_admin: { Args: { p_uid: string }; Returns: boolean };
+      check_rate_limit: {
+        Args: { p_key: string; p_limit: number; p_window_seconds: number };
+        Returns: boolean;
+      };
       claim_cloud_poll_job: {
         Args: {
           p_location_id: string;

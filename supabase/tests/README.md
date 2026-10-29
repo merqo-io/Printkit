@@ -44,6 +44,8 @@ app _asks_ the database for, never what the database _permits_.
   failure. Keep `select plan(N)` in step with the number of assertions;
   pgTAP fails the run on a count mismatch.
 
+- `rate-limits.test.sql` — `0012`: no client access to `rate_limits`, anon and authenticated cannot call the limiter, per-key counting, input bounds and window expiry.
+
 ## Connectivity
 
 Run with `supabase test db` (Supabase CLI, Docker required), which applies

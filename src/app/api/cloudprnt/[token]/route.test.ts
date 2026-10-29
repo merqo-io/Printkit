@@ -33,6 +33,11 @@ vi.mock("@/lib/print-jobs", () => ({
     updatePrintJobStatusMock(...args),
 }));
 
+const rpcMock = vi.fn();
+vi.mock("@/lib/supabase/server", () => ({
+  createServiceClient: () => Promise.resolve({ rpc: rpcMock }),
+}));
+
 import { POST, GET, DELETE } from "./route";
 import { cloudPollJobToken } from "@/lib/connectors/cloud-poll/job-token";
 
@@ -71,6 +76,7 @@ function pollRequest(body: unknown = { printerMAC: "00:11:62:aa:bb:cc" }) {
 }
 
 beforeEach(() => {
+  rpcMock.mockReset().mockResolvedValue({ data: true, error: null });
   resolveDeviceMock.mockReset().mockResolvedValue(printer);
   renderJobPngMock.mockReset().mockResolvedValue(Buffer.from([1, 2, 3]));
   logDeviceEventMock.mockClear();
@@ -306,4 +312,31 @@ it("rejects an opposite terminal confirmation", async () => {
   );
   expect(response.status).toBe(409);
   expect(updatePrintJobStatusMock).not.toHaveBeenCalled();
+});
+
+describe("rate limit", () => {
+  it("answers 429 once a token passes its limit, before touching the device", async () => {
+    rpcMock.mockResolvedValue({ data: false, error: null });
+    resolveDeviceMock.mockClear();
+    const response = await POST(pollRequest(), context);
+    expect(response.status).toBe(429);
+    expect(resolveDeviceMock).not.toHaveBeenCalled();
+  });
+
+  it("keys the limit on the token hash, 120 per 60 seconds", async () => {
+    resolveDeviceMock.mockResolvedValue(null);
+    await GET(new Request("https://printkit.test/api/cloudprnt/tok"), context);
+    const [fn, args] = rpcMock.mock.calls.at(-1) ?? [];
+    expect(fn).toBe("check_rate_limit");
+    expect(args).toMatchObject({ p_limit: 120, p_window_seconds: 60 });
+    expect(args.p_key).toMatch(/^cloudprnt:[0-9a-f]{64}$/);
+    expect(args.p_key).not.toContain("tok");
+  });
+
+  it("lets the request through when the limiter errors", async () => {
+    rpcMock.mockResolvedValue({ data: null, error: { message: "down" } });
+    resolveDeviceMock.mockResolvedValue(null);
+    const response = await POST(pollRequest(), context);
+    expect(response.status).toBe(401);
+  });
 });
