@@ -89,3 +89,22 @@ describe("buildLabelLayout", () => {
     expect(large.elements[0].yMm).toBeGreaterThan(small.elements[0].yMm);
   });
 });
+
+it("includes the drink, modifiers and unit position on each label", () => {
+  const layout = buildLabelLayout(
+    {
+      customer_name: "Ann",
+      order_number: "007",
+      item_name: "Kopi",
+      item_options: "Sugar: Less",
+      label_index: "2",
+      label_total: "3",
+    },
+    { widthMm: 50, heightMm: 30 },
+  );
+  expect(
+    layout.elements
+      .filter((element) => element.kind === "text")
+      .map((element) => element.text),
+  ).toEqual(["#007", "Ann", "Kopi", "Sugar: Less", "2/3"]);
+});

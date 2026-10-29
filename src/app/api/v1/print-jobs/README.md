@@ -34,3 +34,7 @@ via `resolveActiveLocation` (`@/lib/print-locations`) before inserting.
 [src/app](../../../README.md)
 
 Request parsing rejects oversized bodies before privileged creation. Connector payload byte limits are enforced separately before dispatch.
+
+## Label batches
+
+Set `job_type` to `label_batch` and send `labels: [{ item_name, item_options? }, ...]` (1–100 units). Common `payload` still holds `customer_name` and `order_number`. The response `id` is a batch UUID. Identical retries return the same batch without duplicating children. Changed snapshots return 422; a pre-existing legacy job returns 409. Callback `source_ref` remains the original order reference and reports printed only after all children succeed. Migration 0011 is required; legacy bodies retain their original behavior. Request bodies are bounded at 64 KiB.

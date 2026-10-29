@@ -133,3 +133,51 @@ describe("POST /api/v1/print-jobs", () => {
     });
   });
 });
+
+describe("batch API boundary", () => {
+  beforeEach(() => {
+    verifyKitAuthMock.mockResolvedValue({ kitSlug: "qkit" });
+    createPrintJobMock.mockReset().mockResolvedValue({ ok: true, id: "batch" });
+  });
+  const body = {
+    vendor_id: "11111111-1111-4111-8111-111111111111",
+    source_ref: "order",
+    payload: { customer_name: "Ann", order_number: "007" },
+  };
+  it("passes every unit through without collapsing identical drinks", async () => {
+    const labels = [
+      { item_name: "Kopi" },
+      { item_name: "Kopi" },
+      { item_name: "Tea" },
+    ];
+    expect(
+      (await POST(requestWith({ ...body, job_type: "label_batch", labels })))
+        .status,
+    ).toBe(201);
+    expect(createPrintJobMock).toHaveBeenCalledWith(
+      expect.objectContaining({ labels, jobType: "label_batch" }),
+    );
+  });
+  it.each([
+    { job_type: "label_batch" },
+    { labels: [{ item_name: "Kopi" }] },
+    { job_type: "label_batch", labels: [] },
+    {
+      job_type: "label_batch",
+      labels: Array.from({ length: 101 }, () => ({ item_name: "Kopi" })),
+    },
+  ])("rejects incomplete or oversized batches", async (invalid) => {
+    expect((await POST(requestWith({ ...body, ...invalid }))).status).toBe(400);
+    expect(createPrintJobMock).not.toHaveBeenCalled();
+  });
+  it("bounds the full request body before parsing", async () => {
+    expect(
+      (
+        await POST(
+          requestWith({ ...body, payload: { text: "x".repeat(65536) } }),
+        )
+      ).status,
+    ).toBe(413);
+    expect(createPrintJobMock).not.toHaveBeenCalled();
+  });
+});

@@ -111,3 +111,7 @@ The AI harness follows templateCentral 6.0.4: hook commands are anchored on the 
 ## Lint
 
 `eslint.config.mjs` consumes the shared `@merqo/ui/eslint` preset (comment and directive hygiene, size and complexity limits, no colour literals or em dashes in `src`). `eslint.config.test.ts` asserts the key rules stay at `error`. Colour literals are allowed only in `src/lib/brand-icon.tsx`.
+
+## Multi-label batch candidate
+
+The `label_batch` API creates one ordinary job per item unit and reports terminal status for the whole order. Migration 0011 must be applied before rollout. See [the specification](docs/superpowers/specs/2026-10-29-multi-drink-labels.md) for compatibility, retry semantics and the pending Kopitiam Cart physical acceptance checklist.

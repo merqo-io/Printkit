@@ -93,8 +93,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      print_batches: {
+        Row: {
+          id: string;
+          vendor_id: string;
+          source_kit: string;
+          source_ref: string;
+          payload: Json;
+          labels: Json;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          vendor_id: string;
+          source_kit: string;
+          source_ref: string;
+          payload: Json;
+          labels: Json;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: { status?: string; updated_at?: string };
+        Relationships: [];
+      };
       print_jobs: {
         Row: {
+          batch_id: string | null;
           created_at: string;
           driver_ref: string | null;
           failure_reason: string | null;
@@ -111,6 +136,7 @@ export type Database = {
           vendor_id: string;
         };
         Insert: {
+          batch_id?: string | null;
           created_at?: string;
           driver_ref?: string | null;
           failure_reason?: string | null;
@@ -127,6 +153,7 @@ export type Database = {
           vendor_id: string;
         };
         Update: {
+          batch_id?: string | null;
           created_at?: string;
           driver_ref?: string | null;
           failure_reason?: string | null;
@@ -301,6 +328,26 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      create_label_batch: {
+        Args: {
+          p_vendor_id: string;
+          p_source_kit: string;
+          p_source_ref: string;
+          p_payload: Json;
+          p_labels: Json;
+          p_location_id: string | null;
+        };
+        Returns: { id: string; job_ids: string[] }[];
+      };
+      label_batch_status: {
+        Args: { p_batch_id: string };
+        Returns: {
+          source_kit: string;
+          source_ref: string;
+          status: string;
+          updated_at: string;
+        }[];
+      };
       is_admin: { Args: { p_uid: string }; Returns: boolean };
       claim_cloud_poll_job: {
         Args: {

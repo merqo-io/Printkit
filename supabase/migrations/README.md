@@ -27,3 +27,7 @@ apply it before deploying the strict revision-token HTTP route.
 ## Scoped administration predicates
 
 The latest migration limits `is_admin(uuid)` to the signed-in user or trusted service-role administration. Anonymous and foreign-user membership probing is denied; existing self-scoped RLS policies retain their behavior.
+
+`0011_label_batches.sql` adds atomic per-unit batches, service-only creation/status RPCs and vendor-read RLS. Apply through the normal human-controlled migration workflow before deploying the multi-label caller. The local-only regression command is documented in `scripts/test-label-batches.mjs`; it does not operate on Supabase.
+
+`0011_label_batches.sql` adds atomic per-unit batches, service-only creation/status RPCs and vendor-read RLS. Apply through the normal human-controlled migration workflow before deploying the multi-label caller. The local-only regression command is documented in `scripts/test-label-batches.mjs`; it does not operate on Supabase.

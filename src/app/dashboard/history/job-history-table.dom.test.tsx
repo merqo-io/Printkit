@@ -11,6 +11,7 @@ vi.mock("./actions", () => ({
 }));
 
 const JOB: PrintJob = {
+  batch_id: null,
   id: "job-1",
   vendor_id: "vendor-1",
   job_type: "label",

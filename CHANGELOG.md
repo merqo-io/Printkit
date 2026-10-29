@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased: multi-label batches
+
+- Add atomic bounded label batches with one job and acknowledgement per unit, aggregate order callbacks and idempotent batch retries. Existing single-label integrations remain compatible. Migration 0011 and physical staging acceptance are required.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
