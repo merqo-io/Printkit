@@ -19,3 +19,5 @@ The Raspberry Pi agent's source, built to `../dist/` by `npm run build`.
 [bridge-agent](../README.md)
 
 The polling client binds result reports to the claimed job attempt. Configuration tests cover private credential storage; mocked transport tests do not establish physical printer behavior.
+
+Batch jobs are delivered as separate label jobs. The loop regression suite covers independent success and failure for a three-label order.

@@ -213,3 +213,5 @@ and never sends a terminal kit callback.
 `bounded-body.ts` caps streamed request bytes before parsing. `bounded-json.ts` parses bounded JSON and form bodies, rejecting malformed Content-Length and JSON UTF-8 while cancelling oversized input. Public pairing and Feie callbacks use 16 KiB; authenticated CloudPRNT polling uses 64 KiB.
 
 `security-headers.ts` holds the nonce route list and CSP source lists (including the Vercel toolbar origin outside production); `theme-props.ts` is shared by the root layout and the CSP; `columns.ts` lists the columns each table read selects.
+
+`label-batch.ts` validates bounded label batches; `print-jobs.ts` creates and reconciles their individual jobs. Batch callbacks report the aggregate order status.
