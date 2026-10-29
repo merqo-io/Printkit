@@ -20,6 +20,11 @@ vi.mock("@/lib/print-jobs", () => ({
     updatePrintJobStatusMock(...args),
 }));
 
+const recordOpsEventMock = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/ops-events", () => ({
+  recordOpsEvent: (...args: unknown[]) => recordOpsEventMock(...args),
+}));
+
 const selectMock = vi.fn();
 vi.mock("@/lib/supabase/server", () => ({
   createServiceClient: () =>
@@ -74,6 +79,7 @@ beforeEach(() => {
   verifySpy.mockClear();
   selectMock.mockClear();
   updatePrintJobStatusMock.mockClear();
+  recordOpsEventMock.mockClear();
   jobFound("job-1");
 });
 
@@ -151,6 +157,68 @@ describe("POST /api/feie/callback", () => {
     expect(res.status).toBe(200);
     expect(await res.text()).toBe("SUCCESS");
     expect(updatePrintJobStatusMock).not.toHaveBeenCalled();
+  });
+
+  it("logs a webhook_rejected event against the job's vendor on a bad signature", async () => {
+    selectMock.mockReturnValue({
+      eq: () => ({
+        maybeSingle: () =>
+          Promise.resolve({
+            data: { id: "job-1", status: "sent", vendor_id: "vendor-1" },
+            error: null,
+          }),
+      }),
+    });
+
+    const res = await POST(callback(fields, "not-a-signature"));
+
+    expect(res.status).toBe(401);
+    expect(recordOpsEventMock).toHaveBeenCalledWith(expect.anything(), {
+      vendorId: "vendor-1",
+      kind: "webhook_rejected",
+      ref: "job-1",
+      code: "signature_invalid",
+    });
+  });
+
+  it("logs public_key_missing when no key is configured", async () => {
+    delete process.env.FEIE_CALLBACK_PUBLIC_KEY;
+    selectMock.mockReturnValue({
+      eq: () => ({
+        maybeSingle: () =>
+          Promise.resolve({
+            data: { id: "job-1", status: "sent", vendor_id: "vendor-1" },
+            error: null,
+          }),
+      }),
+    });
+
+    await POST(callback(fields));
+
+    expect(recordOpsEventMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ code: "public_key_missing" }),
+    );
+  });
+
+  it("logs nothing for a bad signature on an order that is not ours", async () => {
+    jobFound(null);
+
+    const res = await POST(callback(fields, "not-a-signature"));
+
+    expect(res.status).toBe(401);
+    expect(recordOpsEventMock).not.toHaveBeenCalled();
+  });
+
+  it("still answers 401 when the rejection lookup itself fails", async () => {
+    selectMock.mockImplementation(() => {
+      throw new Error("db down");
+    });
+
+    const res = await POST(callback(fields, "not-a-signature"));
+
+    expect(res.status).toBe(401);
+    expect(recordOpsEventMock).not.toHaveBeenCalled();
   });
 
   it("rejects a body with no signature at all", async () => {

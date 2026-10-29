@@ -26,4 +26,9 @@ callback cannot settle a different delivery attempt after the lookup.
 
 Callback form bodies are capped at 16 KiB of streamed bytes before RSA verification or database lookup. Both multipart and URL-encoded forms retain their signature semantics; oversized input returns 413 regardless of Content-Length.
 
+A callback that fails the signature check (or arrives with no public key
+configured) is logged as a `webhook_rejected` ops event (`signature_invalid`
+or `public_key_missing`) against the vendor of the job its `orderId` names.
+An `orderId` that matches no job is not logged. The log never changes the 401.
+
 The `orderId`, `status` and `sign` form fields are parsed with `feieCallbackFieldsSchema` before the signature check.
