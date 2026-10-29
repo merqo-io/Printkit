@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.1] - 2026-10-30
+
+### Changed
+
+- Indexed the foreign keys the Supabase advisor flagged (`admin_audit.admin_id`, `bridge_pairing_codes.printer_id`, `printers (location_id, vendor_id)`, `print_batches.vendor_id`) in migration `0015_fk_indexes.sql`. Apply it on staging, then prod. No code or type changes.
+
 ## [0.6.0] - 2026-10-30
 
 ### Added
