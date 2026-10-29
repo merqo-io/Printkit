@@ -69,12 +69,7 @@ try {
   ]) {
     sql(readFileSync(resolve("supabase/migrations", file), "utf8"));
   }
-  sql(
-    readFileSync(
-      resolve("supabase/tests/label-batches.regression.sql"),
-      "utf8",
-    ),
-  );
+  sql(readFileSync(resolve("scripts/label-batches.regression.sql"), "utf8"));
   const concurrent = `select * from printkit.create_label_batch('11111111-1111-4111-8111-111111111111','qkit','concurrent','{}','[{"item_name":"Kopi"},{"item_name":"Tea"}]',null);`;
   const exec = promisify(execFile);
   await Promise.all(
