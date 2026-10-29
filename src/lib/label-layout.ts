@@ -40,7 +40,10 @@ export function buildLabelLayout(
   const rawName = payloadField(payload, "customer_name", "").trim();
   const name = truncate(rawName || "Customer");
   const orderNumber = payloadField(payload, "order_number", "").trim() || "?";
-  const item = payloadField(payload, "item_name", "").trim();
+  const item =
+    payloadField(payload, "_printkit_label_batch", "") === "v1"
+      ? payloadField(payload, "item_name", "").trim()
+      : "";
   const options = payloadField(payload, "item_options", "").trim();
   const index = payloadField(payload, "label_index", "");
   const total = payloadField(payload, "label_total", "");

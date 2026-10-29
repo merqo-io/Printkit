@@ -59,7 +59,7 @@ begin
       values(p_vendor_id, p_source_kit, p_source_ref, p_payload, p_labels) returning * into b;
     insert into printkit.print_jobs(vendor_id, source_kit, source_ref, payload, location_id, batch_id)
       select p_vendor_id, p_source_kit, b.id::text || ':label:' || n,
-        p_payload || label || jsonb_build_object('label_index', n::text, 'label_total', jsonb_array_length(p_labels)::text),
+        p_payload || label || jsonb_build_object('_printkit_label_batch', 'v1', 'label_index', n::text, 'label_total', jsonb_array_length(p_labels)::text),
         p_location_id, b.id
       from jsonb_array_elements(p_labels) with ordinality as entries(label, n);
   end if;

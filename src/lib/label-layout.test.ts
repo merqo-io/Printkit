@@ -96,6 +96,7 @@ it("includes the drink, modifiers and unit position on each label", () => {
       customer_name: "Ann",
       order_number: "007",
       item_name: "Kopi",
+      _printkit_label_batch: "v1",
       item_options: "Sugar: Less",
       label_index: "2",
       label_total: "3",
@@ -107,4 +108,14 @@ it("includes the drink, modifiers and unit position on each label", () => {
       .filter((element) => element.kind === "text")
       .map((element) => element.text),
   ).toEqual(["#007", "Ann", "Kopi", "Sugar: Less", "2/3"]);
+});
+
+it("preserves the legacy layout even if another integration supplied item fields", () => {
+  const legacy = { customer_name: "Ann", order_number: "007" };
+  expect(
+    buildLabelLayout(
+      { ...legacy, item_name: "Kopi", label_index: "1", label_total: "3" },
+      size,
+    ),
+  ).toEqual(buildLabelLayout(legacy, size));
 });
