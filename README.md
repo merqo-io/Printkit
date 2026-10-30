@@ -115,3 +115,5 @@ The AI harness follows templateCentral 6.0.4: hook commands are anchored on the 
 ## Multi-label batch candidate
 
 The `label_batch` API creates one ordinary job per item unit and reports terminal status for the whole order. Migration 0011 must be applied before rollout. See [the specification](docs/superpowers/specs/2026-10-29-multi-drink-labels.md) for compatibility, retry semantics and the pending Kopitiam Cart physical acceptance checklist.
+
+The Bluetooth bridge provides an optional 40 by 60 mm calibration preview and an explicitly initiated single-label sample print.
