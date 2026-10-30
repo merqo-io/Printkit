@@ -51,6 +51,9 @@ Design: `docs/superpowers/specs/2026-08-21-printkit-v0.1-design.md`,
 Deploy and staging (`printkit-staging.merqo.io`, previews on the shared staging
 Supabase project, `scripts/staging-migrate.sh`): `docs/DEPLOY.md`.
 
+Migration `0015_fk_indexes.sql` indexes the foreign keys the Supabase advisor
+flagged; it is safe to re-run.
+
 `next` is pinned to `16.3.8` and `vitest` to `4.1.11` (see `CHANGELOG.md`
 for the security context). The Vercel build does not use
 `output: "standalone"`; that config was dropped.
