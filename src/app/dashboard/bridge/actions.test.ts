@@ -302,16 +302,28 @@ describe("bridge job claiming and health", () => {
   });
 
   it("sweeps the booth and records the printer as seen on a heartbeat", async () => {
-    getPrinterByLocationMock.mockResolvedValue({ id: "printer-1" });
+    getPrinterByLocationMock.mockResolvedValue({
+      id: "printer-1",
+      catalog_id: "niimbot-b1",
+      connector: "bridge",
+    });
 
     await bridgeHeartbeat("loc-1", true);
 
     expect(sweepLocationMock).toHaveBeenCalledWith("loc-1");
-    expect(touchPrinterSeenMock).toHaveBeenCalledWith({ id: "printer-1" });
+    expect(touchPrinterSeenMock).toHaveBeenCalledWith({
+      id: "printer-1",
+      catalog_id: "niimbot-b1",
+      connector: "bridge",
+    });
   });
 
   it("sweeps but does not mark the printer seen while none is paired", async () => {
-    getPrinterByLocationMock.mockResolvedValue({ id: "printer-1" });
+    getPrinterByLocationMock.mockResolvedValue({
+      id: "printer-1",
+      catalog_id: "niimbot-b1",
+      connector: "bridge",
+    });
 
     await bridgeHeartbeat("loc-1", false);
 
@@ -327,6 +339,28 @@ describe("bridge job claiming and health", () => {
     expect(sweepLocationMock).not.toHaveBeenCalled();
   });
 
+  it("does not mark a different printer online from a Bluetooth heartbeat", async () => {
+    getPrinterByLocationMock.mockResolvedValue({
+      id: "virtual",
+      catalog_id: "virtual",
+      connector: "virtual",
+    });
+    await bridgeHeartbeat("loc-1", true);
+    expect(touchPrinterSeenMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects pairing when a different printer is configured", async () => {
+    getPrinterByLocationMock.mockResolvedValue({
+      id: "virtual",
+      catalog_id: "virtual",
+      connector: "virtual",
+    });
+    expect(await ensureBridgePrinter("loc-1")).toMatchObject({
+      success: false,
+    });
+    expect(createPrinterMock).not.toHaveBeenCalled();
+  });
+
   it("creates the Bluetooth printer row once", async () => {
     getPrinterByLocationMock.mockResolvedValue(null);
 
@@ -340,7 +374,11 @@ describe("bridge job claiming and health", () => {
   });
 
   it("reuses the printer row on a later pairing", async () => {
-    getPrinterByLocationMock.mockResolvedValue({ id: "printer-1" });
+    getPrinterByLocationMock.mockResolvedValue({
+      id: "printer-1",
+      catalog_id: "niimbot-b1",
+      connector: "bridge",
+    });
 
     await ensureBridgePrinter("loc-1");
 

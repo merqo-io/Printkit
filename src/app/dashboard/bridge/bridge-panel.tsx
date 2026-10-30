@@ -223,8 +223,14 @@ export function BridgePanel({
         setPairState("lost");
         toast.error("Printer disconnected.");
       });
-      await ensureBridgePrinter(locationId);
+      const registration = await ensureBridgePrinter(locationId);
       if (!isCurrent()) return;
+      if (!registration.success) {
+        disconnect();
+        toast.error(registration.error);
+        setPairState("error");
+        return;
+      }
       setPairState("connected");
       logBridgeEvent("printer_paired").catch(() => {});
       // Show the booth online now, not at the next 20-second beat.
