@@ -1,14 +1,22 @@
 # Changelog
 
-## Unreleased: multi-label batches
-
-- Add atomic bounded label batches with one job and acknowledgement per unit, aggregate order callbacks and idempotent batch retries. Existing single-label integrations remain compatible. Migration 0011 and physical staging acceptance are required.
-
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.5.0] - 2026-10-30
+
+### Added
+
+- Atomic bounded label batches with one job and acknowledgement per unit, aggregate order callbacks and idempotent batch retries (migration `0011_label_batches.sql`). Existing single-label integrations remain compatible. Apply migration 0011 and run physical staging acceptance before relying on batches.
+
+## [0.4.0] - 2026-10-29
+
+### Added
+
+- `ops_events` (migration `0013_ops_events.sql`): an append-only, service-role-only failure log with no PII columns (`ref` is a print job id, `code` a short machine code). `pg_cron` job `printkit-ops-events-purge` deletes rows older than 30 days, daily.
+- `print_failed` is logged whenever a job moves to `failed` (code = its `failure_reason`, or `unknown`). `webhook_rejected` is logged when a Feie callback fails its signature check and names one of printkit's jobs (`signature_invalid` or `public_key_missing`).
+- `GET /api/merqo/vendor-activity?email=...` for merqo's admin vendor page, bearer-gated by the new `MERQO_METRICS_SECRET`. Returns printer and job metrics, a triage status, and the last 72 hours of `incidents`/`recent`, including `print_stuck` for jobs queued or sent for over 10 minutes.
 
 ### Changed
 

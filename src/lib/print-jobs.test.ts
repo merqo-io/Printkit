@@ -25,6 +25,11 @@ vi.mock("@/lib/kit-callback", () => ({
     notifyKitPrintStatusMock(...args),
 }));
 
+const recordOpsEventMock = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/ops-events", () => ({
+  recordOpsEvent: (...args: unknown[]) => recordOpsEventMock(...args),
+}));
+
 const resolveActiveLocationMock = vi.fn();
 const listActiveLocationsMock = vi.fn().mockResolvedValue([]);
 vi.mock("@/lib/print-locations", () => ({
@@ -574,6 +579,66 @@ describe("updatePrintJobStatus", () => {
       failure_reason: null,
       printed_at: expect.any(String),
     });
+  });
+
+  it("records a print_failed ops event with the failure reason as code", async () => {
+    recordOpsEventMock.mockClear();
+    updateMock.mockReturnValue({
+      eq: () => ({
+        select: () => ({
+          single: () =>
+            Promise.resolve({
+              data: {
+                vendor_id: "vendor-1",
+                source_kit: "qkit",
+                source_ref: "order-1",
+                created_at: "2026-10-08T01:00:00.123456+00:00",
+              },
+              error: null,
+            }),
+        }),
+      }),
+    });
+
+    await updatePrintJobStatus("job-1", "failed", "printer_offline");
+    await updatePrintJobStatus("job-2", "failed");
+
+    expect(recordOpsEventMock).toHaveBeenNthCalledWith(1, expect.anything(), {
+      vendorId: "vendor-1",
+      kind: "print_failed",
+      ref: "job-1",
+      code: "printer_offline",
+    });
+    expect(recordOpsEventMock).toHaveBeenNthCalledWith(2, expect.anything(), {
+      vendorId: "vendor-1",
+      kind: "print_failed",
+      ref: "job-2",
+      code: "unknown",
+    });
+  });
+
+  it("records no ops event for a non-failed status", async () => {
+    recordOpsEventMock.mockClear();
+    updateMock.mockReturnValue({
+      eq: () => ({
+        select: () => ({
+          single: () =>
+            Promise.resolve({
+              data: {
+                vendor_id: "vendor-1",
+                source_kit: "qkit",
+                source_ref: "order-1",
+                created_at: "2026-10-08T01:00:00.123456+00:00",
+              },
+              error: null,
+            }),
+        }),
+      }),
+    });
+
+    await updatePrintJobStatus("job-1", "printed");
+
+    expect(recordOpsEventMock).not.toHaveBeenCalled();
   });
 
   it("returns ok:false when the row isn't found", async () => {

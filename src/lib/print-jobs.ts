@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { notifyKitPrintStatus } from "@/lib/kit-callback";
+import { recordOpsEvent } from "@/lib/ops-events";
 import { dispatchJob } from "@/lib/job-dispatch";
 import {
   resolveActiveLocation,
@@ -234,6 +235,34 @@ function applyConditions<Q extends Filterable<Q>>(
   return q;
 }
 
+type StatusChangedRow = {
+  batch_id: string | null;
+  source_kit: string;
+  source_ref: string;
+  sent_at: string | null;
+  requeued_at: string | null;
+  created_at: string;
+};
+
+/** Returns false only when a batch aggregate could not be read. */
+async function propagateStatus(
+  data: StatusChangedRow,
+  status: PrintJobStatus,
+): Promise<boolean> {
+  if (data.batch_id) return notifyBatchStatus(data.batch_id);
+  if (status === "printed" || status === "failed") {
+    // Fire-and-forget: never throws, and must not add the callback's own
+    // timeout to this call. Kits without a callback configured are no-ops.
+    void notifyKitPrintStatus(
+      data.source_kit,
+      data.source_ref,
+      status,
+      data.sent_at ?? data.requeued_at ?? data.created_at,
+    );
+  }
+  return true;
+}
+
 /**
  * The single choke point for changing a print_jobs row's status — every
  * caller (manual reprint, the bridge's print-result handler) is a thin
@@ -266,7 +295,7 @@ export async function updatePrintJobStatus(
   query = applyConditions(query, conditions);
   const { data, error } = await query
     .select(
-      "source_kit, source_ref, sent_at, requeued_at, created_at, batch_id",
+      "vendor_id, source_kit, source_ref, sent_at, requeued_at, created_at, batch_id",
     )
     .single();
 
@@ -275,21 +304,17 @@ export async function updatePrintJobStatus(
     return { ok: false, error: "Could not update print job status." };
   }
 
-  if (data.batch_id) {
-    if (!(await notifyBatchStatus(data.batch_id)))
-      return { ok: false, error: "Could not read label batch status." };
-  } else if (status === "printed" || status === "failed") {
-    // Fire-and-forget — never throws, must not add the callback's own
-    // timeout to this call. Kit-agnostic: notifyKitPrintStatus looks up
-    // whichever kit created this job and no-ops if it has no callback
-    // configured.
-    void notifyKitPrintStatus(
-      data.source_kit,
-      data.source_ref,
-      status,
-      data.sent_at ?? data.requeued_at ?? data.created_at,
-    );
+  if (status === "failed") {
+    await recordOpsEvent(supabase, {
+      vendorId: data.vendor_id,
+      kind: "print_failed",
+      ref: jobId,
+      code: failureReason ?? "unknown",
+    });
   }
+
+  if (!(await propagateStatus(data, status)))
+    return { ok: false, error: "Could not read label batch status." };
 
   return { ok: true };
 }

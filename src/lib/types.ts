@@ -117,6 +117,33 @@ export type Database = {
         Update: { status?: string; updated_at?: string };
         Relationships: [];
       };
+      ops_events: {
+        Row: {
+          code: string;
+          created_at: string;
+          id: number;
+          kind: string;
+          ref: string;
+          vendor_id: string;
+        };
+        Insert: {
+          code: string;
+          created_at?: string;
+          id?: never;
+          kind: string;
+          ref: string;
+          vendor_id: string;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          id?: never;
+          kind?: string;
+          ref?: string;
+          vendor_id?: string;
+        };
+        Relationships: [];
+      };
       print_jobs: {
         Row: {
           batch_id: string | null;
@@ -361,6 +388,10 @@ export type Database = {
       claim_job: {
         Args: { p_location_id: string; p_job_id?: string | null };
         Returns: Database["printkit"]["Tables"]["print_jobs"]["Row"][];
+      };
+      purge_ops_events: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
     };
     Enums: {
