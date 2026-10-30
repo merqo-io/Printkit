@@ -14,10 +14,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Rate limits on the public Pi pairing route (10 per IP per minute) and on each CloudPRNT printer URL (120 per token per minute), backed by a new `printkit.rate_limits` table and service-role-only `check_rate_limit` (migration `0014`). The limiter fails open.
 
-### Changed
-
-- `.claude/skill-usage.log` is git-ignored, matching qkit, merqo and loopkit (the skill-usage hook writes it locally on every skill call).
-
 ## [0.5.0] - 2026-10-30
 
 ### Added
@@ -32,6 +28,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `ops_events` (migration `0013_ops_events.sql`): an append-only, service-role-only failure log with no PII columns (`ref` is a print job id, `code` a short machine code). `pg_cron` job `printkit-ops-events-purge` deletes rows older than 30 days, daily.
 - `print_failed` is logged whenever a job moves to `failed` (code = its `failure_reason`, or `unknown`). `webhook_rejected` is logged when a Feie callback fails its signature check and names one of printkit's jobs (`signature_invalid` or `public_key_missing`).
 - `GET /api/merqo/vendor-activity?email=...` for merqo's admin vendor page, bearer-gated by the new `MERQO_METRICS_SECRET`. Returns printer and job metrics, a triage status, and the last 72 hours of `incidents`/`recent`, including `print_stuck` for jobs queued or sent for over 10 minutes.
+
+### Changed
+
+- `.claude/skill-usage.log` is git-ignored, matching qkit, merqo and loopkit (the skill-usage hook writes it locally on every skill call).
 
 ## [0.3.0] - 2026-10-25
 
