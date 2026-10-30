@@ -7,6 +7,7 @@ import {
   listActiveLocations,
 } from "@/lib/print-locations";
 import type { Json } from "@/lib/types";
+import { labelBatchSchema, type LabelBatch } from "@/lib/label-batch";
 
 export type CreatePrintJobInput = {
   vendorId: string;
@@ -18,10 +19,29 @@ export type CreatePrintJobInput = {
   // just lets a caller be explicit rather than relying on the insert's own
   // default, so the API shape isn't hardcoded to one job type.
   jobType?: string;
+  labels?: LabelBatch;
 };
 
 export type CreatePrintJobResult =
   { ok: true; id: string } | { ok: false; status: number; error: string };
+
+async function notifyBatchStatus(batchId: string): Promise<boolean> {
+  const supabase = await createServiceClient();
+  const { data, error } = await supabase.rpc("label_batch_status", {
+    p_batch_id: batchId,
+  });
+  const batch = data?.[0];
+  if (error || !batch) return false;
+  if (batch.status === "printed" || batch.status === "failed") {
+    void notifyKitPrintStatus(
+      batch.source_kit,
+      batch.source_ref,
+      batch.status,
+      batch.updated_at,
+    );
+  }
+  return true;
+}
 
 /**
  * Best-effort `locationRef` -> `location_id` resolution for
@@ -62,6 +82,45 @@ async function resolveSingleActiveLocation(
   return null;
 }
 
+function batchErrorStatus(code: string | undefined): number {
+  if (code === "23505") return 409;
+  if (code === "23514") return 422;
+  if (code === "23503") return 400;
+  return 500;
+}
+
+async function createLabelBatch(
+  input: CreatePrintJobInput,
+  locationId: string | null,
+): Promise<CreatePrintJobResult> {
+  const labels = labelBatchSchema.safeParse(input.labels);
+  if (!labels.success || (input.jobType ?? "label_batch") !== "label_batch") {
+    return { ok: false, status: 400, error: "Invalid label batch." };
+  }
+  const supabase = await createServiceClient();
+  const { data, error } = await supabase.rpc("create_label_batch", {
+    p_vendor_id: input.vendorId,
+    p_source_kit: input.sourceKit,
+    p_source_ref: input.sourceRef,
+    p_payload: input.payload as Json,
+    p_labels: labels.data as Json,
+    p_location_id: locationId,
+  });
+  if (error || !data?.[0]) {
+    return {
+      ok: false,
+      status: batchErrorStatus(error?.code),
+      error: "Could not create label batch.",
+    };
+  }
+  // Only queued children can be claimed; retries never requeue sent labels.
+  await Promise.allSettled(data[0].job_ids.map((id) => dispatchJob(id)));
+  // A repeat request also repairs a lost terminal callback, without printing again.
+  if (!(await notifyBatchStatus(data[0].id)))
+    console.error("Batch status reconciliation failed");
+  return { ok: true, id: data[0].id };
+}
+
 /**
  * Creates a queued print_jobs row. `(source_kit, source_ref)` is unique
  * (0003_printkit_print_jobs_idempotency.sql) — a retried call for the same
@@ -82,6 +141,7 @@ export async function createPrintJob(
     locationId = await resolveSingleActiveLocation(input.vendorId);
   }
 
+  if (input.labels !== undefined) return createLabelBatch(input, locationId);
   const supabase = await createServiceClient();
   const { data, error } = await supabase
     .from("print_jobs")
@@ -175,6 +235,34 @@ function applyConditions<Q extends Filterable<Q>>(
   return q;
 }
 
+type StatusChangedRow = {
+  batch_id: string | null;
+  source_kit: string;
+  source_ref: string;
+  sent_at: string | null;
+  requeued_at: string | null;
+  created_at: string;
+};
+
+/** Returns false only when a batch aggregate could not be read. */
+async function propagateStatus(
+  data: StatusChangedRow,
+  status: PrintJobStatus,
+): Promise<boolean> {
+  if (data.batch_id) return notifyBatchStatus(data.batch_id);
+  if (status === "printed" || status === "failed") {
+    // Fire-and-forget: never throws, and must not add the callback's own
+    // timeout to this call. Kits without a callback configured are no-ops.
+    void notifyKitPrintStatus(
+      data.source_kit,
+      data.source_ref,
+      status,
+      data.sent_at ?? data.requeued_at ?? data.created_at,
+    );
+  }
+  return true;
+}
+
 /**
  * The single choke point for changing a print_jobs row's status — every
  * caller (manual reprint, the bridge's print-result handler) is a thin
@@ -207,7 +295,7 @@ export async function updatePrintJobStatus(
   query = applyConditions(query, conditions);
   const { data, error } = await query
     .select(
-      "vendor_id, source_kit, source_ref, sent_at, requeued_at, created_at",
+      "vendor_id, source_kit, source_ref, sent_at, requeued_at, created_at, batch_id",
     )
     .single();
 
@@ -225,18 +313,8 @@ export async function updatePrintJobStatus(
     });
   }
 
-  if (status === "printed" || status === "failed") {
-    // Fire-and-forget — never throws, must not add the callback's own
-    // timeout to this call. Kit-agnostic: notifyKitPrintStatus looks up
-    // whichever kit created this job and no-ops if it has no callback
-    // configured.
-    void notifyKitPrintStatus(
-      data.source_kit,
-      data.source_ref,
-      status,
-      data.sent_at ?? data.requeued_at ?? data.created_at,
-    );
-  }
+  if (!(await propagateStatus(data, status)))
+    return { ok: false, error: "Could not read label batch status." };
 
   return { ok: true };
 }

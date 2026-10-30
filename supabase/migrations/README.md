@@ -24,6 +24,10 @@ Migration 0009 adds the service-only CloudPRNT revision claim wrapper. It
 locks the exact advertised queued row before calling the existing claim RPC;
 apply it before deploying the strict revision-token HTTP route.
 
+## Label batches
+
+`0011_label_batches.sql` adds atomic per-unit batches, service-only creation/status RPCs and vendor-read RLS. Apply through the normal human-controlled migration workflow before deploying the multi-label caller. The local-only regression command is documented in `scripts/test-label-batches.mjs`; it does not operate on Supabase.
+
 ## Ops events
 
 `0013_ops_events.sql` adds `ops_events`, the append-only failure log behind
@@ -38,4 +42,4 @@ job; scheduling is best-effort, so the migration still applies where
 
 ## Scoped administration predicates
 
-The latest migration limits `is_admin(uuid)` to the signed-in user or trusted service-role administration. Anonymous and foreign-user membership probing is denied; existing self-scoped RLS policies retain their behavior.
+Migration 0010 limits `is_admin(uuid)` to the signed-in user or trusted service-role administration. Anonymous and foreign-user membership probing is denied; existing self-scoped RLS policies retain their behavior.

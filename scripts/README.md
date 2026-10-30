@@ -10,3 +10,5 @@ The operator supplies Supabase credentials through the shell environment; these 
 staging-migrate.sh applies `supabase/migrations` to the shared staging Supabase project with psql, one transaction per file. Run it inside `postgres:17.6-alpine` with the repo mounted at `/repo` (merqo's `docs/STAGING.md`). With no arguments it bootstraps every file and refuses if the `printkit` schema already exists; with file arguments it applies only those, for the staging-first migration gate.
 
 [Parent](../README.md)
+
+`test-label-batches.mjs` runs the batch migration regression suite against a disposable local PostgreSQL cluster, including concurrent submissions and completions.

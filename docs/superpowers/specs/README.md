@@ -12,3 +12,5 @@ Design docs, one per feature, written and approved before the matching implement
 ## Parent
 
 [docs](../../README.md)
+
+The multi-drink label specification describes per-item batch creation, connector delivery, status aggregation, and staging acceptance.

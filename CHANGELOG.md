@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0] - 2026-10-30
+
+### Added
+
+- Atomic bounded label batches with one job and acknowledgement per unit, aggregate order callbacks and idempotent batch retries (migration `0011_label_batches.sql`). Existing single-label integrations remain compatible. Apply migration 0011 and run physical staging acceptance before relying on batches.
+- A digital 40 by 60 mm B1 sample preview on the bridge dashboard and an explicit one-label calibration print.
+
 ## [0.4.0] - 2026-10-29
 
 ### Added

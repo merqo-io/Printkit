@@ -15,3 +15,5 @@ an order will produce.
 ## Parent
 
 [bridge](../README.md)
+
+The optional `sample=b1-40x60` selects an authenticated 40 by 60 mm calibration preview, using the same rasterizer as the bridge test print.
