@@ -12,6 +12,9 @@ vi.mock("@/lib/bridge-mode", () => ({
   isBridgeModeEnabled: vi.fn().mockReturnValue(false),
   setBridgeModeEnabled: vi.fn(),
 }));
+vi.mock("@/lib/bluetooth-support", () => ({
+  getBluetoothSupport: vi.fn().mockReturnValue("supported"),
+}));
 vi.mock("./use-job-delivery", () => ({ useJobDelivery: vi.fn() }));
 vi.mock("@/lib/niimbot-print", () => ({
   connectPrinter: vi.fn().mockResolvedValue({ deviceName: "B1" }),
@@ -32,6 +35,7 @@ vi.mock("./actions", () => ({
 }));
 
 import { isBridgeModeEnabled, setBridgeModeEnabled } from "@/lib/bridge-mode";
+import { getBluetoothSupport } from "@/lib/bluetooth-support";
 import {
   connectPrinter,
   printLabel,
@@ -505,6 +509,37 @@ describe("BridgePanel", () => {
           ATTEMPT,
         );
       });
+    });
+  });
+  describe("Bluetooth support", () => {
+    it("tells an iPhone or iPad user Bluetooth will not work, with no pair button", () => {
+      vi.mocked(getBluetoothSupport).mockReturnValue("ios");
+      vi.mocked(isBridgeModeEnabled).mockReturnValue(true);
+      render(<BridgePanel vendorId="vendor-1" locationId="loc-1" />);
+      expect(
+        screen.getByText("Bluetooth printing does not work on iPhone or iPad"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Apple blocks Web Bluetooth in every iOS browser/),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("button")).not.toBeInTheDocument();
+      expect(screen.queryByRole("switch")).not.toBeInTheDocument();
+      expect(connectPrinter).not.toHaveBeenCalled();
+    });
+
+    it("asks an unsupported desktop browser to switch to Chrome or Edge", () => {
+      vi.mocked(getBluetoothSupport).mockReturnValue("unsupported-browser");
+      render(<BridgePanel vendorId="vendor-1" locationId="loc-1" />);
+      expect(screen.getByText(/in Chrome or Edge/)).toBeInTheDocument();
+      expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    });
+
+    it("asks for https when the page is not a secure context", () => {
+      vi.mocked(getBluetoothSupport).mockReturnValue("insecure-context");
+      render(<BridgePanel vendorId="vendor-1" locationId="loc-1" />);
+      expect(
+        screen.getByText("Bluetooth needs a secure connection"),
+      ).toBeInTheDocument();
     });
   });
 });

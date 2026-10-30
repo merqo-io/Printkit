@@ -15,6 +15,7 @@ tables, RLS policies, and grants, applied in order.
 - `0006_kit_api_keys_callback.sql` — adds nullable `callback_url`/`callback_secret` to `kit_api_keys`, so a calling kit's print-status callback is configured per-row (`src/lib/kit-callback.ts`) instead of hardcoded to one kit's env vars. Plaintext, not hashed — printkit must present them itself.
 - `0007_legal_check_state.sql` — `legal_check_state`, a TTL cache (`email` PK, `checked_at`, `is_current`) for "is this vendor's terms/privacy acceptance current with merqo?" — printkit owns no acceptance record itself, so `src/lib/legal-gate.ts` calls merqo's `GET /api/merqo/legal-status` and caches the result here for 5 minutes, mirroring merqo's own `vendor_sync_state` throttle. Service-role only (RLS on, zero policies), same shape as `kit_api_keys`.
 - `0008_printers_core.sql` — the printer-connectors core (`docs/superpowers/specs/2026-09-20-printer-connectors-design.md`): `printers` (one configured physical printer per `print_locations` row, carrying its catalog id, connector and driver, label size, `device_ref` and the `last_seen_at` health signal), `device_credentials` and `bridge_pairing_codes` (device-presented secrets as SHA-256 hashes, service-role only, zero policies — same shape as `kit_api_keys`), four new `print_jobs` columns (`driver_ref`, `failure_reason`, `sent_at`, `requeued_at`), and `claim_job(p_location_id, p_job_id)` — a `security definer` function that is the only path from `queued` to `sent`, using `for update skip locked` so two devices can never claim the same job. Also adds `print_locations_id_vendor_key` so `printers` enforces "the location belongs to the same vendor" with a composite FK rather than app code.
+- `0014_rate_limits.sql`: `rate_limits` + `check_rate_limit(key, limit, window_seconds)`, the fixed-window limiter copied from paykit `0019` (bounded inputs, sampled cleanup keeping a day of windows). RLS on, no policies; `EXECUTE` for `service_role` only. Backs the pairing and CloudPRNT route limits.
 
 ## Parent
 
@@ -24,10 +25,22 @@ Migration 0009 adds the service-only CloudPRNT revision claim wrapper. It
 locks the exact advertised queued row before calling the existing claim RPC;
 apply it before deploying the strict revision-token HTTP route.
 
+## Label batches
+
+`0011_label_batches.sql` adds atomic per-unit batches, service-only creation/status RPCs and vendor-read RLS. Apply through the normal human-controlled migration workflow before deploying the multi-label caller. The local-only regression command is documented in `scripts/test-label-batches.mjs`; it does not operate on Supabase.
+
+## Ops events
+
+`0013_ops_events.sql` adds `ops_events`, the append-only failure log behind
+`GET /api/merqo/vendor-activity`'s incidents. Its `kind` check allows only the
+kinds printkit writes (`print_failed`, `webhook_rejected`); `print_stuck` is
+computed from `print_jobs`. `ref` and `code` are capped at 64 characters and
+hold internal ids and machine codes only. RLS is on with zero policies, and
+only `service_role` may select or insert. `purge_ops_events()` deletes rows
+older than 30 days and runs daily as the `printkit-ops-events-purge` `pg_cron`
+job; scheduling is best-effort, so the migration still applies where
+`pg_cron` is unavailable.
+
 ## Scoped administration predicates
 
-The latest migration limits `is_admin(uuid)` to the signed-in user or trusted service-role administration. Anonymous and foreign-user membership probing is denied; existing self-scoped RLS policies retain their behavior.
-
-`0011_label_batches.sql` adds atomic per-unit batches, service-only creation/status RPCs and vendor-read RLS. Apply through the normal human-controlled migration workflow before deploying the multi-label caller. The local-only regression command is documented in `scripts/test-label-batches.mjs`; it does not operate on Supabase.
-
-`0011_label_batches.sql` adds atomic per-unit batches, service-only creation/status RPCs and vendor-read RLS. Apply through the normal human-controlled migration workflow before deploying the multi-label caller. The local-only regression command is documented in `scripts/test-label-batches.mjs`; it does not operate on Supabase.
+Migration 0010 limits `is_admin(uuid)` to the signed-in user or trusted service-role administration. Anonymous and foreign-user membership probing is denied; existing self-scoped RLS policies retain their behavior.

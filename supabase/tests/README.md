@@ -44,6 +44,8 @@ app _asks_ the database for, never what the database _permits_.
   failure. Keep `select plan(N)` in step with the number of assertions;
   pgTAP fails the run on a count mismatch.
 
+- `rate-limits.test.sql`: `0014`: no client access to `rate_limits`, anon and authenticated cannot call the limiter, per-key counting, input bounds and window expiry.
+
 ## Connectivity
 
 Run with `supabase test db` (Supabase CLI, Docker required), which applies
@@ -54,6 +56,12 @@ no API keys, no running Next.js app needed.
 ## Parent
 
 See the repo root [README.md](../../README.md) for the full layout.
+
+`ops-events.test.sql` proves `ops_events` is service-role only (RLS on;
+`anon` and `authenticated` can neither select nor insert), that the `kind`
+check rejects an unknown kind and `ref` rejects 65 characters, and that
+`purge_ops_events()` deletes a 31-day-old row, keeps a 29-day-old row and is
+not executable by `authenticated`.
 
 `cloudprnt-revision.test.sql` covers conditional claim revisions and stale outcomes. `admin-membership-scope.test.sql` checks authenticated users cannot probe another user through the admin-membership helper. These prepared SQL regressions remain unrun while the local database engine is unavailable.
 

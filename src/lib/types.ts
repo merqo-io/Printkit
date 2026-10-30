@@ -117,6 +117,33 @@ export type Database = {
         Update: { status?: string; updated_at?: string };
         Relationships: [];
       };
+      ops_events: {
+        Row: {
+          code: string;
+          created_at: string;
+          id: number;
+          kind: string;
+          ref: string;
+          vendor_id: string;
+        };
+        Insert: {
+          code: string;
+          created_at?: string;
+          id?: never;
+          kind: string;
+          ref: string;
+          vendor_id: string;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          id?: never;
+          kind?: string;
+          ref?: string;
+          vendor_id?: string;
+        };
+        Relationships: [];
+      };
       print_jobs: {
         Row: {
           batch_id: string | null;
@@ -323,6 +350,12 @@ export type Database = {
         };
         Relationships: [];
       };
+      rate_limits: {
+        Row: { count: number; key: string; window_start: string };
+        Insert: { count?: number; key: string; window_start: string };
+        Update: { count?: number; key?: string; window_start?: string };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -349,6 +382,10 @@ export type Database = {
         }[];
       };
       is_admin: { Args: { p_uid: string }; Returns: boolean };
+      check_rate_limit: {
+        Args: { p_key: string; p_limit: number; p_window_seconds: number };
+        Returns: boolean;
+      };
       claim_cloud_poll_job: {
         Args: {
           p_location_id: string;
@@ -361,6 +398,10 @@ export type Database = {
       claim_job: {
         Args: { p_location_id: string; p_job_id?: string | null };
         Returns: Database["printkit"]["Tables"]["print_jobs"]["Row"][];
+      };
+      purge_ops_events: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
     };
     Enums: {
