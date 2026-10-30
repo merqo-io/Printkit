@@ -26,7 +26,7 @@ apply it before deploying the strict revision-token HTTP route.
 
 ## Ops events
 
-`0011_ops_events.sql` adds `ops_events`, the append-only failure log behind
+`0013_ops_events.sql` adds `ops_events`, the append-only failure log behind
 `GET /api/merqo/vendor-activity`'s incidents. Its `kind` check allows only the
 kinds printkit writes (`print_failed`, `webhook_rejected`); `print_stuck` is
 computed from `print_jobs`. `ref` and `code` are capped at 64 characters and

@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- `ops_events` (migration `0011_ops_events.sql`): an append-only, service-role-only failure log with no PII columns (`ref` is a print job id, `code` a short machine code). `pg_cron` job `printkit-ops-events-purge` deletes rows older than 30 days, daily.
+- `ops_events` (migration `0013_ops_events.sql`): an append-only, service-role-only failure log with no PII columns (`ref` is a print job id, `code` a short machine code). `pg_cron` job `printkit-ops-events-purge` deletes rows older than 30 days, daily.
 - `print_failed` is logged whenever a job moves to `failed` (code = its `failure_reason`, or `unknown`). `webhook_rejected` is logged when a Feie callback fails its signature check and names one of printkit's jobs (`signature_invalid` or `public_key_missing`).
 - `GET /api/merqo/vendor-activity?email=...` for merqo's admin vendor page, bearer-gated by the new `MERQO_METRICS_SECRET`. Returns printer and job metrics, a triage status, and the last 72 hours of `incidents`/`recent`, including `print_stuck` for jobs queued or sent for over 10 minutes.
 
