@@ -216,7 +216,7 @@ export function BridgePanel({
     }
   };
 
-  const handleTestPrint = () => {
+  const handleTestPrint = (sample?: "b1-40x60") => {
     if (testPrintingRef.current) return;
     testPrintingRef.current = true;
     setTestPrinting(true);
@@ -224,7 +224,9 @@ export function BridgePanel({
       const client = clientRef.current;
       try {
         if (!client) return;
-        const canvas = await fetchSampleLabelCanvas(locationId);
+        const canvas = sample
+          ? await fetchSampleLabelCanvas(locationId, sample)
+          : await fetchSampleLabelCanvas(locationId);
         if (!isCurrent()) return;
         await printLabel(client, canvas);
         toast.success("Test label sent.");
@@ -260,11 +262,35 @@ export function BridgePanel({
           <p className="text-success-text text-sm font-medium">Connected</p>
           <Button
             variant="outline"
-            onClick={handleTestPrint}
+            onClick={() => handleTestPrint()}
             disabled={testPrinting}
           >
             {testPrinting ? "Printing test…" : "Print test"}
           </Button>
+          <div className="space-y-2 border-t pt-4">
+            <p className="text-sm font-medium">40 � 60 mm sample</p>
+            <p className="text-muted-foreground text-sm">
+              Preview the sample before printing one label. The roll width is
+              assumed to be 40 mm.
+            </p>
+            <a
+              className="text-sm underline"
+              href={`/api/bridge/sample-label?location=${encodeURIComponent(locationId)}&sample=b1-40x60`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open sample preview
+            </a>
+            <div>
+              <Button
+                variant="outline"
+                onClick={() => handleTestPrint("b1-40x60")}
+                disabled={testPrinting}
+              >
+                Print one 40 � 60 mm sample
+              </Button>
+            </div>
+          </div>
         </div>
       )}
       {enabled && pairState === "lost" && (

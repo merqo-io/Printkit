@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { buildLabelLayout, MAX_LABEL_CHARS } from "./label-layout";
+import {
+  buildB1CalibrationLabel,
+  buildLabelLayout,
+  MAX_LABEL_CHARS,
+} from "./label-layout";
 
 const size = { widthMm: 50, heightMm: 30 };
 
@@ -118,4 +122,21 @@ it("preserves the legacy layout even if another integration supplied item fields
       size,
     ),
   ).toEqual(buildLabelLayout(legacy, size));
+});
+
+it("renders the full B1 calibration details at 40 by 60 mm", () => {
+  const layout = buildB1CalibrationLabel();
+  expect([layout.widthMm, layout.heightMm]).toEqual([40, 60]);
+  const text = layout.elements
+    .filter((e) => e.kind === "text")
+    .map((e) => e.text);
+  expect(text).toEqual([
+    "#001",
+    "1 / 3",
+    "KOPI",
+    "O (black)",
+    "Hot",
+    "Normal sugar",
+    "SAMPLE ONLY",
+  ]);
 });

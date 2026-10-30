@@ -63,4 +63,26 @@ describe("GET /api/bridge/sample-label", () => {
     expect(res.headers.get("content-type")).toBe("image/png");
     expect(rasterizeLayout).toHaveBeenCalledWith(expect.anything(), 203);
   });
+  it("renders the 40 by 60 mm calibration sample using the printer renderer", async () => {
+    const response = await GET(
+      new Request(
+        `http://localhost/api/bridge/sample-label?location=${LOCATION}&sample=b1-40x60`,
+      ),
+    );
+    expect(response.status).toBe(200);
+    expect(rasterizeLayout).toHaveBeenCalledWith(
+      expect.objectContaining({ widthMm: 40, heightMm: 60 }),
+      203,
+    );
+  });
+
+  it("rejects unknown samples", async () => {
+    const response = await GET(
+      new Request(
+        `http://localhost/api/bridge/sample-label?location=${LOCATION}&sample=unknown`,
+      ),
+    );
+    expect(response.status).toBe(400);
+    expect(rasterizeLayout).not.toHaveBeenCalled();
+  });
 });

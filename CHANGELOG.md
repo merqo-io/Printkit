@@ -440,3 +440,7 @@ actions.ts` to import `LEGAL_VERSIONS`/`getLegalDocSource`/`isLegalCurrent`
 - Auth scaffolding (login, session guard).
 - Data model: `print_jobs`, `kit_api_keys`, `admins`/`is_admin`/`admin_audit` with RLS, verified against real Postgres via pgTAP.
 - Bearer-secret kit-auth verification helper (`kit-auth.ts`), `create-kit-key.mjs` for minting calling-kit secrets.
+
+## Unreleased: B1 calibration preview
+
+- Add a digital 40 by 60 mm B1 sample preview and an explicit one-label calibration print.
