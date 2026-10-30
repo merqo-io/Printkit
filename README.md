@@ -25,6 +25,9 @@ Its body names the job `source_ref`, with `order_id` kept beside it until
 every calling kit reads the new name. `GET /api/v1/print-locations/status`
 also returns `manage_url`, the printkit page for that location, so a calling
 kit links to it instead of building printkit paths.
+`GET /api/merqo/vendor-activity` (bearer `MERQO_METRICS_SECRET`) gives merqo's
+admin vendor page a vendor's printer and job activity plus recent failures
+from the `ops_events` log (30-day retention).
 `next.config.ts` keeps `@napi-rs/canvas` (the label rasterizer's native
 module) out of the bundle and traces `src/assets/fonts/` into every API
 route.
@@ -111,3 +114,9 @@ The AI harness follows templateCentral 6.0.4: hook commands are anchored on the 
 ## Lint
 
 `eslint.config.mjs` consumes the shared `@merqo/ui/eslint` preset (comment and directive hygiene, size and complexity limits, no colour literals or em dashes in `src`). `eslint.config.test.ts` asserts the key rules stay at `error`. Colour literals are allowed only in `src/lib/brand-icon.tsx`.
+
+## Multi-label batch candidate
+
+The `label_batch` API creates one ordinary job per item unit and reports terminal status for the whole order. Migration 0011 must be applied before rollout. See [the specification](docs/superpowers/specs/2026-10-29-multi-drink-labels.md) for compatibility, retry semantics and the pending Kopitiam Cart physical acceptance checklist.
+
+The Bluetooth bridge provides an optional 40 by 60 mm calibration preview and an explicitly initiated single-label sample print.

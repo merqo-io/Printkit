@@ -2,9 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const insertMock = vi.fn();
 const updateMock = vi.fn();
+const rpcMock = vi.fn();
 vi.mock("@/lib/supabase/server", () => ({
   createServiceClient: () =>
     Promise.resolve({
+      rpc: rpcMock,
       from: () => ({
         insert: insertMock,
         update: updateMock,
@@ -21,6 +23,11 @@ const notifyKitPrintStatusMock = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/lib/kit-callback", () => ({
   notifyKitPrintStatus: (...args: unknown[]) =>
     notifyKitPrintStatusMock(...args),
+}));
+
+const recordOpsEventMock = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/ops-events", () => ({
+  recordOpsEvent: (...args: unknown[]) => recordOpsEventMock(...args),
 }));
 
 const resolveActiveLocationMock = vi.fn();
@@ -574,6 +581,66 @@ describe("updatePrintJobStatus", () => {
     });
   });
 
+  it("records a print_failed ops event with the failure reason as code", async () => {
+    recordOpsEventMock.mockClear();
+    updateMock.mockReturnValue({
+      eq: () => ({
+        select: () => ({
+          single: () =>
+            Promise.resolve({
+              data: {
+                vendor_id: "vendor-1",
+                source_kit: "qkit",
+                source_ref: "order-1",
+                created_at: "2026-10-08T01:00:00.123456+00:00",
+              },
+              error: null,
+            }),
+        }),
+      }),
+    });
+
+    await updatePrintJobStatus("job-1", "failed", "printer_offline");
+    await updatePrintJobStatus("job-2", "failed");
+
+    expect(recordOpsEventMock).toHaveBeenNthCalledWith(1, expect.anything(), {
+      vendorId: "vendor-1",
+      kind: "print_failed",
+      ref: "job-1",
+      code: "printer_offline",
+    });
+    expect(recordOpsEventMock).toHaveBeenNthCalledWith(2, expect.anything(), {
+      vendorId: "vendor-1",
+      kind: "print_failed",
+      ref: "job-2",
+      code: "unknown",
+    });
+  });
+
+  it("records no ops event for a non-failed status", async () => {
+    recordOpsEventMock.mockClear();
+    updateMock.mockReturnValue({
+      eq: () => ({
+        select: () => ({
+          single: () =>
+            Promise.resolve({
+              data: {
+                vendor_id: "vendor-1",
+                source_kit: "qkit",
+                source_ref: "order-1",
+                created_at: "2026-10-08T01:00:00.123456+00:00",
+              },
+              error: null,
+            }),
+        }),
+      }),
+    });
+
+    await updatePrintJobStatus("job-1", "printed");
+
+    expect(recordOpsEventMock).not.toHaveBeenCalled();
+  });
+
   it("returns ok:false when the row isn't found", async () => {
     updateMock.mockReturnValue({
       eq: () => ({
@@ -656,3 +723,138 @@ it.each([null, "2026-10-08T00:00:00Z"])(
     expect(notifyKitPrintStatusMock).not.toHaveBeenCalled();
   },
 );
+
+describe("label batches", () => {
+  beforeEach(() => {
+    rpcMock.mockReset();
+    dispatchJobMock.mockClear();
+    notifyKitPrintStatusMock.mockClear();
+    listActiveLocationsMock.mockResolvedValue([]);
+  });
+  it("creates atomically and dispatches every durable child", async () => {
+    rpcMock.mockResolvedValue({
+      data: [{ id: "batch", job_ids: ["one", "two", "three"] }],
+      error: null,
+    });
+    expect(
+      await createPrintJob({
+        vendorId: "v",
+        sourceKit: "qkit",
+        sourceRef: "order",
+        payload: {},
+        jobType: "label_batch",
+        labels: [
+          { item_name: "Kopi" },
+          { item_name: "Kopi" },
+          { item_name: "Tea" },
+        ],
+      }),
+    ).toEqual({ ok: true, id: "batch" });
+    expect(rpcMock).toHaveBeenCalledWith(
+      "create_label_batch",
+      expect.objectContaining({
+        p_source_ref: "order",
+        p_labels: [
+          { item_name: "Kopi" },
+          { item_name: "Kopi" },
+          { item_name: "Tea" },
+        ],
+      }),
+    );
+    expect(dispatchJobMock.mock.calls.map((call) => call[0])).toEqual([
+      "one",
+      "two",
+      "three",
+    ]);
+  });
+  it("resends the aggregate terminal callback when an identical batch is submitted again", async () => {
+    rpcMock.mockImplementation(async (name) =>
+      name === "create_label_batch"
+        ? { data: [{ id: "batch", job_ids: ["one"] }], error: null }
+        : {
+            data: [
+              {
+                source_kit: "qkit",
+                source_ref: "order",
+                status: "printed",
+                updated_at: "2026-10-29T00:00:00.000001Z",
+              },
+            ],
+            error: null,
+          },
+    );
+    await createPrintJob({
+      vendorId: "v",
+      sourceKit: "qkit",
+      sourceRef: "order",
+      payload: {},
+      labels: [{ item_name: "Tea" }],
+    });
+    expect(notifyKitPrintStatusMock).toHaveBeenCalledWith(
+      "qkit",
+      "order",
+      "printed",
+      "2026-10-29T00:00:00.000001Z",
+    );
+  });
+  it("does not dispatch on an atomic creation failure", async () => {
+    rpcMock.mockResolvedValue({ data: null, error: { code: "23514" } });
+    expect(
+      await createPrintJob({
+        vendorId: "v",
+        sourceKit: "qkit",
+        sourceRef: "order",
+        payload: {},
+        labels: [{ item_name: "Tea" }],
+      }),
+    ).toMatchObject({ ok: false, status: 422 });
+    expect(dispatchJobMock).not.toHaveBeenCalled();
+  });
+  it.each(["queued", "failed", "printed"])(
+    "uses aggregate %s rather than the individual label status",
+    async (status) => {
+      const node = {
+        eq: () => node,
+        select: () => node,
+        single: async () => ({ data: { batch_id: "batch" }, error: null }),
+      };
+      updateMock.mockReturnValue(node);
+      rpcMock.mockResolvedValue({
+        data: [
+          {
+            source_kit: "qkit",
+            source_ref: "order",
+            status,
+            updated_at: "2026-10-29T00:00:00.000001Z",
+          },
+        ],
+        error: null,
+      });
+      expect(await updatePrintJobStatus("one", "printed")).toEqual({
+        ok: true,
+      });
+      if (status === "queued")
+        expect(notifyKitPrintStatusMock).not.toHaveBeenCalled();
+      else
+        expect(notifyKitPrintStatusMock).toHaveBeenCalledWith(
+          "qkit",
+          "order",
+          status,
+          "2026-10-29T00:00:00.000001Z",
+        );
+    },
+  );
+  it("cannot report a successful label as a printed batch when aggregation fails", async () => {
+    const node = {
+      eq: () => node,
+      select: () => node,
+      single: async () => ({ data: { batch_id: "batch" }, error: null }),
+    };
+    updateMock.mockReturnValue(node);
+    rpcMock.mockResolvedValue({ data: null, error: { message: "offline" } });
+    expect(await updatePrintJobStatus("one", "printed")).toMatchObject({
+      ok: false,
+    });
+    expect(notifyKitPrintStatusMock).not.toHaveBeenCalled();
+  });
+});

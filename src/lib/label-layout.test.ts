@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { buildLabelLayout, MAX_LABEL_CHARS } from "./label-layout";
+import {
+  buildB1CalibrationLabel,
+  buildLabelLayout,
+  MAX_LABEL_CHARS,
+} from "./label-layout";
 
 const size = { widthMm: 50, heightMm: 30 };
 
@@ -88,4 +92,51 @@ describe("buildLabelLayout", () => {
     expect(large.elements[0].xMm).toBeGreaterThan(small.elements[0].xMm);
     expect(large.elements[0].yMm).toBeGreaterThan(small.elements[0].yMm);
   });
+});
+
+it("includes the drink, modifiers and unit position on each label", () => {
+  const layout = buildLabelLayout(
+    {
+      customer_name: "Ann",
+      order_number: "007",
+      item_name: "Kopi",
+      _printkit_label_batch: "v1",
+      item_options: "Sugar: Less",
+      label_index: "2",
+      label_total: "3",
+    },
+    { widthMm: 50, heightMm: 30 },
+  );
+  expect(
+    layout.elements
+      .filter((element) => element.kind === "text")
+      .map((element) => element.text),
+  ).toEqual(["#007", "Ann", "Kopi", "Sugar: Less", "2/3"]);
+});
+
+it("preserves the legacy layout even if another integration supplied item fields", () => {
+  const legacy = { customer_name: "Ann", order_number: "007" };
+  expect(
+    buildLabelLayout(
+      { ...legacy, item_name: "Kopi", label_index: "1", label_total: "3" },
+      size,
+    ),
+  ).toEqual(buildLabelLayout(legacy, size));
+});
+
+it("renders the full B1 calibration details at 40 by 60 mm", () => {
+  const layout = buildB1CalibrationLabel();
+  expect([layout.widthMm, layout.heightMm]).toEqual([40, 60]);
+  const text = layout.elements
+    .filter((e) => e.kind === "text")
+    .map((e) => e.text);
+  expect(text).toEqual([
+    "#001",
+    "1 / 3",
+    "KOPI",
+    "O (black)",
+    "Hot",
+    "Normal sugar",
+    "SAMPLE ONLY",
+  ]);
 });

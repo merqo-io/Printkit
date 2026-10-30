@@ -140,3 +140,22 @@ it("does not report a physical failure when saving success fails", async () => {
     ATTEMPT,
   );
 });
+
+it("prints three batch children independently and reconnects after the middle label fails", async () => {
+  for (const id of ["one", "two", "three"])
+    nextJob.mockResolvedValueOnce({ jobId: id, sentAt: ATTEMPT });
+  print
+    .mockResolvedValueOnce(undefined)
+    .mockRejectedValueOnce(new Error("paper out"))
+    .mockResolvedValueOnce(undefined);
+  expect(await runOnce(deps())).toBe("printed");
+  expect(await runOnce(deps())).toBe("failed");
+  expect(await runOnce(deps())).toBe("printed");
+  expect(print).toHaveBeenCalledTimes(3);
+  expect(reportResult.mock.calls).toEqual([
+    ["one", "printed", ATTEMPT],
+    ["two", "failed", ATTEMPT],
+    ["three", "printed", ATTEMPT],
+  ]);
+  expect(reconnect).toHaveBeenCalledTimes(1);
+});

@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createServerClient } from "@/lib/supabase/server";
 import { getPrinterByLocation } from "@/lib/printers";
-import { buildLabelLayout } from "@/lib/label-layout";
+import { buildB1CalibrationLabel, buildLabelLayout } from "@/lib/label-layout";
 import { rasterizeLayout } from "@/lib/label-raster";
 import { getCatalogEntry } from "@/lib/printer-catalog";
 
-const querySchema = z.object({ location: z.uuid() });
+const querySchema = z.object({
+  location: z.uuid(),
+  sample: z.literal("b1-40x60").optional(),
+});
 
 /**
  * A sample label at a booth's own label size, for the test print during
@@ -25,6 +28,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const parsed = querySchema.safeParse({
     location: url.searchParams.get("location") ?? undefined,
+    sample: url.searchParams.get("sample") ?? undefined,
   });
   if (!parsed.success) {
     return NextResponse.json({ error: "Unknown booth" }, { status: 400 });
@@ -40,13 +44,16 @@ export async function GET(request: Request) {
   }
 
   const printer = await getPrinterByLocation(location.id);
-  const layout = buildLabelLayout(
-    { customer_name: "Test", order_number: "0000" },
-    {
-      widthMm: Number(printer?.label_width_mm ?? 50),
-      heightMm: Number(printer?.label_height_mm ?? 30),
-    },
-  );
+  const layout =
+    parsed.data.sample === "b1-40x60"
+      ? buildB1CalibrationLabel()
+      : buildLabelLayout(
+          { customer_name: "Test", order_number: "0000" },
+          {
+            widthMm: Number(printer?.label_width_mm ?? 50),
+            heightMm: Number(printer?.label_height_mm ?? 30),
+          },
+        );
   const dpi = printer ? (getCatalogEntry(printer.catalog_id)?.dpi ?? 203) : 203;
   const png = await rasterizeLayout(layout, dpi);
 

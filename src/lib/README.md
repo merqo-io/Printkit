@@ -119,6 +119,25 @@ everything else sits flat here.
   meets while choosing a printer. One module because the same fact has to
   appear on the picker, in a setup wizard and in the Bluetooth guide, and a
   vendor deciding what to buy should not meet three wordings of it.
+- `ops-events.ts` — `recordOpsEvent(supabase, event)` appends one
+  `ops_events` row (`print_failed` or `webhook_rejected`), truncating `ref`
+  and `code` to 64 characters. It never throws: a failed insert logs
+  `ops_events insert failed` with the error code and returns, so a failing
+  request keeps its own error. `summarizeIncidents(supabase, vendorId,
+sinceHours = 72)` groups the window's events with the jobs queued or sent
+  for over 10 minutes (`print_stuck`, `not_claimed`/`not_confirmed`) into
+  per-kind `{kind, count, lastAt}` and the 10 newest `recent` rows; it throws
+  on a failed read. Reads are capped (1000 events, 200 stuck jobs).
+- `merqo-vendor-activity.ts` — `computeVendorActivity(stats, summary)`: the
+  pure payload behind `GET /api/merqo/vendor-activity`. `plan` is always null
+  (printkit has no paid tier) and `active` means at least one printer. Status
+  bands, first match wins: `stuck` (any stuck job), `attention` (30-day
+  failure rate at or above 20%), `new` (no job yet), `quiet` (no job in 30
+  days), else `healthy`. A null `summary` omits `incidents`/`recent`.
+- `merqo-auth.ts` — `bearerOk(request)`: constant-time check of merqo's
+  bearer token against `MERQO_METRICS_SECRET`.
+- `list-all-users.ts` — `listAllUsers(supabase)`: every auth user across
+  `listUsers()` pages (1000 per page, 50-page ceiling), for the email lookup.
 - `kit-callback.ts` — `notifyKitPrintStatus(kitSlug, sourceRef, status)`:
   fire-and-forget outbound callback on job status change, kit-agnostic —
   looks the calling kit's `callback_url`/`callback_secret` up from
@@ -210,8 +229,13 @@ concern — see its README.
 
 Device result callers supply atomic location/state/attempt predicates to
 updatePrintJobStatus. A rejected predicate or database error returns ok:false
-and never sends a terminal kit callback.
+and never sends a terminal kit callback. A successful move to `failed` also
+records a `print_failed` ops event.
 
 `bounded-body.ts` caps streamed request bytes before parsing. `bounded-json.ts` parses bounded JSON and form bodies, rejecting malformed Content-Length and JSON UTF-8 while cancelling oversized input. Public pairing and Feie callbacks use 16 KiB; authenticated CloudPRNT polling uses 64 KiB.
 
 `security-headers.ts` holds the nonce route list and CSP source lists (including the Vercel toolbar origin outside production); `theme-props.ts` is shared by the root layout and the CSP; `columns.ts` lists the columns each table read selects.
+
+`label-batch.ts` validates bounded label batches; `print-jobs.ts` creates and reconciles their individual jobs. Batch callbacks report the aggregate order status.
+
+The B1 calibration sample uses the shared label renderer at 40 mm across by 60 mm along the feed; it is independent of saved order labels.

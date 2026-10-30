@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readBoundedForm, RequestBodyError } from "@/lib/bounded-json";
 import { createVerify } from "node:crypto";
+import { recordOpsEvent } from "@/lib/ops-events";
 import { updatePrintJobStatus } from "@/lib/print-jobs";
 import { createServiceClient } from "@/lib/supabase/server";
 import { feieCallbackFieldsSchema } from "@/lib/schemas";
@@ -30,21 +31,49 @@ function signingString(form: FormData): string {
  * this route is reachable by anyone, and a forged callback would otherwise
  * mark a vendor's labels printed.
  */
-function verifySignature(payload: string, signature: string): boolean {
+type SignatureCheck = "ok" | "public_key_missing" | "signature_invalid";
+
+function verifySignature(payload: string, signature: string): SignatureCheck {
   const publicKey = process.env.FEIE_CALLBACK_PUBLIC_KEY;
   if (!publicKey) {
     console.error("feie callback: FEIE_CALLBACK_PUBLIC_KEY is not set");
-    return false;
+    return "public_key_missing";
   }
 
   try {
     const verifier = createVerify("RSA-SHA256");
     verifier.update(payload, "utf8");
     verifier.end();
-    return verifier.verify(publicKey, signature, "base64");
+    return verifier.verify(publicKey, signature, "base64")
+      ? "ok"
+      : "signature_invalid";
   } catch (err) {
     console.error("feie callback: signature check failed", err);
-    return false;
+    return "signature_invalid";
+  }
+}
+
+// An orderId that matches no job has no vendor to log against.
+async function recordRejectedCallback(
+  driverRef: string,
+  code: Exclude<SignatureCheck, "ok">,
+): Promise<void> {
+  try {
+    const supabase = await createServiceClient();
+    const { data } = await supabase
+      .from("print_jobs")
+      .select("id, vendor_id")
+      .eq("driver_ref", driverRef)
+      .maybeSingle();
+    if (!data) return;
+    await recordOpsEvent(supabase, {
+      vendorId: data.vendor_id,
+      kind: "webhook_rejected",
+      ref: data.id,
+      code,
+    });
+  } catch {
+    console.error("feie callback: rejection log failed");
   }
 }
 
@@ -96,7 +125,9 @@ export async function POST(request: Request) {
   }
   const { orderId, status, sign: signature } = fields.data;
 
-  if (!verifySignature(signingString(form), signature)) {
+  const check = verifySignature(signingString(form), signature);
+  if (check !== "ok") {
+    await recordRejectedCallback(orderId, check);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

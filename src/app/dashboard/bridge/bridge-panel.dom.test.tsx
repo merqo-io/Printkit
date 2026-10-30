@@ -314,6 +314,23 @@ describe("BridgePanel", () => {
     expect(logBridgeEvent).toHaveBeenCalledWith("bridge_disconnected");
   });
 
+  it("previews without printing and prints the selected calibration sample once", async () => {
+    await enableAndPair();
+    vi.mocked(printLabel).mockClear();
+    expect(
+      screen.getByRole("link", { name: /open sample preview/i }),
+    ).toHaveAttribute(
+      "href",
+      "/api/bridge/sample-label?location=loc-1&sample=b1-40x60",
+    );
+    expect(printLabel).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /print one 40/i }));
+    await waitFor(() =>
+      expect(fetchSampleLabelCanvas).toHaveBeenCalledWith("loc-1", "b1-40x60"),
+    );
+    await waitFor(() => expect(printLabel).toHaveBeenCalledTimes(1));
+  });
+
   it("prints a test label at the booth's own size", async () => {
     await enableAndPair();
     fireEvent.click(screen.getByRole("button", { name: /print test/i }));
