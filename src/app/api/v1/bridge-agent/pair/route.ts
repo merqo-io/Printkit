@@ -3,6 +3,13 @@ import { z } from "zod";
 import { readBoundedJson, RequestBodyError } from "@/lib/bounded-json";
 import { redeemPairingCode } from "@/lib/bridge-pairing";
 import { mintDeviceCredential } from "@/lib/device-credentials";
+import {
+  clientIp,
+  rateLimit,
+  PAIR_LIMIT,
+  RATE_WINDOW_SECONDS,
+} from "@/lib/rate-limit";
+import { createServiceClient } from "@/lib/supabase/server";
 
 const bodySchema = z.object({ code: z.string().min(4).max(32) });
 
@@ -13,6 +20,16 @@ const bodySchema = z.object({ code: z.string().min(4).max(32) });
  * printer.
  */
 export async function POST(request: Request) {
+  const allowed = await rateLimit(
+    await createServiceClient(),
+    `pair:${clientIp(request.headers)}`,
+    PAIR_LIMIT,
+    RATE_WINDOW_SECONDS,
+  );
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   let json: unknown;
   try {
     json = await readBoundedJson(request);

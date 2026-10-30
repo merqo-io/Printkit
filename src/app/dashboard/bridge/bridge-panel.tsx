@@ -4,7 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { isBridgeModeEnabled, setBridgeModeEnabled } from "@/lib/bridge-mode";
+import {
+  getBluetoothSupport,
+  type BluetoothSupport,
+} from "@/lib/bluetooth-support";
 import {
   connectPrinter,
   printLabel,
@@ -28,6 +33,24 @@ type PairState = "unpaired" | "connecting" | "connected" | "error" | "lost";
 
 const HEARTBEAT_MS = 20_000;
 
+const UNSUPPORTED_COPY: Record<
+  Exclude<BluetoothSupport, "supported">,
+  { title: string; body: string }
+> = {
+  ios: {
+    title: "Bluetooth printing does not work on iPhone or iPad",
+    body: "Apple blocks Web Bluetooth in every iOS browser. Use the Bridge on an Android phone, or a Windows, Mac or ChromeOS computer with Chrome or Edge, or switch this location to a cloud printer.",
+  },
+  "unsupported-browser": {
+    title: "This browser cannot use Bluetooth printers",
+    body: "Open this page in Chrome or Edge on an Android phone, or on a Windows, Mac or ChromeOS computer.",
+  },
+  "insecure-context": {
+    title: "Bluetooth needs a secure connection",
+    body: "Open this page over https in Chrome or Edge.",
+  },
+};
+
 /**
  * The Bridge-mode state machine: local toggle -> pair (Web Bluetooth user
  * gesture) -> claim a delivered job -> print the label printkit rendered ->
@@ -42,6 +65,7 @@ export function BridgePanel({
   locationId: string;
 }) {
   const [enabled, setEnabled] = useState(false);
+  const [support, setSupport] = useState<BluetoothSupport | null>(null);
   const [pairState, setPairState] = useState<PairState>("unpaired");
   const clientRef = useRef<NiimbotBluetoothClient | null>(null);
   const queueRef = useRef<Promise<void>>(Promise.resolve());
@@ -69,6 +93,7 @@ export function BridgePanel({
     mountedRef.current = true;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- browser storage is only readable after hydration
     setEnabled(isBridgeModeEnabled());
+    setSupport(getBluetoothSupport(navigator, navigator.userAgent));
     return () => {
       mountedRef.current = false;
       disconnect();
@@ -239,6 +264,17 @@ export function BridgePanel({
       }
     });
   };
+
+  if (support === null) return null;
+  if (support !== "supported") {
+    const copy = UNSUPPORTED_COPY[support];
+    return (
+      <Alert>
+        <AlertTitle>{copy.title}</AlertTitle>
+        <AlertDescription>{copy.body}</AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-6">

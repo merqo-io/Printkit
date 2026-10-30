@@ -10,7 +10,9 @@ credential, so each printer gets a private address at setup.
 - `route.ts` — `POST` poll, `GET` job fetch (claims the job), `DELETE`
   confirmation. Both fetch and confirmation require the opaque revision token
   advertised by polling. Missing, stale and legacy job-ID tokens fail closed.
-  See `../README.md` for the full flow.
+  See `../README.md` for the full flow. Every method is rate limited to 120
+  requests per token per 60 seconds, keyed by the token hash (429 beyond
+  that, fails open if the limiter errors).
 - `route.test.ts` — every method against mocked services, including a bad
   token, a hardware mismatch, another printer's job and token-less firmware.
 

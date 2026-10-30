@@ -9,7 +9,9 @@ device token.
 
 - `route.ts` — `POST {code}`. Redeems the code (8 characters, 10 minutes,
   single use) and returns a token that is stored only as a hash. Tested in
-  `../route.test.ts`.
+  `../route.test.ts`. Rate limited to 10 requests per IP per 60 seconds
+  (429 beyond that, fails open if the limiter errors); `route.test.ts` here
+  covers the limit.
 
 ## Parent
 
