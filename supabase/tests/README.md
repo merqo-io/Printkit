@@ -46,6 +46,8 @@ app _asks_ the database for, never what the database _permits_.
 
 - `rate-limits.test.sql`: `0014`: no client access to `rate_limits`, anon and authenticated cannot call the limiter, per-key counting, input bounds and window expiry.
 
+- `db-hygiene.test.sql`: `0015`: the foreign key indexes exist and every printkit table has RLS on.
+
 ## Connectivity
 
 Run with `supabase test db` (Supabase CLI, Docker required), which applies
