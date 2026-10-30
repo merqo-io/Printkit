@@ -217,3 +217,7 @@ and never sends a terminal kit callback.
 `label-batch.ts` validates bounded label batches; `print-jobs.ts` creates and reconciles their individual jobs. Batch callbacks report the aggregate order status.
 
 The B1 calibration sample uses the shared label renderer at 40 mm across by 60 mm along the feed; it is independent of saved order labels.
+
+`sticker-template.ts` defines a versioned, validated sticker geometry model with a 40 by 60 mm default. It is not yet connected to the editor, saved templates, logo storage or printer rendering.
+
+`render-sticker-template.ts` renders validated geometry at a specified DPI, wrapping text and returning a field-specific overflow error. Logo rendering remains unsupported.
