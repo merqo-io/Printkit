@@ -2,8 +2,6 @@
 
 ## Unreleased: multi-label batches
 
-- Refuse Bluetooth pairing when a booth is configured for a different printer, instead of reporting that printer online or claiming its jobs.
-
 - Add atomic bounded label batches with one job and acknowledgement per unit, aggregate order callbacks and idempotent batch retries. Existing single-label integrations remain compatible. Migration 0011 and physical staging acceptance are required.
 
 All notable changes to this project will be documented in this file.
