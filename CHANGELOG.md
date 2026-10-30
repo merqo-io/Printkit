@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.1] - 2026-10-30
+
+### Fixed
+
+- Bluetooth pairing is refused when the booth is set up for a different printer. Before, a connected B1 could appear as that printer: it was marked online and could claim its jobs.
+
 ## [0.6.0] - 2026-10-30
 
 ### Added
