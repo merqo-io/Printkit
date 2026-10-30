@@ -104,3 +104,76 @@ export function buildLabelLayout(
     ],
   };
 }
+
+/** Digital and physical calibration sample; 40 mm across the roll. */
+export function buildB1CalibrationLabel(): LabelLayout {
+  return {
+    widthMm: 40,
+    heightMm: 60,
+    elements: [
+      {
+        kind: "text",
+        text: `#${"001"}`,
+        xMm: 3,
+        yMm: 7,
+        size: "md",
+        bold: true,
+        align: "left",
+      },
+      {
+        kind: "text",
+        text: "1 / 3",
+        xMm: 37,
+        yMm: 7,
+        size: "sm",
+        bold: false,
+        align: "right",
+      },
+      {
+        kind: "text",
+        text: "KOPI",
+        xMm: 3,
+        yMm: 20,
+        size: "md",
+        bold: true,
+        align: "left",
+      },
+      {
+        kind: "text",
+        text: "O (black)",
+        xMm: 3,
+        yMm: 29,
+        size: "sm",
+        bold: false,
+        align: "left",
+      },
+      {
+        kind: "text",
+        text: "Hot",
+        xMm: 3,
+        yMm: 36,
+        size: "sm",
+        bold: false,
+        align: "left",
+      },
+      {
+        kind: "text",
+        text: "Normal sugar",
+        xMm: 3,
+        yMm: 43,
+        size: "sm",
+        bold: false,
+        align: "left",
+      },
+      {
+        kind: "text",
+        text: "SAMPLE ONLY",
+        xMm: 3,
+        yMm: 54,
+        size: "sm",
+        bold: true,
+        align: "left",
+      },
+    ],
+  };
+}

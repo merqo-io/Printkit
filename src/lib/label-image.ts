@@ -32,9 +32,11 @@ export async function fetchLabelCanvas(
  */
 export async function fetchSampleLabelCanvas(
   locationId: string,
+  sample?: "b1-40x60",
 ): Promise<HTMLCanvasElement> {
+  const suffix = sample ? "&sample=" + sample : "";
   return download(
-    `/api/bridge/sample-label?location=${encodeURIComponent(locationId)}`,
+    `/api/bridge/sample-label?location=${encodeURIComponent(locationId)}${suffix}`,
   );
 }
 
