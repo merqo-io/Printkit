@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient, createServiceClient } from "@/lib/supabase/server";
+import { readBoundedJson, RequestBodyError } from "@/lib/bounded-json";
+import { rateLimit, RATE_WINDOW_SECONDS } from "@/lib/rate-limit";
 import { renderStickerTemplate } from "@/lib/render-sticker-template";
 
 const MAX_BODY_BYTES = 32 * 1024;
@@ -14,35 +16,23 @@ export async function POST(request: Request) {
       { error: "Sign in to preview a sticker." },
       { status: 401 },
     );
-  const length = Number(request.headers.get("content-length") ?? 0);
-  if (length > MAX_BODY_BYTES)
+  const allowed = await rateLimit(
+    await createServiceClient(),
+    `sticker-preview:${user.id}`,
+    30,
+    RATE_WINDOW_SECONDS,
+  );
+  if (!allowed)
     return NextResponse.json(
-      { error: "The design is too large." },
-      { status: 413 },
+      { error: "Too many previews. Wait a moment and try again." },
+      { status: 429 },
     );
-  const reader = request.body?.getReader();
-  if (!reader)
-    return NextResponse.json({ error: "Invalid design." }, { status: 400 });
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.byteLength;
-    if (size > MAX_BODY_BYTES) {
-      await reader.cancel();
-      return NextResponse.json(
-        { error: "The design is too large." },
-        { status: 413 },
-      );
-    }
-    chunks.push(value);
-  }
   let body: unknown;
   try {
-    body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    return NextResponse.json({ error: "Invalid design." }, { status: 400 });
+    body = await readBoundedJson(request, MAX_BODY_BYTES);
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    return NextResponse.json({ error: "Invalid design." }, { status });
   }
   const result = renderStickerTemplate(body, {
     order_number: `#${"001"}`,

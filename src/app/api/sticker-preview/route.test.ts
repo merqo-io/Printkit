@@ -1,15 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ getUser: vi.fn(), render: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  getUser: vi.fn(),
+  render: vi.fn(),
+  limit: vi.fn(),
+}));
 vi.mock("@/lib/supabase/server", () => ({
   createServerClient: async () => ({ auth: { getUser: mocks.getUser } }),
+  createServiceClient: async () => ({}),
 }));
 vi.mock("@/lib/render-sticker-template", () => ({
   renderStickerTemplate: mocks.render,
 }));
+vi.mock("@/lib/rate-limit", () => ({
+  rateLimit: mocks.limit,
+  RATE_WINDOW_SECONDS: 60,
+}));
 import { POST } from "./route";
 
 beforeEach(() => {
+  mocks.limit.mockReset().mockResolvedValue(true);
   mocks.getUser
     .mockReset()
     .mockResolvedValue({ data: { user: { id: "vendor" } } });
@@ -67,6 +77,14 @@ describe("sticker preview", () => {
       }),
     );
     expect(response.status).toBe(413);
+    expect(mocks.render).not.toHaveBeenCalled();
+  });
+  it("does not render when the vendor reaches the preview limit", async () => {
+    mocks.limit.mockResolvedValue(false);
+    const response = await POST(
+      new Request("http://localhost", { method: "POST", body: "{}" }),
+    );
+    expect(response.status).toBe(429);
     expect(mocks.render).not.toHaveBeenCalled();
   });
 });

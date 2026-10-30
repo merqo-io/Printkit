@@ -467,3 +467,7 @@ actions.ts` to import `LEGAL_VERSIONS`/`getLegalDocSource`/`isLegalCurrent`
 ## Unreleased: B1 calibration preview
 
 - Add a digital 40 by 60 mm B1 sample preview and an explicit one-label calibration print.
+
+## Unreleased: sticker designer foundation
+
+- Add a booth-scoped sticker design prototype and non-printing preview. Order printing integration remains unfinished.

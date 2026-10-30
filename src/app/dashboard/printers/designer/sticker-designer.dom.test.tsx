@@ -6,7 +6,9 @@ import { StickerDesigner } from "./sticker-designer";
 describe("sticker designer prototype", () => {
   it("shows the actual dimensions and sample order fields without claiming to save", () => {
     render(<StickerDesigner />);
-    expect(screen.getByRole("status")).toHaveTextContent(/not saved/i);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      /does not use them yet/i,
+    );
     expect(screen.getByLabelText("Width (mm)")).toHaveValue(40);
     expect(screen.getByLabelText("Length (mm)")).toHaveValue(60);
     expect(
@@ -32,5 +34,20 @@ describe("sticker designer prototype", () => {
     expect(screen.getByLabelText("Width (mm)")).toHaveValue(40);
     fireEvent.click(screen.getByRole("button", { name: "Reset preview" }));
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+  it("adds and removes an optional field and can undo the removal", () => {
+    render(<StickerDesigner />);
+    fireEvent.click(screen.getByRole("button", { name: "Add Booth name" }));
+    expect(
+      screen.getByRole("button", { name: "Select Booth name" }),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Remove field" }));
+    expect(
+      screen.queryByRole("button", { name: "Select Booth name" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(
+      screen.getByRole("button", { name: "Select Booth name" }),
+    ).toBeInTheDocument();
   });
 });

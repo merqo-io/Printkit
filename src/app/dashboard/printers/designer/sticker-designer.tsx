@@ -1,6 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { saveStickerDesign } from "./actions";
+import { StickerSize } from "./sticker-size";
+import { examples, names } from "./sticker-content";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
   defaultStickerTemplate,
@@ -9,34 +12,28 @@ import {
 } from "@/lib/sticker-template";
 
 type Element = StickerTemplate["elements"][number];
-const examples: Record<string, string> = {
-  order_number: `#${"001"}`,
-  customer_name: "Alex",
-  item_name: "Kopi",
-  item_options: "O (black)\nHot\nNormal sugar",
-  unit_position: "1 / 3",
-  booth_name: "Kopitiam Cart",
-};
-const names: Record<string, string> = {
-  order_number: "Order number",
-  customer_name: "Customer name",
-  item_name: "Item name",
-  item_options: "Drink options",
-  unit_position: "Item count",
-  booth_name: "Booth name",
-};
 
-export function StickerDesigner() {
+export function StickerDesigner({
+  locationId,
+  initialTemplate,
+}: {
+  locationId?: string;
+  initialTemplate?: StickerTemplate;
+}) {
   const [template, setTemplate] = useState<StickerTemplate>(
-    defaultStickerTemplate,
+    initialTemplate ?? defaultStickerTemplate,
   );
   const [selectedId, setSelectedId] = useState(
-    defaultStickerTemplate.elements[0].id,
+    (initialTemplate ?? defaultStickerTemplate).elements[0].id,
   );
   const [error, setError] = useState("");
+  const [history, setHistory] = useState<StickerTemplate[]>([]);
   const [rendered, setRendered] = useState<string | null>(null);
   const [rendering, setRendering] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const previewVersion = useRef(0);
+  const editVersion = useRef(0);
   useEffect(
     () => () => {
       if (rendered) URL.revokeObjectURL(rendered);
@@ -64,9 +61,12 @@ export function StickerDesigner() {
       return;
     }
     previewVersion.current += 1;
+    editVersion.current += 1;
     setRendered(null);
     setRendering(false);
+    setSaved(false);
     setError("");
+    setHistory((items) => [...items.slice(-19), template]);
     setTemplate(result.data);
   }
 
@@ -166,9 +166,39 @@ export function StickerDesigner() {
         role="status"
         className="bg-muted text-muted-foreground rounded-lg p-4 text-sm"
       >
-        Preview only. Changes are not saved or used for printing yet.
+        Designs can be saved for this booth. Order printing does not use them
+        yet.
       </p>
       <div className="flex flex-wrap items-center gap-3">
+        {locationId && (
+          <button
+            type="button"
+            disabled={saving}
+            onClick={async () => {
+              setSaving(true);
+              setSaved(false);
+              const version = editVersion.current;
+              const result = await saveStickerDesign(
+                locationId,
+                template,
+              ).catch(() => ({
+                ok: false as const,
+                error: "Could not save your design. Please try again.",
+              }));
+              if (result.ok && version === editVersion.current) setSaved(true);
+              else if (!result.ok) setError(result.error);
+              setSaving(false);
+            }}
+            className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
+          >
+            {saving ? "Saving�" : "Save design"}
+          </button>
+        )}
+        {saved && (
+          <span role="status" className="text-sm">
+            Design saved for this booth.
+          </span>
+        )}
         <button
           type="button"
           onClick={renderPreview}
@@ -244,31 +274,7 @@ export function StickerDesigner() {
           </div>
         </section>
         <section aria-label="Sticker settings" className="space-y-6">
-          <div>
-            <h2 className="text-lg font-semibold">Sticker size</h2>
-            <p className="text-muted-foreground text-sm">
-              Width across the roll and length along the feed.
-            </p>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              {(["widthMm", "heightMm"] as const).map((key) => (
-                <label key={key} className="text-sm font-medium">
-                  {key === "widthMm" ? "Width (mm)" : "Length (mm)"}
-                  <input
-                    aria-label={
-                      key === "widthMm" ? "Width (mm)" : "Length (mm)"
-                    }
-                    type="number"
-                    min={20}
-                    value={template[key]}
-                    onChange={(event) =>
-                      update({ ...template, [key]: Number(event.target.value) })
-                    }
-                    className="border-input bg-background mt-1 w-full rounded-md border px-3 py-2"
-                  />
-                </label>
-              ))}
-            </div>
-          </div>
+          <StickerSize template={template} onChange={update} />
           <div>
             <h2 className="text-lg font-semibold">Fields</h2>
             <p className="text-muted-foreground text-sm">
@@ -287,6 +293,62 @@ export function StickerDesigner() {
                 </button>
               ))}
             </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                "order_number",
+                "customer_name",
+                "item_name",
+                "item_options",
+                "unit_position",
+                "booth_name",
+              ] as const
+            )
+              .filter(
+                (field) =>
+                  !template.elements.some(
+                    (element) =>
+                      element.kind === "field" && element.field === field,
+                  ),
+              )
+              .map((field) => (
+                <button
+                  key={field}
+                  type="button"
+                  className="border-input rounded-md border px-3 py-2 text-sm"
+                  onClick={() => {
+                    const id = crypto.randomUUID();
+                    update({
+                      ...template,
+                      elements: [
+                        ...template.elements,
+                        {
+                          id,
+                          kind: "field",
+                          field,
+                          xMm: template.marginMm,
+                          yMm: template.marginMm,
+                          widthMm: Math.min(
+                            30,
+                            template.widthMm - 2 * template.marginMm,
+                          ),
+                          heightMm: Math.min(
+                            6,
+                            template.heightMm - 2 * template.marginMm,
+                          ),
+                          fontSizeMm: 3,
+                          bold: false,
+                          align: "left",
+                        },
+                      ],
+                    });
+                    setSelectedId(id);
+                  }}
+                >
+                  Add {names[field]}
+                </button>
+              ))}
           </div>
           {selected && (
             <div className="space-y-3">
@@ -335,6 +397,59 @@ export function StickerDesigner() {
                   />
                 </label>
               )}
+              {selected.kind === "field" && (
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selected.bold}
+                      onChange={(event) =>
+                        updateElement(selected.id, {
+                          bold: event.target.checked,
+                        })
+                      }
+                    />{" "}
+                    Bold text
+                  </label>
+                  <label className="block text-sm font-medium">
+                    Alignment
+                    <select
+                      aria-label="Alignment"
+                      value={selected.align}
+                      onChange={(event) => {
+                        const alignment = event.target.value;
+                        if (
+                          alignment === "left" ||
+                          alignment === "center" ||
+                          alignment === "right"
+                        )
+                          updateElement(selected.id, { align: alignment });
+                      }}
+                      className="border-input bg-background mt-1 w-full rounded-md border px-3 py-2"
+                    >
+                      <option value="left">Left</option>
+                      <option value="center">Center</option>
+                      <option value="right">Right</option>
+                    </select>
+                  </label>
+                </div>
+              )}
+              <button
+                type="button"
+                disabled={template.elements.length <= 1}
+                className="border-input rounded-md border px-3 py-2 text-sm disabled:opacity-50"
+                onClick={() => {
+                  const elements = template.elements.filter(
+                    (element) => element.id !== selected.id,
+                  );
+                  if (elements.length) {
+                    update({ ...template, elements });
+                    setSelectedId(elements[0].id);
+                  }
+                }}
+              >
+                Remove field
+              </button>
             </div>
           )}
           {error && (
@@ -344,11 +459,34 @@ export function StickerDesigner() {
           )}
           <button
             type="button"
+            disabled={!history.length}
+            className="border-input mr-2 rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
+            onClick={() => {
+              const previous = history[history.length - 1];
+              if (previous) {
+                previewVersion.current += 1;
+                editVersion.current += 1;
+                setSaved(false);
+                setRendered(null);
+                setTemplate(previous);
+                setSelectedId(previous.elements[0].id);
+                setHistory((items) => items.slice(0, -1));
+                setError("");
+              }
+            }}
+          >
+            Undo
+          </button>
+          <button
+            type="button"
             className="border-input rounded-md border px-4 py-2 text-sm font-medium"
             onClick={() => {
               previewVersion.current += 1;
+              editVersion.current += 1;
+              setSaved(false);
               setRendered(null);
               setRendering(false);
+              setHistory((items) => [...items.slice(-19), template]);
               setTemplate(defaultStickerTemplate);
               setSelectedId(defaultStickerTemplate.elements[0].id);
               setError("");

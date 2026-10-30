@@ -63,3 +63,5 @@ vendor-cloud driver. Links out to `/guides/bluetooth-printers` and
 ## Parent
 
 [dashboard](../README.md)
+
+`designer/` is an unfinished booth-scoped sticker editor candidate; saved templates are not yet used by order printing.

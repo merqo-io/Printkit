@@ -66,3 +66,5 @@ not executable by `authenticated`.
 `cloudprnt-revision.test.sql` covers conditional claim revisions and stale outcomes. `admin-membership-scope.test.sql` checks authenticated users cannot probe another user through the admin-membership helper. These prepared SQL regressions remain unrun while the local database engine is unavailable.
 
 CloudPRNT mutation assertions attach their data-modifying CTE to the top-level SELECT, as PostgreSQL requires. Each assertion retains its exact attempt/location/revision predicates and verifies the number of matched rows.
+
+`sticker-templates.test.sql` checks booth ownership, service-only writes, version retention and vendor isolation for the template migration.
