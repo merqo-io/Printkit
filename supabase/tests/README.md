@@ -55,6 +55,12 @@ no API keys, no running Next.js app needed.
 
 See the repo root [README.md](../../README.md) for the full layout.
 
+`ops-events.test.sql` proves `ops_events` is service-role only (RLS on;
+`anon` and `authenticated` can neither select nor insert), that the `kind`
+check rejects an unknown kind and `ref` rejects 65 characters, and that
+`purge_ops_events()` deletes a 31-day-old row, keeps a 29-day-old row and is
+not executable by `authenticated`.
+
 `cloudprnt-revision.test.sql` covers conditional claim revisions and stale outcomes. `admin-membership-scope.test.sql` checks authenticated users cannot probe another user through the admin-membership helper. These prepared SQL regressions remain unrun while the local database engine is unavailable.
 
 CloudPRNT mutation assertions attach their data-modifying CTE to the top-level SELECT, as PostgreSQL requires. Each assertion retains its exact attempt/location/revision predicates and verifies the number of matched rows.

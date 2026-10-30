@@ -25,6 +25,9 @@ Its body names the job `source_ref`, with `order_id` kept beside it until
 every calling kit reads the new name. `GET /api/v1/print-locations/status`
 also returns `manage_url`, the printkit page for that location, so a calling
 kit links to it instead of building printkit paths.
+`GET /api/merqo/vendor-activity` (bearer `MERQO_METRICS_SECRET`) gives merqo's
+admin vendor page a vendor's printer and job activity plus recent failures
+from the `ops_events` log (30-day retention).
 `next.config.ts` keeps `@napi-rs/canvas` (the label rasterizer's native
 module) out of the bundle and traces `src/assets/fonts/` into every API
 route.

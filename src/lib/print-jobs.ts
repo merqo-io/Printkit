@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { notifyKitPrintStatus } from "@/lib/kit-callback";
+import { recordOpsEvent } from "@/lib/ops-events";
 import { dispatchJob } from "@/lib/job-dispatch";
 import {
   resolveActiveLocation,
@@ -205,12 +206,23 @@ export async function updatePrintJobStatus(
 
   query = applyConditions(query, conditions);
   const { data, error } = await query
-    .select("source_kit, source_ref, sent_at, requeued_at, created_at")
+    .select(
+      "vendor_id, source_kit, source_ref, sent_at, requeued_at, created_at",
+    )
     .single();
 
   if (error || !data) {
     console.error("updatePrintJobStatus failed", error?.message ?? "not found");
     return { ok: false, error: "Could not update print job status." };
+  }
+
+  if (status === "failed") {
+    await recordOpsEvent(supabase, {
+      vendorId: data.vendor_id,
+      kind: "print_failed",
+      ref: jobId,
+      code: failureReason ?? "unknown",
+    });
   }
 
   if (status === "printed" || status === "failed") {
