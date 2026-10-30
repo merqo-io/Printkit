@@ -240,4 +240,4 @@ records a `print_failed` ops event.
 
 The B1 calibration sample uses the shared label renderer at 40 mm across by 60 mm along the feed; it is independent of saved order labels.
 
-`sticker-template.ts` defines a versioned, validated sticker geometry model. `render-sticker-template.ts` renders it with explicit overflow errors; saved designs and logo rendering remain unfinished.
+`sticker-template.ts` defines a versioned, validated sticker geometry model. `render-sticker-template.ts` renders it with explicit overflow errors. Booth designs can be saved after the migration; live order rendering and logo support remain unfinished.

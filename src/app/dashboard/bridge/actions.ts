@@ -155,7 +155,8 @@ export async function bridgeHeartbeat(
   // Only a paired printer can print, so only then is it reachable.
   if (z.boolean().parse(printerPaired) !== true) return;
   const printer = await getPrinterByLocation(locationId);
-  if (printer) await touchPrinterSeen(printer);
+  if (printer?.catalog_id === "niimbot-b1" && printer.connector === "bridge")
+    await touchPrinterSeen(printer);
 }
 
 /**
@@ -163,16 +164,33 @@ export async function bridgeHeartbeat(
  * so it carries the same connector, driver and health signal as every other
  * printer instead of being a special case.
  */
-export async function ensureBridgePrinter(locationId: string): Promise<void> {
+export async function ensureBridgePrinter(
+  locationId: string,
+): Promise<ActionResult> {
   const { user } = await getVendorSession();
-  if (!(await ownedLocation(locationId, user.id))) return;
+  if (!(await ownedLocation(locationId, user.id)))
+    return { success: false, error: "Booth not found." };
 
   const existing = await getPrinterByLocation(locationId);
-  if (existing) return;
+  if (existing) {
+    if (existing.catalog_id === "niimbot-b1" && existing.connector === "bridge")
+      return { success: true };
+    return {
+      success: false,
+      error:
+        "This booth has another printer configured. Change its printer before pairing a B1.",
+    };
+  }
 
-  await createPrinter({
+  const created = await createPrinter({
     vendorId: user.id,
     locationId,
     catalogId: "niimbot-b1",
   });
+  return created
+    ? { success: true }
+    : {
+        success: false,
+        error: "Could not register this printer. Please try again.",
+      };
 }

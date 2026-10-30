@@ -21,10 +21,19 @@ export function StickerSize({
               aria-label={key === "widthMm" ? "Width (mm)" : "Length (mm)"}
               type="number"
               min={20}
-              value={template[key]}
-              onChange={(event) =>
-                onChange({ ...template, [key]: Number(event.target.value) })
-              }
+              key={`${key}-${template[key]}`}
+              defaultValue={template[key]}
+              onBlur={(event) => {
+                const value = event.currentTarget.value;
+                onChange({
+                  ...template,
+                  [key]: value === "" ? NaN : Number(value),
+                });
+                event.currentTarget.value = String(template[key]);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.currentTarget.blur();
+              }}
               className="border-input bg-background mt-1 w-full rounded-md border px-3 py-2"
             />
           </label>

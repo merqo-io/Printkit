@@ -1,7 +1,5 @@
-# Sticker designer prototype
+# Sticker designer
 
-The authenticated page contains a temporary client-side canvas for experimenting with physical dimensions and field placement. It validates geometry using `sticker-template.ts`, supports pointer movement and numeric position controls, and shows sample content. Changes are not saved or used for printing. Storage, renderer parity, logo upload, accessible editing, overflow detection, and printer compatibility are future work; do not deploy this prototype as a finished designer.
+The authenticated, booth-scoped editor supports sticker dimensions, field positioning, typography, and a thermal-rendered sample preview. Vendors can save versioned designs after the owner applies the migration. The save action checks ownership, geometry, printer width, and sample overflow.
 
-The Render print preview button uses the authenticated thermal preview endpoint. It does not print or save a design.
-
-The owner-controlled migration prepares versioned booth designs. Rendering actual order labels, uploading logos, and complete device support remain unfinished.
+Order printing does not yet use saved designs. Logo uploads, full printer compatibility, and live-order overflow handling remain unfinished. The sample preview never sends a print job.

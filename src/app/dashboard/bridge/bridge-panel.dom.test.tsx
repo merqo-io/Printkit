@@ -31,7 +31,7 @@ vi.mock("./actions", () => ({
   logBridgeEvent: vi.fn().mockResolvedValue({ success: true }),
   claimBridgeJob: vi.fn(),
   bridgeHeartbeat: vi.fn().mockResolvedValue(undefined),
-  ensureBridgePrinter: vi.fn().mockResolvedValue(undefined),
+  ensureBridgePrinter: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 import { isBridgeModeEnabled, setBridgeModeEnabled } from "@/lib/bridge-mode";
@@ -103,8 +103,23 @@ describe("BridgePanel", () => {
       jobId ? { ok: true, jobId: "job-1", sentAt: ATTEMPT } : { ok: false },
     );
     vi.mocked(bridgeHeartbeat).mockReset().mockResolvedValue(undefined);
-    vi.mocked(ensureBridgePrinter).mockReset().mockResolvedValue(undefined);
+    vi.mocked(ensureBridgePrinter)
+      .mockReset()
+      .mockResolvedValue({ success: true });
     vi.mocked(useJobDelivery).mockReset();
+  });
+
+  it("does not claim or print jobs when the configured printer differs", async () => {
+    vi.mocked(ensureBridgePrinter).mockResolvedValueOnce({
+      success: false,
+      error: "Another printer is configured.",
+    });
+    render(<BridgePanel vendorId="vendor-1" locationId="loc-1" />);
+    fireEvent.click(screen.getByRole("switch"));
+    fireEvent.click(screen.getByRole("button", { name: /pair printer/i }));
+    await waitFor(() => expect(disconnectPrinter).toHaveBeenCalled());
+    expect(claimBridgeJob).not.toHaveBeenCalled();
+    expect(printLabel).not.toHaveBeenCalled();
   });
 
   it("offers the pair button again after a failed pairing", async () => {

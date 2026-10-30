@@ -24,6 +24,18 @@ describe("sticker template rendering", () => {
       elementId: defaultStickerTemplate.elements[3].id,
     });
   });
+  it("wraps unspaced multilingual text when the field can hold it", () => {
+    const element = {
+      ...defaultStickerTemplate.elements[3],
+      widthMm: 20,
+      heightMm: 23,
+    };
+    const result = renderStickerTemplate(
+      { ...defaultStickerTemplate, elements: [element] },
+      { item_options: "无糖少冰燕麦奶加珍珠" },
+    );
+    expect(result.ok).toBe(true);
+  });
   it("does not silently omit unsupported logo assets", () => {
     const logo = {
       id: "20000000-0000-4000-8000-000000000001",

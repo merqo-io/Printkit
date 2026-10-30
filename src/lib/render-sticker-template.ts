@@ -46,6 +46,54 @@ export type StickerRenderResult =
       elementId?: string;
     };
 
+function splitLongWord(
+  word: string,
+  maxWidth: number,
+  measure: (text: string) => number,
+): string[] | null {
+  const parts: string[] = [];
+  let part = "";
+  const graphemes = new Intl.Segmenter(undefined, {
+    granularity: "grapheme",
+  }).segment(word);
+  for (const { segment } of graphemes) {
+    if (measure(segment) > maxWidth) return null;
+    if (part && measure(part + segment) > maxWidth) {
+      parts.push(part);
+      part = segment;
+    } else part += segment;
+  }
+  if (part) parts.push(part);
+  return parts;
+}
+
+function wrapParagraph(
+  paragraph: string,
+  maxWidth: number,
+  measure: (text: string) => number,
+): string[] | null {
+  const lines: string[] = [];
+  let line = "";
+  for (const word of paragraph.trim().split(/\s+/).filter(Boolean)) {
+    if (measure(word) > maxWidth) {
+      if (line) lines.push(line);
+      const parts = splitLongWord(word, maxWidth, measure);
+      if (!parts) return null;
+      lines.push(...parts.slice(0, -1));
+      line = parts.at(-1) ?? "";
+      continue;
+    }
+    const candidate = line ? `${line} ${word}` : word;
+    if (measure(candidate) <= maxWidth) line = candidate;
+    else {
+      lines.push(line);
+      line = word;
+    }
+  }
+  lines.push(line);
+  return lines;
+}
+
 function wrapText(
   text: string,
   maxWidth: number,
@@ -53,17 +101,9 @@ function wrapText(
 ): string[] | null {
   const lines: string[] = [];
   for (const paragraph of text.split(/\r?\n/)) {
-    let line = "";
-    for (const word of paragraph.trim().split(/\s+/).filter(Boolean)) {
-      if (measure(word) > maxWidth) return null;
-      const candidate = line ? `${line} ${word}` : word;
-      if (measure(candidate) <= maxWidth) line = candidate;
-      else {
-        lines.push(line);
-        line = word;
-      }
-    }
-    lines.push(line);
+    const wrapped = wrapParagraph(paragraph, maxWidth, measure);
+    if (!wrapped) return null;
+    lines.push(...wrapped);
   }
   return lines;
 }
