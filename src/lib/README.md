@@ -214,8 +214,8 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
   time if unset, instead of silently reading `undefined`.
 - `utils.ts` � `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
 - `location-printer-summaries.ts` � reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
-- `bluetooth-support.ts` — `getBluetoothSupport(nav, ua)`: `supported`, `ios` (iPhone, iPad including the Mac-UA iPad, Chrome for iOS), `unsupported-browser` or `insecure-context`, for the Bridge page.
-- `rate-limit.ts` — `clientIp(headers)` and `rateLimit(supabase, key, limit, windowSeconds)` over the `check_rate_limit` RPC, same contract as paykit; fails open. Limits: pairing 10 per IP, CloudPRNT 120 per token, per 60 seconds.
+- `bluetooth-support.ts`: `getBluetoothSupport(nav, ua)`: `supported`, `ios` (iPhone, iPad including the Mac-UA iPad, Chrome for iOS), `unsupported-browser` or `insecure-context`, for the Bridge page.
+- `rate-limit.ts`: `clientIp(headers)` and `rateLimit(supabase, key, limit, windowSeconds)` over the `check_rate_limit` RPC, same contract as paykit; fails open. Limits: pairing 10 per IP, CloudPRNT 120 per token, per 60 seconds.
 
 ## Connectivity
 
