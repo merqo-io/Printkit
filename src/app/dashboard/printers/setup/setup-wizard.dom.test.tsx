@@ -124,6 +124,15 @@ it("moves focus into the new-address prompt and back on Escape or cancel", async
   await user.click(trigger());
   await user.click(screen.getByRole("button", { name: "Keep the old one" }));
   expect(trigger()).toHaveFocus();
+  m.url.mockResolvedValueOnce({ ok: true, url: "https://test.invalid/two" });
+  await user.click(trigger());
+  await user.click(
+    within(screen.getByRole("alertdialog")).getByRole("button", {
+      name: "Make a new address",
+    }),
+  );
+  expect(await screen.findByText("https://test.invalid/two")).toBeTruthy();
+  expect(trigger()).toHaveFocus();
 });
 it.each([
   ["feie-fp-n20w", "online"],

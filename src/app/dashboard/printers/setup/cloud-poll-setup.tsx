@@ -48,6 +48,7 @@ export function CloudPollSetup({
           return;
         }
         setUrl(result.url);
+        restoreFocus.current = true;
         setConfirming(false);
       } catch {
         toast.error("Could not complete setup. Please try again.");
