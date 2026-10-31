@@ -9,6 +9,8 @@ import { mmToPx } from "@/lib/label-raster";
 const NORMAL = "StickerTemplateNormal";
 const BOLD = "StickerTemplateBold";
 const CJK = "StickerTemplateCJK";
+const MIN_FONT_MM = 1.5;
+const MIN_FONT_RATIO = 0.6;
 let ready = false;
 
 function ensureFonts() {
@@ -27,7 +29,7 @@ function ensureFonts() {
   ready = true;
 }
 
-type Values = Partial<
+export type StickerValues = Partial<
   Record<
     | "order_number"
     | "customer_name"
@@ -38,6 +40,7 @@ type Values = Partial<
     string
   >
 >;
+export type OverflowMode = "reject" | "fit";
 export type StickerRenderResult =
   | { ok: true; png: Buffer }
   | {
@@ -108,11 +111,74 @@ function wrapText(
   return lines;
 }
 
-/** Renders one immutable template; rejects rather than silently clipping text. */
+// Drops whole graphemes so an emoji or combined character is never cut in half.
+function ellipsize(
+  text: string,
+  maxWidth: number,
+  measure: (text: string) => number,
+): string {
+  const graphemes = [
+    ...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text),
+  ].map((part) => part.segment);
+  while (graphemes.length && measure(`${graphemes.join("")}…`) > maxWidth)
+    graphemes.pop();
+  const kept = graphemes.join("").trimEnd();
+  return measure(`${kept}…`) <= maxWidth ? `${kept}…` : "";
+}
+
+type Measure = (text: string) => number;
+type Fitted = { fontSize: number; lineHeight: number; lines: string[] };
+
+// Wrap at the design size, shrink to a floor, then truncate the last line.
+// Returns null only when not even one line fits the box height.
+function fitText(
+  text: string,
+  box: { width: number; height: number },
+  sizes: { design: number; min: number },
+  tools: { setSize: (size: number) => void; measure: Measure },
+): Fitted | null {
+  const { width: maxWidth, height: maxHeight } = box;
+  const { design: designSize, min: minSizePx } = sizes;
+  const { setSize, measure } = tools;
+  const floor = Math.min(
+    designSize,
+    Math.max(minSizePx, Math.floor(designSize * MIN_FONT_RATIO)),
+  );
+  for (let size = designSize; size >= floor; size--) {
+    setSize(size);
+    const lineHeight = Math.ceil(size * 1.25);
+    const lines = wrapText(text, maxWidth, measure);
+    if (lines && lines.length * lineHeight <= maxHeight)
+      return { fontSize: size, lineHeight, lines };
+  }
+  setSize(floor);
+  const lineHeight = Math.ceil(floor * 1.25);
+  const maxLines = Math.floor(maxHeight / lineHeight);
+  if (maxLines < 1) return null;
+  const wrapped = wrapText(text, maxWidth, measure);
+  // A single glyph wider than the box cannot be wrapped; truncate the raw text.
+  const source = wrapped ?? [text.replace(/\s+/g, " ").trim()];
+  const kept = source.slice(0, maxLines);
+  const rest = source.slice(maxLines).join(" ");
+  const last = kept[maxLines - 1] ?? kept[kept.length - 1] ?? "";
+  kept[kept.length - 1] = ellipsize(
+    rest ? `${last} ${rest}` : last,
+    maxWidth,
+    measure,
+  );
+  return { fontSize: floor, lineHeight, lines: kept };
+}
+
+/**
+ * Renders one immutable template. "reject" (designer preview) reports text
+ * that does not fit so the vendor can fix the box; "fit" (live orders) never
+ * fails for text: it shrinks, then truncates with an ellipsis.
+ */
 export function renderStickerTemplate(
   input: unknown,
-  values: Values,
+  values: StickerValues,
   dpi = 203,
+  overflow: OverflowMode = "reject",
 ): StickerRenderResult {
   const parsed = stickerTemplateSchema.safeParse(input);
   if (!parsed.success || !Number.isFinite(dpi) || dpi < 72 || dpi > 600)
@@ -127,7 +193,7 @@ export function renderStickerTemplate(
   ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = "black";
   ctx.textBaseline = "top";
-  const issue = drawElements(ctx, template, values, dpi);
+  const issue = drawElements(ctx, template, values, { dpi, overflow });
   if (issue) return issue;
   const pixels = ctx.getImageData(0, 0, width, height);
   for (let i = 0; i < pixels.data.length; i += 4) {
@@ -143,35 +209,67 @@ export function renderStickerTemplate(
   return { ok: true, png: canvas.toBuffer("image/png") };
 }
 
+type Ctx = ReturnType<ReturnType<typeof createCanvas>["getContext"]>;
+type FieldElement = Extract<
+  StickerTemplate["elements"][number],
+  { kind: "field" }
+>;
+
+// Lays out one field's text; "reject" returns null when it does not fit.
+function layoutField(
+  ctx: Ctx,
+  element: FieldElement,
+  text: string,
+  opts: { dpi: number; overflow: OverflowMode },
+): Fitted | null {
+  const { dpi, overflow } = opts;
+  const box = {
+    width: mmToPx(element.widthMm, dpi),
+    height: mmToPx(element.heightMm, dpi),
+  };
+  const measure = (value: string) => ctx.measureText(value).width;
+  const setSize = (size: number) => {
+    ctx.font = `${size}px "${element.bold ? BOLD : NORMAL}", "${CJK}"`;
+  };
+  const design = mmToPx(element.fontSizeMm, dpi);
+  if (overflow === "fit")
+    return fitText(
+      text,
+      box,
+      { design, min: mmToPx(MIN_FONT_MM, dpi) },
+      { setSize, measure },
+    );
+  setSize(design);
+  const lineHeight = Math.ceil(design * 1.25);
+  const lines = wrapText(text, box.width, measure);
+  if (!lines || lines.length * lineHeight > box.height) return null;
+  return { fontSize: design, lineHeight, lines };
+}
+
 function drawElements(
-  ctx: ReturnType<ReturnType<typeof createCanvas>["getContext"]>,
+  ctx: Ctx,
   template: StickerTemplate,
-  values: Values,
-  dpi: number,
+  values: StickerValues,
+  opts: { dpi: number; overflow: OverflowMode },
 ): Exclude<StickerRenderResult, { ok: true }> | null {
+  const { dpi, overflow } = opts;
   for (const element of template.elements) {
     if (element.kind === "logo")
       return { ok: false, error: "logo_not_supported", elementId: element.id };
-    const text = values[element.field] ?? "";
-    const fontSize = mmToPx(element.fontSizeMm, dpi);
-    const lineHeight = Math.ceil(fontSize * 1.25);
-    ctx.font = `${fontSize}px "${element.bold ? BOLD : NORMAL}", "${CJK}"`;
-    const availableWidth = mmToPx(element.widthMm, dpi);
-    const lines = wrapText(
-      text,
-      availableWidth,
-      (value) => ctx.measureText(value).width,
-    );
-    if (!lines || lines.length * lineHeight > mmToPx(element.heightMm, dpi)) {
+    const fitted = layoutField(ctx, element, values[element.field] ?? "", opts);
+    if (!fitted) {
+      if (overflow === "fit") continue;
       return { ok: false, error: "text_overflow", elementId: element.id };
     }
+    const availableWidth = mmToPx(element.widthMm, dpi);
     ctx.textAlign = element.align;
     let offset = 0;
     if (element.align === "center") offset = availableWidth / 2;
     if (element.align === "right") offset = availableWidth;
     const x = mmToPx(element.xMm, dpi) + offset;
     const y = mmToPx(element.yMm, dpi);
-    lines.forEach((line, index) =>
+    const { lineHeight } = fitted;
+    fitted.lines.forEach((line, index) =>
       ctx.fillText(line, x, y + index * lineHeight),
     );
   }
