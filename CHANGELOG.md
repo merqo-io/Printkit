@@ -483,3 +483,7 @@ actions.ts` to import `LEGAL_VERSIONS`/`getLegalDocSource`/`isLegalCurrent`
 ## Unreleased: sticker designer foundation
 
 - Add a booth-scoped sticker design prototype and non-printing preview. Order printing integration remains unfinished.
+
+## Unreleased: sticker logo upload
+
+- Let vendors upload and place one PNG or JPEG logo in the sticker designer. Logos live in a private `sticker-logos` bucket, readable only by their owner; writes go through the service role. Logos are not printed yet. Included in migration 0016.

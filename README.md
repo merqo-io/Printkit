@@ -124,4 +124,4 @@ The `label_batch` API creates one ordinary job per item unit and reports termina
 
 The Bluetooth bridge provides an optional 40 by 60 mm calibration preview and an explicitly initiated single-label sample print.
 
-The sticker designer prototype supports configurable label geometry and a non-printing renderer preview; it is not yet connected to order printing.
+The sticker designer prototype supports configurable label geometry and a non-printing renderer preview; it is not yet connected to order printing. A vendor can upload one PNG or JPEG logo (up to 512 KB and 1024 by 1024 pixels) into the private `sticker-logos` storage bucket and place it on the sticker; the logo shows in the designer but is not printed yet.
