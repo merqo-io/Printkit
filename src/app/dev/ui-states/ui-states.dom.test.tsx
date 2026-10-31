@@ -45,10 +45,10 @@ describe("dev ui-states", () => {
   it("shows the unrouted notice for one and for many jobs", () => {
     render(<UnroutedPreviewPage />);
     expect(screen.getByTestId("unrouted-one")).toHaveTextContent(
-      "1 unrouted print job needs a booth assigned before it can print.",
+      "Needs a booth (1) This order has no booth yet, so it did not print. Choose a booth for it.",
     );
     expect(screen.getByTestId("unrouted-many")).toHaveTextContent(
-      "3 unrouted print jobs need a booth assigned before they can print.",
+      "Needs a booth (3) These orders have no booth yet, so they did not print. Choose a booth for each.",
     );
   });
 

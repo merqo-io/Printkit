@@ -8,18 +8,18 @@ test.describe("dashboard states in a real browser", () => {
 
     const one = page.getByTestId("unrouted-one");
     await expect(one).toHaveText(
-      "1 unrouted print job needs a booth assigned before it can print.",
+      "Needs a booth (1) This order has no booth yet, so it did not print. Choose a booth for it.",
     );
     await expect(
-      one.getByRole("link", { name: "1 unrouted print job" }),
+      one.getByRole("link", { name: "Needs a booth (1)" }),
     ).toHaveAttribute("href", "/dashboard/history?unrouted=1");
 
     const many = page.getByTestId("unrouted-many");
     await expect(many).toHaveText(
-      "3 unrouted print jobs need a booth assigned before they can print.",
+      "Needs a booth (3) These orders have no booth yet, so they did not print. Choose a booth for each.",
     );
     await expect(
-      many.getByRole("link", { name: "3 unrouted print jobs" }),
+      many.getByRole("link", { name: "Needs a booth (3)" }),
     ).toHaveAttribute("href", "/dashboard/history?unrouted=1");
 
     await page.screenshot({

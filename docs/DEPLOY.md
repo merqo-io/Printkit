@@ -86,8 +86,12 @@ callback_secret` row this deployment presents back to qkit's own
   `PRINTKIT_CALLBACK_SECRET` ("job printed/failed").
 - **Migration note for an already-deployed printkit**: the outbound
   callback used to read `QKIT_CALLBACK_SECRET`/`NEXT_PUBLIC_QKIT_URL` from
-  env vars; both are now ignored (`src/lib/kit-callback.ts` reads
+  env vars; both are now ignored for callbacks (`src/lib/kit-callback.ts` reads
   `kit_api_keys.callback_url`/`callback_secret` instead). Run step 3's
   command against the live project before or immediately after this ships,
   or job-status callbacks to qkit silently stop until you do (fails open,
   logged, never breaks order/print flow itself).
+- `NEXT_PUBLIC_QKIT_URL` is optional again, for a different job: it makes the
+  "turn on printing" step on the Overview's first-run panel a link to qkit.
+  Unset leaves that step as plain text. Next.js inlines `NEXT_PUBLIC_*` values
+  at build time, so set it before building; changing it needs a redeploy.

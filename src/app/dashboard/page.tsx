@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { getVendorSession } from "@/lib/vendor-session";
-import { listPrintJobs, countUnroutedJobs } from "@/lib/print-jobs-list";
+import {
+  listPrintJobs,
+  countUnroutedJobs,
+  hasPrintedJob,
+} from "@/lib/print-jobs-list";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
 import { PageHeader } from "@/components/page-header";
 import { Panel } from "@/components/panel";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { TextLink } from "@/components/text-link";
 import { JobHistoryTable } from "./history/job-history-table";
+import { AutoRefresh } from "./auto-refresh";
+import { FirstRunPanel } from "./first-run-panel";
 import { UnroutedJobsNotice } from "./unrouted-jobs-notice";
 
 export const metadata: Metadata = {
@@ -15,16 +21,24 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const { supabase, user } = await getVendorSession();
-  const [recentJobs, printers, unroutedCount] = await Promise.all([
+  const [recentJobs, printers, unroutedCount, hasPrinted] = await Promise.all([
     listPrintJobs(supabase, user.id, 5),
     listLocationPrinterSummaries(user.id),
     countUnroutedJobs(user.id),
+    hasPrintedJob(user.id),
   ]);
 
   const locations = printers.map(({ location }) => location);
+  const progress = {
+    hasBooth: locations.length > 0,
+    hasPrinter: printers.some(({ printer }) => printer !== null),
+    hasPrintedJob: hasPrinted,
+  };
+  const qkitUrl = process.env.NEXT_PUBLIC_QKIT_URL;
 
   return (
     <div className="mx-auto max-w-4xl">
+      <AutoRefresh />
       <PageHeader
         title="Overview"
         description="Whether each booth's printer is online, and the latest labels from qkit orders."
@@ -33,35 +47,41 @@ export default async function DashboardPage() {
       <div className="space-y-8">
         <UnroutedJobsNotice count={unroutedCount} />
 
-        <section aria-labelledby="booths-heading">
-          <div className="flex items-baseline justify-between gap-4">
-            <h2 id="booths-heading" className="text-lg font-semibold">
-              Booths
-            </h2>
-            <TextLink href="/dashboard/printers" className="text-sm">
-              Manage printers
-            </TextLink>
-          </div>
-          <Panel className="mt-3 divide-y p-0">
-            {locations.length === 0 ? (
-              <p className="text-muted-foreground p-5 text-sm">
-                No booths have printing enabled yet. Turn it on in qkit&apos;s
-                booth settings.
-              </p>
-            ) : (
-              printers.map(({ location: loc, printer, state }) => (
-                <div key={loc.id} className="px-5 py-4">
+        <FirstRunPanel progress={progress} qkitUrl={qkitUrl} />
+
+        {locations.length > 0 && (
+          <section aria-labelledby="booths-heading">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 id="booths-heading" className="text-lg font-semibold">
+                Booths
+              </h2>
+              <TextLink href="/dashboard/printers" className="text-sm">
+                Manage printers
+              </TextLink>
+            </div>
+            <Panel className="mt-3 divide-y p-0">
+              {printers.map(({ location: loc, printer, state }) => (
+                <div
+                  key={loc.id}
+                  className="flex items-center justify-between gap-4 px-5 py-4"
+                >
                   <PrinterStatusRow
                     label={loc.label}
                     printerName={printer?.display_name ?? null}
                     state={state}
                     lastSeenAt={printer?.last_seen_at ?? null}
                   />
+                  <TextLink
+                    href={`/dashboard/printers/designer?location=${encodeURIComponent(loc.id)}`}
+                    className="shrink-0 text-sm"
+                  >
+                    Design label
+                  </TextLink>
                 </div>
-              ))
-            )}
-          </Panel>
-        </section>
+              ))}
+            </Panel>
+          </section>
+        )}
 
         <section aria-labelledby="recent-heading">
           <div className="flex items-baseline justify-between gap-4">

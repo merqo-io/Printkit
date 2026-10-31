@@ -32,8 +32,10 @@ The authenticated vendor area (`/dashboard/*`).
   only feeds the avatar's initials) carries the visible vendor name — see
   `AccountMenuProps` in `@merqo/ui`. No plan/tier/tour concept exists in
   printkit yet, so those optional shared-component props are omitted.
-- `page.tsx` — the Overview: an unrouted-jobs `Notice` when any exist, one `PrinterStatusRow` per booth in a `Panel`, and the five most recent jobs. Its title (page heading and tab title) matches the nav label. The unrouted note is `unrouted-jobs-notice.tsx` and says "1 job needs" or "N jobs need".
-- `unrouted-jobs-notice.tsx` / `unrouted-jobs-notice.dom.test.tsx` — `UnroutedJobsNotice`: the warning `Notice` whose linked "N unrouted print job(s)" leads to `/dashboard/history?unrouted=1`, followed by the rest of the sentence. Renders nothing for a count of zero. Also rendered by `src/app/dev/ui-states/unrouted/` for the e2e check.
+- `page.tsx` — the Overview: a "Needs a booth" `Notice` when unrouted jobs exist, the first-run panel until a label has printed, one `PrinterStatusRow` per booth (with a "Design label" link to the designer) in a `Panel`, and the five most recent jobs. `hasPrintedJob` (`@/lib/print-jobs-list`) decides whether the last first-run step is done, so a printed job older than the five shown still counts. Its title (page heading and tab title) matches the nav label.
+- `first-run-panel.tsx` — `FirstRunPanel`: three numbered steps (booth, printer, first label) with done marks; the first open step gets the magenta mark. Renders nothing once all three are done. Step 1 links to qkit only when `NEXT_PUBLIC_QKIT_URL` is an http(s) URL.
+- `auto-refresh.tsx` — `AutoRefresh`: client component that calls `router.refresh()` on window focus / `visibilitychange` and every 30 s, never while the tab is hidden. Reusable on other pages.
+- `unrouted-jobs-notice.tsx` / `unrouted-jobs-notice.dom.test.tsx` — `UnroutedJobsNotice`: the warning `Notice` whose linked "Needs a booth (N)" leads to `/dashboard/history?unrouted=1`, followed by a plain sentence saying those orders did not print. Renders nothing for a count of zero. Also rendered by `src/app/dev/ui-states/unrouted/` for the e2e check.
 - `dashboard-nav.dom.test.tsx` — RTL/jsdom test: renders the wordmark and
   vendor name.
 - `layout.dom.test.tsx` — RTL/jsdom test: renders the nav (mocked) with

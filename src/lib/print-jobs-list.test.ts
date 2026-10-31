@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { listPrintJobs, countUnroutedJobs } from "./print-jobs-list";
+import {
+  listPrintJobs,
+  countUnroutedJobs,
+  hasPrintedJob,
+} from "./print-jobs-list";
 
 const { createServerClientMock } = vi.hoisted(() => ({
   createServerClientMock: vi.fn(),
@@ -79,5 +83,38 @@ describe("countUnroutedJobs", () => {
 
     const result = await countUnroutedJobs("vendor-1");
     expect(result).toBe(0);
+  });
+});
+
+describe("hasPrintedJob", () => {
+  function mockQuery(result: { data: unknown; error: unknown }) {
+    const limitMock = vi.fn().mockResolvedValue(result);
+    const eqStatusMock = vi.fn().mockReturnValue({ limit: limitMock });
+    const eqVendorMock = vi.fn().mockReturnValue({ eq: eqStatusMock });
+    const selectMock = vi.fn().mockReturnValue({ eq: eqVendorMock });
+    createServerClientMock.mockResolvedValue({
+      from: () => ({ select: selectMock }),
+    });
+    return { selectMock, eqVendorMock, eqStatusMock, limitMock };
+  }
+
+  it("looks for one printed job owned by the vendor", async () => {
+    const m = mockQuery({ data: [{ id: "j1" }], error: null });
+
+    expect(await hasPrintedJob("vendor-1")).toBe(true);
+    expect(m.selectMock).toHaveBeenCalledWith("id");
+    expect(m.eqVendorMock).toHaveBeenCalledWith("vendor_id", "vendor-1");
+    expect(m.eqStatusMock).toHaveBeenCalledWith("status", "printed");
+    expect(m.limitMock).toHaveBeenCalledWith(1);
+  });
+
+  it("is false when no job has printed", async () => {
+    mockQuery({ data: [], error: null });
+    expect(await hasPrintedJob("vendor-1")).toBe(false);
+  });
+
+  it("is false on a query error rather than throwing", async () => {
+    mockQuery({ data: null, error: { message: "boom" } });
+    expect(await hasPrintedJob("vendor-1")).toBe(false);
   });
 });
