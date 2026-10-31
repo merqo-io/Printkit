@@ -106,6 +106,25 @@ it("keeps the old address when the new-address prompt is cancelled", async () =>
   expect(m.url).toHaveBeenCalledTimes(1);
   expect(screen.getByText("https://test.invalid/one")).toBeTruthy();
 });
+it("moves focus into the new-address prompt and back on Escape or cancel", async () => {
+  const user = userEvent.setup();
+  m.url.mockResolvedValueOnce({ ok: true, url: "https://test.invalid/one" });
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await user.click(screen.getByRole("button", { name: "Create the address" }));
+  const trigger = () =>
+    screen.getByRole("button", { name: "Make a new address" });
+  await user.click(
+    await screen.findByRole("button", { name: "Make a new address" }),
+  );
+  expect(screen.getByText("Make a new address?")).toHaveFocus();
+  await user.keyboard("{Escape}");
+  expect(trigger()).toHaveFocus();
+  await user.click(trigger());
+  await user.click(screen.getByRole("button", { name: "Keep the old one" }));
+  expect(trigger()).toHaveFocus();
+});
 it.each([
   ["feie-fp-n20w", "online"],
   ["feie-fp-n20h", "offline"],

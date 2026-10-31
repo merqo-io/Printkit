@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,25 @@ export function CloudPollSetup({
   const [url, setUrl] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const { pending: busy, run } = useAsyncAction();
+  const titleRef = useRef<HTMLParagraphElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const restoreFocus = useRef(false);
+
+  // The trigger is unmounted while the panel is open, so focus can only go
+  // back to it after the re-render that brings it back.
+  useEffect(() => {
+    if (confirming) {
+      titleRef.current?.focus();
+    } else if (restoreFocus.current) {
+      restoreFocus.current = false;
+      triggerRef.current?.focus();
+    }
+  }, [confirming]);
+
+  const cancelConfirm = () => {
+    restoreFocus.current = true;
+    setConfirming(false);
+  };
 
   const onCreate = async () => {
     return run(async () => {
@@ -66,11 +85,16 @@ export function CloudPollSetup({
                 aria-labelledby="new-address-title"
                 aria-describedby="new-address-details"
                 onKeyDown={(event) => {
-                  if (event.key === "Escape" && !busy) setConfirming(false);
+                  if (event.key === "Escape" && !busy) cancelConfirm();
                 }}
                 className="bg-muted/50 space-y-3 rounded-md border p-4"
               >
-                <p id="new-address-title" className="font-medium">
+                <p
+                  id="new-address-title"
+                  ref={titleRef}
+                  tabIndex={-1}
+                  className="font-medium outline-none"
+                >
                   Make a new address?
                 </p>
                 <p
@@ -92,7 +116,7 @@ export function CloudPollSetup({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setConfirming(false)}
+                    onClick={cancelConfirm}
                     disabled={busy}
                   >
                     Keep the old one
@@ -101,6 +125,7 @@ export function CloudPollSetup({
               </div>
             ) : (
               <Button
+                ref={triggerRef}
                 variant="outline"
                 size="sm"
                 onClick={() => setConfirming(true)}
