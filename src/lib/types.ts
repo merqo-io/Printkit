@@ -93,6 +93,28 @@ export type Database = {
         };
         Relationships: [];
       };
+      sticker_templates: {
+        Row: {
+          id: string;
+          location_id: string;
+          vendor_id: string;
+          version: number;
+          design: Json;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          vendor_id: string;
+          version: number;
+          design: Json;
+          active?: boolean;
+          created_at?: string;
+        };
+        Update: { active?: boolean };
+        Relationships: [];
+      };
       print_batches: {
         Row: {
           id: string;
@@ -361,6 +383,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      save_sticker_template: {
+        Args: { p_location_id: string; p_vendor_id: string; p_design: Json };
+        Returns: string;
+      };
       create_label_batch: {
         Args: {
           p_vendor_id: string;

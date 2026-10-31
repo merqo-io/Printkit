@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.0] - 2026-10-31
+
+### Added
+
+- The designer print preview now draws logos: it sends logo elements with the booth id (`?location=`), and the route loads them only from the signed-in vendor's own folder.
+
+- Print sticker designs on every raster printer: uploaded logos are fitted and dithered to 1-bit (a bad logo is skipped, never fails the job), designs are scaled to the printer label size, `booth_name` falls back to the location name, and the designer notes size mismatches and that Feie printers print the standard label.
+
+- Add atomic bounded label batches with one job and acknowledgement per unit, aggregate order callbacks and idempotent batch retries. Existing single-label integrations remain compatible. Migration 0011 and physical staging acceptance are required.
+
 ## [0.6.2] - 2026-10-31
 
 ### Fixed
@@ -471,3 +481,16 @@ actions.ts` to import `LEGAL_VERSIONS`/`getLegalDocSource`/`isLegalCurrent`
 - Auth scaffolding (login, session guard).
 - Data model: `print_jobs`, `kit_api_keys`, `admins`/`is_admin`/`admin_audit` with RLS, verified against real Postgres via pgTAP.
 - Bearer-secret kit-auth verification helper (`kit-auth.ts`), `create-kit-key.mjs` for minting calling-kit secrets.
+
+## Unreleased: B1 calibration preview
+
+- Add a digital 40 by 60 mm B1 sample preview and an explicit one-label calibration print.
+
+## Unreleased: sticker designer foundation
+
+- Add a booth-scoped sticker design prototype and non-printing preview. Order printing integration remains unfinished.
+- Print live label jobs from the booth's saved sticker design, falling back to the default label when none exists or it cannot render. Long item names and options now wrap, shrink to a minimum size, then truncate with an ellipsis instead of failing the job.
+
+## Unreleased: sticker logo upload
+
+- Let vendors upload and place one PNG or JPEG logo in the sticker designer. Logos live in a private `sticker-logos` bucket, readable only by their owner; writes go through the service role. Logos are not printed yet. Included in migration 0016.
