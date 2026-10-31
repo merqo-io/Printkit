@@ -64,3 +64,20 @@ export async function countUnroutedJobs(vendorId: string): Promise<number> {
   }
   return count ?? 0;
 }
+
+/** Whether the vendor has ever had a label print; drives the first-run steps. */
+export async function hasPrintedJob(vendorId: string): Promise<boolean> {
+  const supabase = await createServerClient();
+  const { data, error } = await supabase
+    .from("print_jobs")
+    .select("id")
+    .eq("vendor_id", vendorId)
+    .eq("status", "printed")
+    .limit(1);
+
+  if (error) {
+    console.error("hasPrintedJob failed", error.message);
+    return false;
+  }
+  return (data ?? []).length > 0;
+}
