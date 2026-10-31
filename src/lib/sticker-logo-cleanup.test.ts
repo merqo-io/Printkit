@@ -44,34 +44,55 @@ describe("planCleanup", () => {
   ) => planCleanup({ objects, referenced: new Set(refs), now, graceMs: day });
 
   it("keeps a fresh unsaved upload", () => {
-    const result = plan([{ path: "a", createdAt: fresh }], []);
-    expect(result.keptByGrace).toEqual(["a"]);
+    const result = plan([{ path: "v/b/a.png", createdAt: fresh }], []);
+    expect(result.keptByGrace).toEqual(["v/b/a.png"]);
     expect(result.orphans).toEqual([]);
   });
 
   it("deletes an old unsaved upload", () => {
-    expect(plan([{ path: "a", createdAt: old }], []).orphans).toEqual(["a"]);
+    expect(plan([{ path: "v/b/a.png", createdAt: old }], []).orphans).toEqual([
+      "v/b/a.png",
+    ]);
   });
 
   it("keeps an old path referenced by any template version or job snapshot", () => {
-    const result = plan([{ path: "a", createdAt: old }], ["a"]);
-    expect(result.keptReferenced).toEqual(["a"]);
+    const result = plan([{ path: "v/b/a.png", createdAt: old }], ["v/b/a.png"]);
+    expect(result.keptReferenced).toEqual(["v/b/a.png"]);
     expect(result.orphans).toEqual([]);
   });
 
   it("keeps objects with a missing or invalid age", () => {
     const result = plan(
       [
-        { path: "a", createdAt: null },
-        { path: "b", createdAt: "garbage" },
+        { path: "v/b/a.png", createdAt: null },
+        { path: "v/b/b.jpg", createdAt: "garbage" },
       ],
       [],
     );
-    expect(result.keptByGrace).toEqual(["a", "b"]);
+    expect(result.keptByGrace).toEqual(["v/b/a.png", "v/b/b.jpg"]);
+  });
+
+  it("never plans deletion outside vendor/booth/file images", () => {
+    const strays = [
+      "root.png",
+      "v/shallow.png",
+      "v/b/.emptyFolderPlaceholder",
+      "v/b/c/deep.png",
+      "v/b/a.gif",
+    ];
+    const result = plan(
+      strays.map((path) => ({ path, createdAt: old })),
+      [],
+    );
+    expect(result.orphans).toEqual([]);
+    expect(result.keptUnmanaged).toEqual(strays);
   });
 
   it("reports counts", () => {
-    const result = plan([{ path: "a", createdAt: old }], ["a", "gone"]);
+    const result = plan(
+      [{ path: "v/b/a.png", createdAt: old }],
+      ["v/b/a.png", "v/b/gone.png"],
+    );
     expect(result.listed).toBe(1);
     expect(result.referenced).toBe(2);
   });
@@ -84,7 +105,10 @@ type Tree = Record<
 
 function fakeStorage(tree: Tree) {
   const list = vi.fn(
-    async (prefix: string, o: { limit: number; offset: number }) => ({
+    async (
+      prefix: string,
+      o: { limit: number; offset: number; sortBy: unknown },
+    ) => ({
       data: (tree[prefix] ?? []).slice(o.offset, o.offset + o.limit),
       error: null,
     }),
@@ -108,6 +132,11 @@ describe("listAllLogos", () => {
     const found = await listAllLogos(storage);
     expect(found).toHaveLength(150);
     expect(found[0]).toEqual({ path: "v1/b1/f0.png", createdAt: old });
+    expect(storage.list).toHaveBeenCalledWith("v1/b1", {
+      limit: 100,
+      offset: 100,
+      sortBy: { column: "name", order: "asc" },
+    });
   });
 
   it("throws on a listing error", async () => {

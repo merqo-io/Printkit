@@ -60,23 +60,27 @@ try {
     const db = createClient(url, secretKey, { db: { schema: "printkit" } });
     const storage = db.storage.from(BUCKET);
 
-    const referenced = new Set();
-    for await (const row of pages(
-      () => db.from("sticker_templates").select("id, design"),
-      "sticker_templates",
-    ))
-      for (const path of collectLogoPaths(row.design, `template ${row.id}`))
-        referenced.add(path);
-    for await (const row of pages(
-      () =>
-        db
-          .from("print_jobs")
-          .select("id, snapshot:payload->_printkit_sticker_template")
-          .not("payload->_printkit_sticker_template", "is", null),
-      "print_jobs",
-    ))
-      for (const path of collectLogoPaths(row.snapshot, `job ${row.id}`))
-        referenced.add(path);
+    const readReferences = async () => {
+      const referenced = new Set();
+      for await (const row of pages(
+        () => db.from("sticker_templates").select("id, design"),
+        "sticker_templates",
+      ))
+        for (const path of collectLogoPaths(row.design, `template ${row.id}`))
+          referenced.add(path);
+      for await (const row of pages(
+        () =>
+          db
+            .from("print_jobs")
+            .select("id, snapshot:payload->_printkit_sticker_template")
+            .not("payload->_printkit_sticker_template", "is", null),
+        "print_jobs",
+      ))
+        for (const path of collectLogoPaths(row.snapshot, `job ${row.id}`))
+          referenced.add(path);
+      return referenced;
+    };
+    const referenced = await readReferences();
 
     // Listed after the references are read, so an upload racing the run is
     // either unlisted or protected by the grace period.
@@ -88,13 +92,20 @@ try {
       graceMs: options.graceHours * 3_600_000,
     });
 
-    for (const path of plan.orphans) console.log(path);
+    let orphans = plan.orphans;
     let deleted = 0;
-    if (options.apply) deleted = await removeInBatches(storage, plan.orphans);
+    if (options.apply) {
+      // A designer session open since before the first read may have saved
+      // since; re-reading drops any candidate that is now in use.
+      const latest = await readReferences();
+      orphans = orphans.filter((path) => !latest.has(path));
+    }
+    for (const path of orphans) console.log(path);
+    if (options.apply) deleted = await removeInBatches(storage, orphans);
     console.log(
-      `${options.apply ? "Applied" : "Dry run"}: listed ${plan.listed}, referenced paths ${plan.referenced}, kept in use ${plan.keptReferenced.length}, kept by grace ${plan.keptByGrace.length}, orphaned ${plan.orphans.length}, deleted ${deleted}.`,
+      `${options.apply ? "Applied" : "Dry run"}: listed ${plan.listed}, referenced paths ${plan.referenced}, kept in use ${plan.keptReferenced.length}, kept by grace ${plan.keptByGrace.length}, kept as not ours ${plan.keptUnmanaged.length}, orphaned ${orphans.length}, deleted ${deleted}.`,
     );
-    if (!options.apply && plan.orphans.length > 0)
+    if (!options.apply && orphans.length > 0)
       console.log("Re-run with --apply to delete these.");
   }
 } catch (error) {

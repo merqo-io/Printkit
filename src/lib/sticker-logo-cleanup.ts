@@ -10,6 +10,7 @@ export type CleanupPlan = {
   referenced: number;
   keptReferenced: string[];
   keptByGrace: string[];
+  keptUnmanaged: string[];
   orphans: string[];
 };
 
@@ -48,12 +49,18 @@ export function planCleanup(input: {
     referenced: input.referenced.size,
     keptReferenced: [],
     keptByGrace: [],
+    keptUnmanaged: [],
     orphans: [],
   };
   const cutoff = input.now.getTime() - input.graceMs;
   for (const object of input.objects) {
     if (input.referenced.has(object.path)) {
       plan.keptReferenced.push(object.path);
+      continue;
+    }
+    // Only <vendor>/<booth>/<file> uploads are ours; placeholders and strays stay.
+    if (!MANAGED_PATH.test(object.path)) {
+      plan.keptUnmanaged.push(object.path);
       continue;
     }
     const created = object.createdAt ? Date.parse(object.createdAt) : NaN;
@@ -78,11 +85,16 @@ type ListResult = {
 export type LogoStorage = {
   list(
     prefix: string,
-    options: { limit: number; offset: number },
+    options: {
+      limit: number;
+      offset: number;
+      sortBy: { column: string; order: "asc" | "desc" };
+    },
   ): Promise<ListResult>;
   remove(paths: string[]): Promise<{ error: { message: string } | null }>;
 };
 
+const MANAGED_PATH = /^[^/]+\/[^/]+\/[^/]+\.(png|jpg)$/;
 const PAGE = 100;
 // Folders are <vendor>/<booth>; files sit one level below.
 const MAX_DEPTH = 2;
@@ -113,6 +125,7 @@ async function listFolder(
   for (let offset = 0; ; offset += PAGE) {
     const { data, error } = await storage.list(prefix, {
       limit: PAGE,
+      sortBy: { column: "name", order: "asc" },
       offset,
     });
     if (error || !data)
