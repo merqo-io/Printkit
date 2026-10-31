@@ -52,7 +52,13 @@ describe("sticker preview", () => {
     expect(mocks.render).toHaveBeenCalledWith(
       { version: 1 },
       expect.objectContaining({ item_name: "Kopi" }),
+      203,
+      expect.anything(),
     );
+  });
+  it("loads no logos unless the request names the booth being designed", async () => {
+    await POST(new Request("http://localhost", { method: "POST", body: "{}" }));
+    expect(mocks.render.mock.calls[0][3]).toEqual({ logos: undefined });
   });
   it("returns an actionable overflow error", async () => {
     mocks.render.mockReturnValue({

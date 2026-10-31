@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { defaultStickerTemplate } from "./sticker-template";
 import { renderStickerTemplate } from "./render-sticker-template";
+import { mmToPx } from "./label-raster";
 
 describe("sticker template rendering", () => {
   it("renders the full sample to a monochrome PNG", () => {
@@ -36,7 +37,7 @@ describe("sticker template rendering", () => {
     );
     expect(result.ok).toBe(true);
   });
-  it("does not silently omit unsupported logo assets", () => {
+  it("skips a logo with no decoded image instead of failing", () => {
     const logo = {
       id: "20000000-0000-4000-8000-000000000001",
       kind: "logo",
@@ -47,10 +48,18 @@ describe("sticker template rendering", () => {
       heightMm: 10,
     };
     expect(
-      renderStickerTemplate(
-        { ...defaultStickerTemplate, elements: [logo] },
-        {},
-      ),
-    ).toMatchObject({ ok: false, error: "logo_not_supported" });
+      renderStickerTemplate({ ...defaultStickerTemplate, elements: [logo] }, {})
+        .ok,
+    ).toBe(true);
+  });
+  it("scales the design to fit a larger label, centered", () => {
+    const result = renderStickerTemplate(
+      defaultStickerTemplate,
+      { order_number: "#001" },
+      203,
+      { overflow: "fit", fitTo: { widthMm: 100, heightMm: 60 } },
+    );
+    expect(result.ok && result.png.readUInt32BE(16)).toBe(mmToPx(100, 203));
+    expect(result.ok && result.png.readUInt32BE(20)).toBe(mmToPx(60, 203));
   });
 });

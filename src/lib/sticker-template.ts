@@ -37,6 +37,8 @@ const logoElementSchema = boxSchema.extend({
   path: logoPathSchema,
 });
 
+export const MAX_LOGOS = 4;
+
 export const stickerTemplateSchema = z
   .object({
     version: z.literal(1),
@@ -51,6 +53,14 @@ export const stickerTemplateSchema = z
       .max(30),
   })
   .superRefine((template, ctx) => {
+    // Each logo is decoded into memory at render time, so the count is bounded.
+    if (template.elements.filter((e) => e.kind === "logo").length > MAX_LOGOS) {
+      ctx.addIssue({
+        code: "custom",
+        message: `At most ${MAX_LOGOS} logos per sticker`,
+        path: ["elements"],
+      });
+    }
     if (
       template.marginMm * 2 >=
       Math.min(template.widthMm, template.heightMm)

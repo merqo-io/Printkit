@@ -26,6 +26,39 @@ describe("sticker designer prototype", () => {
       screen.getByRole("button", { name: "Select Drink options" }),
     ).toHaveTextContent("Normal sugar");
   });
+  it("warns when the printer label size differs from the design, and shows nothing when it matches", () => {
+    const printer = {
+      model: "FP-N20W",
+      connector: "cloud_poll",
+      labelWidthMm: 50,
+      labelHeightMm: 30,
+    };
+    const { rerender } = render(<StickerDesigner printer={printer} />);
+    expect(screen.getByRole("note")).toHaveTextContent(
+      /label is 50 by 30 mm, but this sticker is 40 by 60 mm/,
+    );
+    rerender(
+      <StickerDesigner
+        printer={{ ...printer, labelWidthMm: 40, labelHeightMm: 60 }}
+      />,
+    );
+    expect(screen.queryByRole("note")).not.toBeInTheDocument();
+  });
+  it("says a Feie printer prints the standard label", () => {
+    render(
+      <StickerDesigner
+        printer={{
+          model: "FP-N20W",
+          connector: "vendor_cloud",
+          labelWidthMm: 40,
+          labelHeightMm: 60,
+        }}
+      />,
+    );
+    expect(screen.getByRole("note")).toHaveTextContent(
+      "This printer prints the standard label; custom designs are not supported.",
+    );
+  });
   it("lets a vendor select a field and use accessible numeric position controls", () => {
     render(<StickerDesigner />);
     fireEvent.click(screen.getByRole("button", { name: "Drink options" }));

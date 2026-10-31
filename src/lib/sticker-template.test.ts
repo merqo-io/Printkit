@@ -4,6 +4,26 @@ import {
   stickerTemplateSchema,
 } from "./sticker-template";
 
+describe("logo cap", () => {
+  const logoAt = (n: number) => ({
+    id: `20000000-0000-4000-8000-00000000010${n}`,
+    kind: "logo" as const,
+    path: "20000000-0000-4000-8000-000000000002/20000000-0000-4000-8000-000000000003/20000000-0000-4000-8000-000000000004.png",
+    xMm: 3,
+    yMm: 3,
+    widthMm: 5,
+    heightMm: 5,
+  });
+  it("allows 4 logos and rejects 5", () => {
+    const withLogos = (count: number) => ({
+      ...defaultStickerTemplate,
+      elements: Array.from({ length: count }, (_, n) => logoAt(n)),
+    });
+    expect(stickerTemplateSchema.safeParse(withLogos(4)).success).toBe(true);
+    expect(stickerTemplateSchema.safeParse(withLogos(5)).success).toBe(false);
+  });
+});
+
 describe("sticker templates", () => {
   it("accepts the 40 mm across by 60 mm feed default", () => {
     expect(stickerTemplateSchema.parse(defaultStickerTemplate)).toMatchObject({

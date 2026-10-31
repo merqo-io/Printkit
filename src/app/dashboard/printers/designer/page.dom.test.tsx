@@ -17,6 +17,7 @@ vi.mock("@/lib/vendor-session", () => ({ getVendorSession: mocks.session }));
 vi.mock("@/lib/print-locations", () => ({
   listActiveLocations: mocks.locations,
 }));
+vi.mock("@/lib/printers", () => ({ getPrinterByLocation: async () => null }));
 vi.mock("@/components/page-header", () => ({
   PageHeader: () => <h1>Sticker designer</h1>,
 }));

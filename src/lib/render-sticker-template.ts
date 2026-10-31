@@ -1,10 +1,11 @@
 import path from "node:path";
-import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
+import { createCanvas, GlobalFonts, type Image } from "@napi-rs/canvas";
 import {
   stickerTemplateSchema,
   type StickerTemplate,
 } from "@/lib/sticker-template";
 import { mmToPx } from "@/lib/label-raster";
+import { drawLogoBitmap } from "@/lib/sticker-logo-bitmap";
 
 const NORMAL = "StickerTemplateNormal";
 const BOLD = "StickerTemplateBold";
@@ -45,7 +46,7 @@ export type StickerRenderResult =
   | { ok: true; png: Buffer }
   | {
       ok: false;
-      error: "invalid_template" | "text_overflow" | "logo_not_supported";
+      error: "invalid_template" | "text_overflow";
       elementId?: string;
     };
 
@@ -180,6 +181,42 @@ function fitText(
   return { fontSize: floor, lineHeight, lines: kept };
 }
 
+export type RenderOptions = {
+  /** Decoded logos by storage path; an element whose logo is absent is skipped. */
+  logos?: ReadonlyMap<string, Image>;
+  /** Output label size; the design is scaled to fit (contain) and centered. */
+  fitTo?: { widthMm: number; heightMm: number };
+};
+
+type Placement = { offsetX: number; offsetY: number; scale: number };
+
+function placeDesign(
+  design: { widthMm: number; heightMm: number },
+  fitTo: RenderOptions["fitTo"],
+  dpi: number,
+): { width: number; height: number; placement: Placement } {
+  const designW = mmToPx(design.widthMm, dpi);
+  const designH = mmToPx(design.heightMm, dpi);
+  if (!fitTo)
+    return {
+      width: designW,
+      height: designH,
+      placement: { offsetX: 0, offsetY: 0, scale: 1 },
+    };
+  const width = mmToPx(fitTo.widthMm, dpi);
+  const height = mmToPx(fitTo.heightMm, dpi);
+  const scale = Math.min(width / designW, height / designH);
+  return {
+    width,
+    height,
+    placement: {
+      offsetX: (width - designW * scale) / 2,
+      offsetY: (height - designH * scale) / 2,
+      scale,
+    },
+  };
+}
+
 /**
  * Renders one immutable template. "reject" (designer preview) reports text
  * that does not fit so the vendor can fix the box; "fit" (live orders) never
@@ -189,22 +226,33 @@ export function renderStickerTemplate(
   input: unknown,
   values: StickerValues,
   dpi = 203,
-  overflow: OverflowMode = "reject",
+  mode: OverflowMode | (RenderOptions & { overflow?: OverflowMode }) = "reject",
 ): StickerRenderResult {
+  const options = typeof mode === "string" ? {} : mode;
+  const overflow =
+    (typeof mode === "string" ? mode : mode.overflow) ?? "reject";
   const parsed = stickerTemplateSchema.safeParse(input);
   if (!parsed.success || !Number.isFinite(dpi) || dpi < 72 || dpi > 600)
     return { ok: false, error: "invalid_template" };
   const template: StickerTemplate = parsed.data;
   ensureFonts();
-  const width = mmToPx(template.widthMm, dpi);
-  const height = mmToPx(template.heightMm, dpi);
+  const { width, height, placement } = placeDesign(
+    template,
+    options.fitTo,
+    dpi,
+  );
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = "black";
   ctx.textBaseline = "top";
-  const issue = drawElements(ctx, template, values, { dpi, overflow });
+  const issue = drawElements(ctx, template, values, {
+    dpi,
+    overflow,
+    placement,
+    logos: options.logos,
+  });
   if (issue) return issue;
   const pixels = ctx.getImageData(0, 0, width, height);
   for (let i = 0; i < pixels.data.length; i += 4) {
@@ -261,12 +309,31 @@ function drawElements(
   ctx: Ctx,
   template: StickerTemplate,
   values: StickerValues,
-  opts: { dpi: number; overflow: OverflowMode },
+  opts: {
+    dpi: number;
+    overflow: OverflowMode;
+    placement: Placement;
+    logos?: ReadonlyMap<string, Image>;
+  },
 ): Exclude<StickerRenderResult, { ok: true }> | null {
-  const { dpi, overflow } = opts;
+  const { dpi, overflow, placement, logos } = opts;
+  const { offsetX, offsetY, scale } = placement;
   for (const element of template.elements) {
-    if (element.kind === "logo")
-      return { ok: false, error: "logo_not_supported", elementId: element.id };
+    if (element.kind === "logo") {
+      const image = logos?.get(element.path);
+      // Logos are dithered at final pixel size, so they bypass the context scale below.
+      if (image)
+        drawLogoBitmap(ctx, image, {
+          x: Math.round(offsetX + scale * mmToPx(element.xMm, dpi)),
+          y: Math.round(offsetY + scale * mmToPx(element.yMm, dpi)),
+          width: Math.max(1, Math.round(scale * mmToPx(element.widthMm, dpi))),
+          height: Math.max(
+            1,
+            Math.round(scale * mmToPx(element.heightMm, dpi)),
+          ),
+        });
+      continue;
+    }
     const fitted = layoutField(ctx, element, values[element.field] ?? "", opts);
     if (!fitted) {
       if (overflow === "fit") continue;
@@ -280,9 +347,13 @@ function drawElements(
     const x = mmToPx(element.xMm, dpi) + offset;
     const y = mmToPx(element.yMm, dpi);
     const { lineHeight } = fitted;
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+    ctx.scale(scale, scale);
     fitted.lines.forEach((line, index) =>
       ctx.fillText(line, x, y + index * lineHeight),
     );
+    ctx.restore();
   }
   return null;
 }

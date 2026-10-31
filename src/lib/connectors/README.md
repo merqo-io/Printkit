@@ -39,7 +39,7 @@ Consumed by each connector's routes and by the printer picker. Depends on
 `../printer-catalog.ts` for `ConnectorId` and on `../label-layout.ts` for
 the layout a driver renders. Raster paths go through `../render-job.ts`,
 which prefers the job's saved sticker design snapshot over the default
-layout; `vendor_cloud` still renders the default layout.
+layout; `vendor_cloud` always renders the default layout (Feie takes markup, and a raster label is unverified on hardware).
 
 ## Parent
 
