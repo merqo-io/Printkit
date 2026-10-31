@@ -124,4 +124,4 @@ The `label_batch` API creates one ordinary job per item unit and reports termina
 
 The Bluetooth bridge provides an optional 40 by 60 mm calibration preview and an explicitly initiated single-label sample print.
 
-The sticker designer prototype supports configurable label geometry and a non-printing renderer preview; it is not yet connected to order printing.
+The sticker designer prototype supports configurable label geometry and a non-printing renderer preview; saved designs now print on live label jobs. Long text fits its box (wrap, shrink, then ellipsis), and a job falls back to the default label if the design cannot render.
