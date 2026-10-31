@@ -36,6 +36,8 @@ function valuesFrom(payload: Json): StickerValues {
 export function renderSnapshotLabel(payload: Json, dpi: number): Buffer | null {
   const snapshot = snapshotOf(payload);
   if (snapshot === null) return null;
+  const order = payloadField(payload, "order_number", "?");
+  const ref = `order ${order} label ${payloadField(payload, "label_index", "?")}`;
   try {
     const result = renderStickerTemplate(
       snapshot,
@@ -44,9 +46,9 @@ export function renderSnapshotLabel(payload: Json, dpi: number): Buffer | null {
       "fit",
     );
     if (result.ok) return result.png;
-    console.error("sticker snapshot not rendered", result.error);
+    console.error("sticker snapshot not rendered", ref, result.error);
   } catch (err) {
-    console.error("sticker snapshot render threw", err);
+    console.error("sticker snapshot render threw", ref, err);
   }
   return null;
 }

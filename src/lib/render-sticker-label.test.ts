@@ -5,7 +5,7 @@ import {
   STICKER_SNAPSHOT_KEY,
 } from "./render-sticker-label";
 import { renderJobForPrinter } from "./render-job";
-import { renderStickerTemplate } from "./render-sticker-template";
+import { joinLines, renderStickerTemplate } from "./render-sticker-template";
 import { mmToPx } from "./label-raster";
 import type { Json } from "./types";
 
@@ -127,5 +127,29 @@ describe("overflow on live orders", () => {
         item_options: "x".repeat(240),
       }),
     ).toMatchObject({ ok: false, error: "text_overflow" });
+  });
+});
+
+describe("joinLines", () => {
+  it("adds no space between CJK lines", () => {
+    expect(joinLines("无糖少冰", "燕麦奶")).toBe("无糖少冰燕麦奶");
+  });
+  it("keeps a space between Latin lines", () => {
+    expect(joinLines("oat milk", "extra hot")).toBe("oat milk extra hot");
+  });
+});
+
+describe("snapshot fallback log", () => {
+  it("names the order and label in the log", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    renderSnapshotLabel(
+      {
+        order_number: "042",
+        label_index: "2",
+        [STICKER_SNAPSHOT_KEY]: { version: 9 },
+      } as Json,
+      203,
+    );
+    expect(spy.mock.calls.at(-1)?.[1]).toBe("order 042 label 2");
   });
 });

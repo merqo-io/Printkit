@@ -126,6 +126,16 @@ function ellipsize(
   return measure(`${kept}…`) <= maxWidth ? `${kept}…` : "";
 }
 
+const CJK_CHAR =
+  /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u;
+
+// CJK lines were split without whitespace, so rejoining them must not add one.
+export function joinLines(last: string, rest: string): string {
+  const unspaced =
+    CJK_CHAR.test(last.slice(-1)) || CJK_CHAR.test(rest.slice(0, 1));
+  return unspaced ? `${last}${rest}` : `${last} ${rest}`;
+}
+
 type Measure = (text: string) => number;
 type Fitted = { fontSize: number; lineHeight: number; lines: string[] };
 
@@ -159,10 +169,11 @@ function fitText(
   // A single glyph wider than the box cannot be wrapped; truncate the raw text.
   const source = wrapped ?? [text.replace(/\s+/g, " ").trim()];
   const kept = source.slice(0, maxLines);
+  if (!kept.length) return { fontSize: floor, lineHeight, lines: [] };
   const rest = source.slice(maxLines).join(" ");
-  const last = kept[maxLines - 1] ?? kept[kept.length - 1] ?? "";
+  const last = kept[kept.length - 1];
   kept[kept.length - 1] = ellipsize(
-    rest ? `${last} ${rest}` : last,
+    rest ? joinLines(last, rest) : last,
     maxWidth,
     measure,
   );
