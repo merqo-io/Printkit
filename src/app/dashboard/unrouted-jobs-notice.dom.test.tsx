@@ -12,14 +12,19 @@ describe("UnroutedJobsNotice", () => {
   it("uses the singular for one job", () => {
     const { container } = render(<UnroutedJobsNotice count={1} />);
     expect(container).toHaveTextContent(
-      "1 unrouted print job needs a booth assigned before it can print.",
+      "Needs a booth (1) This order has no booth yet, so it did not print. Choose a booth for it.",
     );
   });
 
   it("uses the plural for several jobs", () => {
     const { container } = render(<UnroutedJobsNotice count={2} />);
     expect(container).toHaveTextContent(
-      "2 unrouted print jobs need a booth assigned before they can print.",
+      "Needs a booth (2) These orders have no booth yet, so they did not print. Choose a booth for each.",
     );
+  });
+
+  it("does not say unrouted", () => {
+    const { container } = render(<UnroutedJobsNotice count={2} />);
+    expect(container.textContent).not.toMatch(/unrouted/i);
   });
 });

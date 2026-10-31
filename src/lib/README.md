@@ -104,7 +104,9 @@ everything else sits flat here.
   vendor's `queued` jobs with a `null location_id` — jobs that never
   resolved to a print location — used by the dashboard overview's
   unrouted-jobs callout. Fails open (returns `0`) on a query error, same
-  convention as `listPrintJobs`.
+  convention as `listPrintJobs`. `hasPrintedJob(vendorId)`: whether the
+  vendor has any `printed` job (one-row query), used by the overview's
+  first-run steps; returns `false` on a query error.
 - `print-job-payload.ts` — `payloadField(payload, key, fallback = "—")`:
   the one place that defensively narrows a string field out of a
   `print_jobs.payload` jsonb value, shared by the history table's display

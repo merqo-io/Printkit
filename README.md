@@ -58,6 +58,8 @@ flagged; it is safe to re-run.
 for the security context). The Vercel build does not use
 `output: "standalone"`; that config was dropped.
 
+The Overview shows three first-run steps (booth, printer, first label) until a label has printed, refreshes itself on tab focus and every 30 seconds while visible, and links each booth to its label designer. Set the optional `NEXT_PUBLIC_QKIT_URL` (see `.env.example`) before building to make the first step link to qkit.
+
 The Printers page lets a vendor remove or swap a booth's printer (with a confirm), regenerate a cloud printer's address, edit a Feie SN and KEY, and reach the designer. Overview and printers share a vendor-scoped batch loader. Connector setup flows live in separate local components; history uses shared DataTable with Printkit-specific action eligibility.
 
 Each page sets its own `metadata.title`, which the root layout's template turns into "<title> | printkit" (lowercase, like every mention outside the wordmark). Public pages open with the shared `LandingNav` (`SiteNav`) and a dashboard page's way back is the shared `BackButton`. The footer is the family's shared `@merqo/ui` `Footer`, through `src/components/site-footer.tsx`, and `/about` renders the shared `AboutMerqo` story. Every dashboard page is built from the shared parts in `src/components/` (`PageHeader`, `Panel`, `Notice`, `Steps`, `TextLink`), and colour comes from the tokens in `src/app/globals.css`, including the `success`/`warning`/`info` status tokens, never from raw Tailwind colours. Rows that pair a name with a status, like `PrinterStatusRow`, stack below the `sm` breakpoint so they fit a phone. A Bluetooth bridge reports its booth online only while a printer is actually paired, its test print runs one at a time, and leaving the page while a printer is paired asks first. A dashboard error shows inside the dashboard (`src/app/dashboard/error.tsx`); both error pages' "Try again" re-fetches from the server, and a malformed history cursor falls back to the newest page.
@@ -85,6 +87,10 @@ secondary, process-magenta accent) — see `src/app/globals.css`'s own header co
 
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
+Reprint first asks "Print this label again?" so a double tap cannot queue two
+labels, and a failed job in History explains its `failure_reason` in plain
+words. The printer picker cards show only the essentials, with the rest behind
+a "Details" disclosure.
 
 `/reset-password` shows its form only to the session a fresh reset link
 created, within 15 minutes, through a signed recovery-window cookie set by

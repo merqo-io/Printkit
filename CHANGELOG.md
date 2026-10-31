@@ -4,17 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## Unreleased: plainer history and printer picker
+
+### Changed
+
+- Failed jobs in History explain why in plain words. Reprint asks "Print this label again?" first, ignores a double tap, and names the booth when it succeeds. Jobs without a booth read "Needs a booth".
+- Printer picker cards show only how it connects, label width, price and whether it works with an iPad alone, with one info button. Setup, monthly cost and notes are behind a "Details" disclosure.
+
 ## [Unreleased]
 
 ### Added
 
 - Printers page: each booth row now has one action group per printer type (Printer address, Edit SN and KEY, or Open bridge mode) with the rest under More: View setup steps, Design label, Use a different printer and Remove printer. Removing asks first and says what happens to waiting orders.
 - Offline printers show a one-line check for their type, with a link to the setup steps. The empty state lists three numbered steps and links to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
+- The Overview shows three first-run steps (turn on printing in qkit, pick your printer, print your first label) with done marks until a label has printed. Set `NEXT_PUBLIC_QKIT_URL` to link the first step to qkit; it is optional again (callbacks still ignore it) and is inlined at build time, so set it before building.
+- The Overview refreshes itself when you return to the tab and every 30 seconds while it is open, so printer and job status stay current.
+- Each booth on the Overview links to its label designer.
 
 ### Changed
 
 - The cloud printer setup keeps a "Make a new address" button after the address is shown, and asks before retiring the old address.
 - Removing a 4G printer also unregisters it from the maker's account (best effort), and the removal audit entry records the booth, type and model.
+- The "unrouted jobs" note on the Overview now reads "Needs a booth" and says in plain words that those orders did not print.
 
 ## [0.7.0] - 2026-10-31
 
