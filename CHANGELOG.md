@@ -2,6 +2,8 @@
 
 ## Unreleased: multi-label batches
 
+- Print sticker designs on every raster printer: uploaded logos are fitted and dithered to 1-bit (a bad logo is skipped, never fails the job), designs are scaled to the printer label size, `booth_name` falls back to the location name, and the designer notes size mismatches and that Feie printers print the standard label.
+
 - Add atomic bounded label batches with one job and acknowledgement per unit, aggregate order callbacks and idempotent batch retries. Existing single-label integrations remain compatible. Migration 0011 and physical staging acceptance are required.
 
 All notable changes to this project will be documented in this file.

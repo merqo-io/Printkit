@@ -52,6 +52,8 @@ describe("sticker preview", () => {
     expect(mocks.render).toHaveBeenCalledWith(
       { version: 1 },
       expect.objectContaining({ item_name: "Kopi" }),
+      203,
+      expect.anything(),
     );
   });
   it("returns an actionable overflow error", async () => {

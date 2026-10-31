@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { saveStickerDesign } from "./actions";
 import { StickerSize } from "./sticker-size";
+import { PrinterFitNotice, type DesignerPrinter } from "./printer-fit-notice";
 import { AddFieldButtons } from "./add-field-buttons";
 import { names } from "./sticker-content";
 import {
@@ -25,19 +26,18 @@ export function StickerDesigner({
   locationId,
   initialTemplate,
   initialLogoUrls = {},
+  printer,
 }: {
+  printer?: DesignerPrinter;
   locationId?: string;
   initialTemplate?: StickerTemplate;
   initialLogoUrls?: Record<string, string>;
 }) {
   const [logoUrls, setLogoUrls] = useState(initialLogoUrls);
   const [uploading, setUploading] = useState(false);
-  const [template, setTemplate] = useState<StickerTemplate>(
-    initialTemplate ?? defaultStickerTemplate,
-  );
-  const [selectedId, setSelectedId] = useState(
-    (initialTemplate ?? defaultStickerTemplate).elements[0].id,
-  );
+  const start = initialTemplate ?? defaultStickerTemplate;
+  const [template, setTemplate] = useState<StickerTemplate>(start);
+  const [selectedId, setSelectedId] = useState(start.elements[0].id);
   const [error, setError] = useState("");
   const [history, setHistory] = useState<StickerTemplate[]>([]);
   const [rendered, setRendered] = useState<string | null>(null);
@@ -72,14 +72,19 @@ export function StickerDesigner({
       );
       return;
     }
-    previewVersion.current += 1;
-    editVersion.current += 1;
-    setRendered(null);
+    invalidate();
     setRendering(false);
-    setSaved(false);
     setError("");
     setHistory((items) => [...items.slice(-19), template]);
     setTemplate(result.data);
+  }
+
+  // Any edit makes an in-flight or finished preview and the saved status stale.
+  function invalidate() {
+    previewVersion.current += 1;
+    editVersion.current += 1;
+    setRendered(null);
+    setSaved(false);
   }
 
   async function renderPreview() {
@@ -323,6 +328,7 @@ export function StickerDesigner({
           </div>
         </section>
         <section aria-label="Sticker settings" className="space-y-6">
+          <PrinterFitNotice printer={printer} template={template} />
           <StickerSize template={template} onChange={update} />
           <div>
             <h2 className="text-lg font-semibold">Fields</h2>
@@ -476,10 +482,7 @@ export function StickerDesigner({
             onClick={() => {
               const previous = history[history.length - 1];
               if (previous) {
-                previewVersion.current += 1;
-                editVersion.current += 1;
-                setSaved(false);
-                setRendered(null);
+                invalidate();
                 setTemplate(previous);
                 setSelectedId(previous.elements[0].id);
                 setHistory((items) => items.slice(0, -1));
@@ -493,10 +496,7 @@ export function StickerDesigner({
             type="button"
             className="border-input rounded-md border px-4 py-2 text-sm font-medium"
             onClick={() => {
-              previewVersion.current += 1;
-              editVersion.current += 1;
-              setSaved(false);
-              setRendered(null);
+              invalidate();
               setRendering(false);
               setHistory((items) => [...items.slice(-19), template]);
               setTemplate(defaultStickerTemplate);

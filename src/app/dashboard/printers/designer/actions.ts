@@ -149,21 +149,16 @@ function printerWidthError(catalogId: string, widthMm: number): string | null {
   return null;
 }
 
-// The renderer cannot draw logos yet, so only text boxes take part in the fit check.
+// Logos never overflow text, so the fit check renders without them.
 function sampleFits(design: StickerTemplate): boolean {
-  const elements = design.elements.filter((element) => element.kind !== "logo");
-  if (!elements.length) return true;
-  return renderStickerTemplate(
-    { ...design, elements },
-    {
-      order_number: `#${"001"}`,
-      customer_name: "Alex",
-      item_name: "Kopi",
-      item_options: "O (black)\nHot\nNormal sugar",
-      unit_position: "1 / 3",
-      booth_name: "Kopitiam Cart",
-    },
-  ).ok;
+  return renderStickerTemplate(design, {
+    order_number: `#${"001"}`,
+    customer_name: "Alex",
+    item_name: "Kopi",
+    item_options: "O (black)\nHot\nNormal sugar",
+    unit_position: "1 / 3",
+    booth_name: "Kopitiam Cart",
+  }).ok;
 }
 
 export async function saveStickerDesign(

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
+import { getPrinterByLocation } from "@/lib/printers";
+import { getCatalogEntry } from "@/lib/printer-catalog";
 import { stickerTemplateSchema } from "@/lib/sticker-template";
 import { StickerDesigner } from "./sticker-designer";
 import { signLogoUrls } from "./logo-urls";
@@ -31,6 +33,15 @@ export default async function DesignerPage({
   if (initial && !initial.success)
     throw new Error("Stored sticker design is invalid");
   const logoUrls = await signLogoUrls(supabase.storage, initial?.data);
+  const printerRow = await getPrinterByLocation(location.id);
+  const printer = printerRow
+    ? {
+        model: getCatalogEntry(printerRow.catalog_id)?.model ?? "printer",
+        connector: printerRow.connector,
+        labelWidthMm: Number(printerRow.label_width_mm),
+        labelHeightMm: Number(printerRow.label_height_mm),
+      }
+    : undefined;
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
@@ -42,6 +53,7 @@ export default async function DesignerPage({
         locationId={location.id}
         initialTemplate={initial?.data}
         initialLogoUrls={logoUrls}
+        printer={printer}
       />
     </div>
   );
