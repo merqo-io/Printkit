@@ -37,7 +37,8 @@ export default async function HistoryPage({
   if (nextCursor) next.set("cursor", nextCursor);
 
   let emptyMessage: string | undefined;
-  if (unrouted) emptyMessage = "No unrouted jobs. Every job has a booth.";
+  if (unrouted)
+    emptyMessage = "No jobs are waiting for a booth. Every job has one.";
   else if (cursor) emptyMessage = "No older jobs.";
 
   return (

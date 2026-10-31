@@ -84,9 +84,32 @@ describe("JobHistoryTable", () => {
     expect(screen.getByText("Kopitiam Cart")).toBeInTheDocument();
   });
 
-  it("shows Unrouted for a job with no location_id", () => {
+  it("shows Needs a booth for a job with no location_id", () => {
     render(<JobHistoryTable jobs={[UNROUTED_JOB]} />);
-    expect(screen.getByText("Unrouted")).toBeInTheDocument();
+    expect(screen.getByText("Needs a booth")).toBeInTheDocument();
+    expect(screen.queryByText(/unrouted/i)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["expired", /did not pick this label up in time/i],
+    ["printer_offline", /printer was offline/i],
+    ["driver_error", /could not take this label/i],
+    ["device_reported_error", /no paper or an open lid/i],
+    [null, /did not print\. Check the printer/i],
+    ["something_new", /did not print\. Check the printer/i],
+  ])("explains a failed job with reason %s in plain words", (reason, text) => {
+    render(
+      <JobHistoryTable
+        jobs={[{ ...JOB, status: "failed", failure_reason: reason }]}
+      />,
+    );
+    expect(screen.getByText(text)).toBeInTheDocument();
+    if (reason) expect(screen.queryByText(reason)).not.toBeInTheDocument();
+  });
+
+  it("shows no failure line for a printed job", () => {
+    render(<JobHistoryTable jobs={[JOB]} />);
+    expect(screen.queryByText(/print again/i)).not.toBeInTheDocument();
   });
 
   it("shows no assign control for an unrouted job when there are no active locations", () => {

@@ -202,9 +202,14 @@ function PrinterCard({
   locationId: string;
 }) {
   const needsHelper = !worksWithIpadAlone(entry);
+  const recommended = isRecommended(entry);
 
   return (
-    <Panel as="li" data-printer={entry.id} className="flex flex-col">
+    <Panel
+      as="li"
+      data-printer={entry.id}
+      className={cn("flex flex-col", recommended && "border-primary/60")}
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-muted-foreground text-xs tracking-wide uppercase">
@@ -218,33 +223,8 @@ function PrinterCard({
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        {entry.connectivity
-          .filter(
-            (value): value is Connection =>
-              value === "4g" || value === "wifi" || value === "bluetooth",
-          )
-          .map((connection) => {
-            const Icon = CONNECTION_ICON[connection];
-            return (
-              <span
-                key={connection}
-                className="text-muted-foreground inline-flex items-center gap-1 text-xs"
-              >
-                <Icon aria-hidden className="size-3.5" />
-                {CONNECTION_LABEL[connection]}
-                <InfoButton topic={connection} />
-              </span>
-            );
-          })}
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        {isRecommended(entry) && (
-          <span className="inline-flex items-center gap-1">
-            <Badge>Recommended</Badge>
-            <InfoButton topic="recommended" />
-          </span>
-        )}
+        {recommended && <Badge>Recommended</Badge>}
+        {/* The one info button on the card: the iPad question decides the buy. */}
         {needsHelper ? (
           <span className="inline-flex items-center gap-1">
             <Badge variant="outline">Needs a helper device</Badge>
@@ -256,29 +236,29 @@ function PrinterCard({
             <InfoButton topic="ipad_alone" />
           </span>
         )}
-        {!entry.hardwareVerified && (
-          <span className="inline-flex items-center gap-1">
-            <Badge variant="outline">Untested with real hardware</Badge>
-            <InfoButton topic="untested" />
-          </span>
-        )}
       </div>
 
       <dl className="text-muted-foreground mt-4 space-y-1 text-sm">
         <div className="flex justify-between gap-3">
-          <dt className="inline-flex items-center gap-1">
-            Setup
-            <InfoButton topic="setup_effort" />
-          </dt>
-          <dd className="text-foreground">{setupWords(entry.setupEffort)}</dd>
-        </div>
-        <div className="flex justify-between gap-3">
-          <dt className="inline-flex items-center gap-1">
-            Monthly cost
-            <InfoButton topic="monthly_cost" />
-          </dt>
-          <dd className="text-foreground">
-            {entry.monthlyCost === "none" ? "None" : "4G data plan"}
+          <dt>Connects by</dt>
+          <dd className="text-foreground inline-flex flex-wrap justify-end gap-x-3">
+            {entry.connectivity
+              .filter(
+                (value): value is Connection =>
+                  value === "4g" || value === "wifi" || value === "bluetooth",
+              )
+              .map((connection) => {
+                const Icon = CONNECTION_ICON[connection];
+                return (
+                  <span
+                    key={connection}
+                    className="inline-flex items-center gap-1"
+                  >
+                    <Icon aria-hidden className="size-3.5" />
+                    {CONNECTION_LABEL[connection]}
+                  </span>
+                );
+              })}
           </dd>
         </div>
         <div className="flex justify-between gap-3">
@@ -286,14 +266,6 @@ function PrinterCard({
           <dd className="text-foreground">{entry.labelWidthMm.max} mm</dd>
         </div>
       </dl>
-
-      {entry.notes.length > 0 && (
-        <ul className="text-muted-foreground mt-3 space-y-1 text-sm">
-          {entry.notes.map((note) => (
-            <li key={note}>{note}</li>
-          ))}
-        </ul>
-      )}
 
       {needsHelper && (
         <p className="border-border text-muted-foreground mt-4 border-t pt-3 text-sm">
@@ -303,6 +275,47 @@ function PrinterCard({
           </TextLink>
         </p>
       )}
+
+      <details className="group mt-4 text-sm">
+        <summary className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 inline-flex cursor-pointer list-none items-center gap-1 rounded-md py-1 outline-none focus-visible:ring-[3px] pointer-coarse:min-h-10">
+          Details
+          <ChevronDown
+            aria-hidden
+            className="size-4 transition-transform group-open:rotate-180"
+          />
+        </summary>
+        <div className="mt-2 space-y-3">
+          <dl className="text-muted-foreground space-y-1">
+            <div className="flex justify-between gap-3">
+              <dt>Setup</dt>
+              <dd className="text-foreground">
+                {setupWords(entry.setupEffort)}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt>Monthly cost</dt>
+              <dd className="text-foreground">
+                {entry.monthlyCost === "none" ? "None" : "4G data plan"}
+              </dd>
+            </div>
+            {!entry.hardwareVerified && (
+              <div className="flex justify-between gap-3">
+                <dt>Testing</dt>
+                <dd className="text-foreground">
+                  Not yet tested on a real unit
+                </dd>
+              </div>
+            )}
+          </dl>
+          {entry.notes.length > 0 && (
+            <ul className="text-muted-foreground space-y-1">
+              {entry.notes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </details>
 
       <div className="mt-auto pt-5">
         <Button asChild className="w-full">

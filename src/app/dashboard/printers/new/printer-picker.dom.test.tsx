@@ -148,35 +148,81 @@ describe("PrinterPicker", () => {
     expect(info.length).toBeGreaterThan(0);
   });
 
-  it.each([
-    ["Recommended"],
-    ["Works with iPad alone"],
-    ["Needs a helper device"],
-    ["Untested with real hardware"],
-  ])("keeps the %s badge and its info button on one line", (badge) => {
+  it("puts at most one info button on each card", () => {
     renderPicker();
     fireEvent.click(
       screen.getByRole("button", { name: "Works with iPad alone" }),
     );
 
-    const cards = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-printer]"),
-    );
-    const pairs = cards.flatMap((element) =>
-      within(element)
-        .queryAllByText(badge, { selector: "[data-slot=badge]" })
-        .map((found) => ({ element, found })),
-    );
-    expect(pairs.length).toBeGreaterThan(0);
-    for (const { found } of pairs) {
-      const group = found.parentElement as HTMLElement;
-      expect(group).toHaveClass("inline-flex");
+    const cards = document.querySelectorAll<HTMLElement>("[data-printer]");
+    expect(cards.length).toBeGreaterThan(1);
+    for (const element of cards) {
       expect(
-        within(group).getByRole("button", {
-          name: `What does "${badge}" mean?`,
-        }),
-      ).toBeInTheDocument();
-      expect(group.querySelectorAll("[data-slot=badge]")).toHaveLength(1);
+        within(element).queryAllByRole("button", { name: /what does/i }).length,
+      ).toBeLessThanOrEqual(1);
     }
   });
+
+  it("keeps secondary facts behind one Details disclosure", () => {
+    renderPicker();
+
+    const details = card("feie-fp-n20h").querySelectorAll("details");
+    expect(details).toHaveLength(1);
+    expect(details[0]).not.toHaveAttribute("open");
+    expect(within(details[0]).getByText("Monthly cost")).toBeInTheDocument();
+    expect(within(details[0]).getByText("Setup")).toBeInTheDocument();
+  });
+
+  it("shows how it connects and the label width up front", () => {
+    renderPicker();
+
+    const first = card("feie-fp-n20w");
+    expect(within(first).getByText("Connects by")).toBeInTheDocument();
+    const width = within(first).getByText("Labels up to");
+    expect(width.closest("details")).toBeNull();
+  });
+
+  it("marks the recommended printer and lists it first", () => {
+    renderPicker();
+
+    const first = document.querySelector<HTMLElement>(
+      "[data-printer]",
+    ) as HTMLElement;
+    expect(within(first).getByText("Recommended")).toBeInTheDocument();
+  });
+
+  it("avoids connector jargon in card copy", () => {
+    renderPicker();
+    expect(document.body.textContent).not.toMatch(/connector|brand-cloud/i);
+  });
+
+  it.each([["Works with iPad alone"], ["Needs a helper device"]])(
+    "keeps the %s badge and its info button on one line",
+    (badge) => {
+      renderPicker();
+      fireEvent.click(
+        screen.getByRole("button", { name: "Works with iPad alone" }),
+      );
+
+      const cards = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-printer]"),
+      );
+      const pairs = cards.flatMap((element) =>
+        within(element)
+          .queryAllByText(badge, { selector: "[data-slot=badge]" })
+          .map((found) => ({ element, found })),
+      );
+      expect(pairs.length).toBeGreaterThan(0);
+      for (const { found } of pairs) {
+        const group = found.parentElement as HTMLElement;
+        expect(group).toHaveClass("inline-flex");
+        expect(
+          within(group).getByRole("button", {
+            name: `What does "${badge}" mean?`,
+          }),
+        ).toBeInTheDocument();
+        expect(group.querySelectorAll("[data-slot=badge]")).toHaveLength(1);
+      }
+    },
+  );
 });

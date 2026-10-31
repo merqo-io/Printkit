@@ -85,6 +85,10 @@ secondary, process-magenta accent) — see `src/app/globals.css`'s own header co
 
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
+Reprint first asks "Print this label again?" so a double tap cannot queue two
+labels, and a failed job in History explains its `failure_reason` in plain
+words. The printer picker cards show only the essentials, with the rest behind
+a "Details" disclosure.
 
 `/reset-password` shows its form only to the session a fresh reset link
 created, within 15 minutes, through a signed recovery-window cookie set by
