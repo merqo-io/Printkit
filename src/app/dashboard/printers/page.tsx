@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 const CONNECTOR_LABEL: Record<string, string> = {
   cloud_poll: "Cloud printer",
-  vendor_cloud: "Brand-cloud printer",
+  vendor_cloud: "4G printer",
   bridge: "Bluetooth printer with a helper device",
 };
 

@@ -50,7 +50,7 @@ is online or it is not.
   wait that turns into "Connected" when the printer first reports in:
   - Cloud printer: mint this booth's private printer address once, copy it,
     paste it into the printer's own settings page.
-  - Brand-cloud printer: insert a SIM or join WiFi, then type the SN and KEY
+  - 4G printer: insert a SIM or join WiFi, then type the SN and KEY
     off the device. The KEY is used once to claim the printer and never
     stored.
   - Bluetooth printer: choose Android (continue in Bridge mode) or Raspberry
