@@ -63,6 +63,20 @@ it("retries address creation and reports clipboard outcomes", async () => {
   await waitFor(() => expect(m.success).toHaveBeenCalledWith("Address copied"));
   expect(write).toHaveBeenCalledWith("https://test.invalid/printer/token");
 });
+it("offers a new address after one is shown", async () => {
+  const user = userEvent.setup();
+  m.url
+    .mockResolvedValueOnce({ ok: true, url: "https://test.invalid/one" })
+    .mockResolvedValueOnce({ ok: true, url: "https://test.invalid/two" });
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await user.click(screen.getByRole("button", { name: "Create the address" }));
+  await user.click(
+    await screen.findByRole("button", { name: "Make a new address" }),
+  );
+  expect(await screen.findByText("https://test.invalid/two")).toBeTruthy();
+});
 it.each([
   ["feie-fp-n20w", "online"],
   ["feie-fp-n20h", "offline"],

@@ -56,8 +56,16 @@ export function CloudPollSetup({
             </Button>
             <p className="text-muted-foreground text-xs">
               Keep this private. Anyone with it can print to this booth. Make a
-              new one here if it leaks.
+              new one if it leaks. The old one stops working.
             </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onCreate}
+              disabled={busy}
+            >
+              {busy ? "Working…" : "Make a new address"}
+            </Button>
           </div>
         ) : (
           <Button onClick={onCreate} disabled={busy}>

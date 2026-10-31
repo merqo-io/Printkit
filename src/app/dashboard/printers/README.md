@@ -15,7 +15,15 @@ is online or it is not.
 - `page.tsx` — one row per booth: the printer, whether it is online (from
   the shared `last_seen_at` signal), loaded through one vendor-scoped printer summary query, what kind it is in plain words, and the
   one action that makes sense next. A booth with no printer offers only
-  "Choose a printer"; a Bluetooth booth also offers Bridge mode.
+  "Choose a printer". A booth with a printer shows its main action (Printer
+  address, Edit SN and KEY, or Open bridge mode) and a "More" group with View
+  setup steps, Design label, Use a different printer and Remove printer
+  (`printer-actions.tsx`, confirm panel first). An offline printer also shows
+  a one-line check for its type. With no booths the page lists three numbered
+  steps, linking to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
+- `actions.ts` — `removePrinter`: vendor session, Zod-checked booth id, delete
+  scoped to the vendor, `admin_audit` entry `printer_removed`. Device
+  credentials cascade; queued jobs stay on the booth for the next printer.
   Each row carries the id `booth-<location id>` (`locationRowId`), which the
   status API's `manage_url` names so a calling kit's "manage this booth's
   printer" link lands on the right row, which is outlined while it is the
