@@ -37,6 +37,23 @@ describe("ReprintButton", () => {
     expect(screen.getByRole("button", { name: "Reprint" })).toBeVisible();
   });
 
+  it("moves focus to Yes, print, then back to Reprint after cancel", () => {
+    render(<ReprintButton jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Reprint" }));
+    expect(screen.getByRole("button", { name: "Yes, print" })).toHaveFocus();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByRole("button", { name: "Reprint" })).toHaveFocus();
+  });
+
+  it("returns focus to Reprint after the print finishes", async () => {
+    render(<ReprintButton jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Reprint" }));
+    fireEvent.click(screen.getByRole("button", { name: "Yes, print" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Reprint" })).toHaveFocus(),
+    );
+  });
+
   it("queues one label on a double tap of confirm and names the booth", async () => {
     render(<ReprintButton jobId="job-1" boothLabel="Kopitiam Cart" />);
     fireEvent.click(screen.getByRole("button", { name: "Reprint" }));

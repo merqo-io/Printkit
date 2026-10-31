@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,16 @@ export function ReprintButton({
 }) {
   const { pending, run } = useAsyncAction();
   const [confirming, setConfirming] = useState(false);
+  const reprintRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
+
+  // Swapping the button for the question would otherwise drop focus to body.
+  useEffect(() => {
+    if (confirming) confirmRef.current?.focus();
+    else if (wasConfirming.current) reprintRef.current?.focus();
+    wasConfirming.current = confirming;
+  }, [confirming]);
 
   const confirm = () =>
     run(async () => {
@@ -40,6 +50,7 @@ export function ReprintButton({
   if (!confirming) {
     return (
       <Button
+        ref={reprintRef}
         size="sm"
         variant="outline"
         onClick={() => setConfirming(true)}
@@ -55,6 +66,7 @@ export function ReprintButton({
       <p className="text-sm">Print this label again?</p>
       <div className="flex gap-2">
         <Button
+          ref={confirmRef}
           size="sm"
           onClick={confirm}
           disabled={pending}
