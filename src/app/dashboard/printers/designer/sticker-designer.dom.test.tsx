@@ -237,7 +237,7 @@ describe("sticker designer prototype", () => {
         "https://signed/1",
       );
     });
-    it("leaves the logo out of the text-only print preview", async () => {
+    it("sends logo elements and the location to the print preview", async () => {
       upload.mockResolvedValueOnce({
         ok: true,
         path: first,
@@ -255,11 +255,14 @@ describe("sticker designer prototype", () => {
           screen.getByRole("button", { name: "Render print preview" }),
         );
         await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+        expect(fetchMock.mock.calls[0][0]).toBe(
+          "/api/sticker-preview?location=booth",
+        );
         const sent = JSON.parse(fetchMock.mock.calls[0][1].body as string) as {
           elements: { kind: string }[];
         };
         expect(sent.elements.some((element) => element.kind === "logo")).toBe(
-          false,
+          true,
         );
       } finally {
         vi.unstubAllGlobals();

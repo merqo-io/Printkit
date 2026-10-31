@@ -1,14 +1,18 @@
 # Changelog
 
-## Unreleased: multi-label batches
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [0.7.0] - 2026-10-31
+
+### Added
+
+- The designer print preview now draws logos: it sends logo elements with the booth id (`?location=`), and the route loads them only from the signed-in vendor's own folder.
 
 - Print sticker designs on every raster printer: uploaded logos are fitted and dithered to 1-bit (a bad logo is skipped, never fails the job), designs are scaled to the printer label size, `booth_name` falls back to the location name, and the designer notes size mismatches and that Feie printers print the standard label.
 
 - Add atomic bounded label batches with one job and acknowledgement per unit, aggregate order callbacks and idempotent batch retries. Existing single-label integrations remain compatible. Migration 0011 and physical staging acceptance are required.
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [0.6.2] - 2026-10-31
 

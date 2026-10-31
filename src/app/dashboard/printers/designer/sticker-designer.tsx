@@ -92,16 +92,14 @@ export function StickerDesigner({
     setRendering(true);
     setError("");
     try {
-      const response = await fetch("/api/sticker-preview", {
+      // The route draws logos only for a location the vendor owns.
+      const query = locationId
+        ? `?location=${encodeURIComponent(locationId)}`
+        : "";
+      const response = await fetch(`/api/sticker-preview${query}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // The print renderer cannot draw logos yet, so the preview covers text only.
-        body: JSON.stringify({
-          ...template,
-          elements: template.elements.filter(
-            (element) => element.kind !== "logo",
-          ),
-        }),
+        body: JSON.stringify(template),
       });
       if (version !== previewVersion.current) return;
       if (!response.ok) {
