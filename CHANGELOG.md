@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Printers page: each booth row now has one action group per printer type (Printer address, Edit SN and KEY, or Open bridge mode) with the rest under More: View setup steps, Design label, Use a different printer and Remove printer. Removing asks first and says what happens to waiting orders.
+- Offline printers show a one-line check for their type, with a link to the setup steps. The empty state lists three numbered steps and links to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
+
+### Changed
+
+- The cloud printer setup keeps a "Make a new address" button after the address is shown, and asks before retiring the old address.
+- Removing a 4G printer also unregisters it from the maker's account (best effort), and the removal audit entry records the booth, type and model.
+
 ## [0.7.0] - 2026-10-31
 
 ### Added
