@@ -56,7 +56,9 @@ export function FirstRunPanel({
     },
     {
       done: progress.hasPrintedJob,
-      body: <TextLink href="/dashboard/printers">Print a test label.</TextLink>,
+      body: (
+        <TextLink href="/dashboard/printers">Print your first label.</TextLink>
+      ),
     },
   ];
   const currentIndex = steps.findIndex((step) => !step.done);

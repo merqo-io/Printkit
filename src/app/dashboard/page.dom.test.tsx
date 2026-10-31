@@ -10,6 +10,7 @@ vi.mock("@/lib/vendor-session", () => ({
 vi.mock("@/lib/print-jobs-list", () => ({
   listPrintJobs: vi.fn().mockResolvedValue([]),
   countUnroutedJobs: vi.fn().mockResolvedValue(0),
+  hasPrintedJob: vi.fn().mockResolvedValue(false),
 }));
 vi.mock("@/lib/location-printer-summaries", () => ({
   listLocationPrinterSummaries: vi.fn().mockResolvedValue([]),
@@ -20,8 +21,8 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
 import {
   countUnroutedJobs,
+  hasPrintedJob,
   listPrintJobs,
-  type PrintJob,
 } from "@/lib/print-jobs-list";
 import DashboardPage from "./page";
 
@@ -44,6 +45,7 @@ describe("DashboardPage", () => {
     vi.mocked(listLocationPrinterSummaries).mockReset().mockResolvedValue([]);
     vi.mocked(countUnroutedJobs).mockReset().mockResolvedValue(0);
     vi.mocked(listPrintJobs).mockReset().mockResolvedValue([]);
+    vi.mocked(hasPrintedJob).mockReset().mockResolvedValue(false);
   });
 
   it("reports each booth's printer and its live state", async () => {
@@ -130,13 +132,12 @@ describe("DashboardPage", () => {
     expect(items[2]).toHaveTextContent("(next)");
   });
 
-  it("hides the first-run panel once a job has printed", async () => {
+  it("hides the first-run panel when a label printed, even if no printed job is among the newest five", async () => {
     vi.mocked(listLocationPrinterSummaries).mockResolvedValue([
       booth("online"),
     ]);
-    vi.mocked(listPrintJobs).mockResolvedValue([
-      { id: "j1", status: "printed" } as PrintJob,
-    ]);
+    vi.mocked(listPrintJobs).mockResolvedValue([]);
+    vi.mocked(hasPrintedJob).mockResolvedValue(true);
     render(await DashboardPage());
     expect(
       screen.queryByRole("heading", { name: /first label/i }),

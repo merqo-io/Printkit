@@ -27,7 +27,7 @@ describe("FirstRunPanel", () => {
       screen.getByRole("link", { name: "Pick your printer." }),
     ).toHaveAttribute("href", "/dashboard/printers");
     expect(
-      screen.getByRole("link", { name: "Print a test label." }),
+      screen.getByRole("link", { name: "Print your first label." }),
     ).toHaveAttribute("href", "/dashboard/printers");
   });
 

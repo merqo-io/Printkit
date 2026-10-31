@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { getVendorSession } from "@/lib/vendor-session";
-import { listPrintJobs, countUnroutedJobs } from "@/lib/print-jobs-list";
+import {
+  listPrintJobs,
+  countUnroutedJobs,
+  hasPrintedJob,
+} from "@/lib/print-jobs-list";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
 import { PageHeader } from "@/components/page-header";
 import { Panel } from "@/components/panel";
@@ -11,27 +15,24 @@ import { AutoRefresh } from "./auto-refresh";
 import { FirstRunPanel } from "./first-run-panel";
 import { UnroutedJobsNotice } from "./unrouted-jobs-notice";
 
-const FIRST_RUN_JOB_WINDOW = 50;
-
 export const metadata: Metadata = {
   title: "Overview",
 };
 
 export default async function DashboardPage() {
   const { supabase, user } = await getVendorSession();
-  const [jobs, printers, unroutedCount] = await Promise.all([
-    listPrintJobs(supabase, user.id, FIRST_RUN_JOB_WINDOW),
+  const [recentJobs, printers, unroutedCount, hasPrinted] = await Promise.all([
+    listPrintJobs(supabase, user.id, 5),
     listLocationPrinterSummaries(user.id),
     countUnroutedJobs(user.id),
+    hasPrintedJob(user.id),
   ]);
 
-  const recentJobs = jobs.slice(0, 5);
   const locations = printers.map(({ location }) => location);
-  // A printed job may sit past the five shown, so look across the wider window.
   const progress = {
     hasBooth: locations.length > 0,
     hasPrinter: printers.some(({ printer }) => printer !== null),
-    hasPrintedJob: jobs.some((job) => job.status === "printed"),
+    hasPrintedJob: hasPrinted,
   };
   const qkitUrl = process.env.NEXT_PUBLIC_QKIT_URL;
 
