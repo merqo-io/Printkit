@@ -35,11 +35,11 @@ describe("sticker templates", () => {
       }).success,
     ).toBe(false);
   });
-  it("accepts only a bounded asset identifier, not an external logo URL", () => {
+  it("accepts only a bucket storage path, not an external logo URL", () => {
     const logo = {
       id: "20000000-0000-4000-8000-000000000001",
       kind: "logo",
-      assetId: "20000000-0000-4000-8000-000000000002",
+      path: "20000000-0000-4000-8000-000000000002/20000000-0000-4000-8000-000000000003/20000000-0000-4000-8000-000000000004.png",
       xMm: 3,
       yMm: 3,
       widthMm: 10,
@@ -54,7 +54,7 @@ describe("sticker templates", () => {
     expect(
       stickerTemplateSchema.safeParse({
         ...defaultStickerTemplate,
-        elements: [{ ...logo, assetId: "https://example.invalid/logo" }],
+        elements: [{ ...logo, path: "https://example.invalid/logo.png" }],
       }).success,
     ).toBe(false);
   });

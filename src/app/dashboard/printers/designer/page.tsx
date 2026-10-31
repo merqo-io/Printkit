@@ -4,6 +4,7 @@ import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { stickerTemplateSchema } from "@/lib/sticker-template";
 import { StickerDesigner } from "./sticker-designer";
+import { signLogoUrls } from "./logo-urls";
 
 export default async function DesignerPage({
   searchParams,
@@ -29,6 +30,7 @@ export default async function DesignerPage({
   const initial = data ? stickerTemplateSchema.safeParse(data.design) : null;
   if (initial && !initial.success)
     throw new Error("Stored sticker design is invalid");
+  const logoUrls = await signLogoUrls(supabase.storage, initial?.data);
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
@@ -39,6 +41,7 @@ export default async function DesignerPage({
       <StickerDesigner
         locationId={location.id}
         initialTemplate={initial?.data}
+        initialLogoUrls={logoUrls}
       />
     </div>
   );

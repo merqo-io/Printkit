@@ -25,9 +25,16 @@ const textElementSchema = boxSchema.extend({
   align: z.enum(["left", "center", "right"]),
 });
 
+const uuidPart = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+
+// A storage key inside the private logo bucket, never a URL, so a design cannot point at external content.
+export const logoPathSchema = z
+  .string()
+  .regex(new RegExp(`^${uuidPart}/${uuidPart}/${uuidPart}\\.(png|jpg)$`));
+
 const logoElementSchema = boxSchema.extend({
   kind: z.literal("logo"),
-  assetId: z.uuid(),
+  path: logoPathSchema,
 });
 
 export const stickerTemplateSchema = z
