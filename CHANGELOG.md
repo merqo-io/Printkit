@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## Unreleased: plainer history and printer picker
+
+### Changed
+
+- Failed jobs in History explain why in plain words. Reprint asks "Print this label again?" first, ignores a double tap, and names the booth when it succeeds. Jobs without a booth read "Needs a booth".
+- Printer picker cards show only how it connects, label width, price and whether it works with an iPad alone, with one info button. Setup, monthly cost and notes are behind a "Details" disclosure.
+
 ## [Unreleased]
 
 ### Added

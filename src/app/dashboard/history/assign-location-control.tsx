@@ -14,7 +14,7 @@ import {
 import { assignPrintLocation } from "./actions";
 
 /**
- * Inline control for routing an "unrouted" job to a booth. One click when
+ * Inline control for giving a job that has no booth a booth. One click when
  * there's a single active location; a select-and-confirm when there are
  * several. Renders nothing when the vendor has no active locations at all.
  */
