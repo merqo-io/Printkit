@@ -1,7 +1,7 @@
 import { Notice } from "@/components/notice";
 import { TextLink } from "@/components/text-link";
 
-/** Overview callout for jobs that arrived without a booth to print at. */
+/** Overview callout for orders that arrived without a booth to print at. */
 export function UnroutedJobsNotice({ count }: { count: number }) {
   if (count <= 0) return null;
 
@@ -9,11 +9,11 @@ export function UnroutedJobsNotice({ count }: { count: number }) {
     <Notice tone="warning">
       <p>
         <TextLink href="/dashboard/history?unrouted=1">
-          {count} unrouted print job{count === 1 ? "" : "s"}
+          Needs a booth ({count})
         </TextLink>{" "}
         {count === 1
-          ? "needs a booth assigned before it can print."
-          : "need a booth assigned before they can print."}
+          ? "This order has no booth yet, so it did not print. Choose a booth for it."
+          : "These orders have no booth yet, so they did not print. Choose a booth for each."}
       </p>
     </Notice>
   );

@@ -15,14 +15,35 @@ vi.mock("@/lib/location-printer-summaries", () => ({
   listLocationPrinterSummaries: vi.fn().mockResolvedValue([]),
 }));
 
+vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
-import { countUnroutedJobs } from "@/lib/print-jobs-list";
+import {
+  countUnroutedJobs,
+  listPrintJobs,
+  type PrintJob,
+} from "@/lib/print-jobs-list";
 import DashboardPage from "./page";
+
+function booth(state: "online" | "offline" | "not_set_up") {
+  return {
+    location: { id: "loc-1", label: "Kopitiam Cart", source_ref: "booth-1" },
+    printer: {
+      location_id: "loc-1",
+      display_name: "Feie FP-N20H",
+      connector: "vendor_cloud",
+      catalog_id: "feie-fp-n20h",
+      last_seen_at: new Date().toISOString(),
+    },
+    state,
+  };
+}
 
 describe("DashboardPage", () => {
   beforeEach(() => {
     vi.mocked(listLocationPrinterSummaries).mockReset().mockResolvedValue([]);
     vi.mocked(countUnroutedJobs).mockReset().mockResolvedValue(0);
+    vi.mocked(listPrintJobs).mockReset().mockResolvedValue([]);
   });
 
   it("reports each booth's printer and its live state", async () => {
@@ -87,13 +108,50 @@ describe("DashboardPage", () => {
     expect(screen.getByText(/offline since/i)).toBeInTheDocument();
   });
 
-  it("shows an empty-state message when there are no active locations", async () => {
+  it("shows the first-run steps when there are no active locations", async () => {
     vi.mocked(listLocationPrinterSummaries).mockResolvedValue([]);
     render(await DashboardPage());
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    expect(screen.getByText(/turn on printing for your booth/i)).toBeVisible();
     expect(
-      screen.getByText(/no booths have printing enabled yet/i),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(/bridge status for/)).not.toBeInTheDocument();
+      screen.queryByText(/no booths have printing/i),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Booths" })).toBeNull();
+  });
+
+  it("marks the booth and printer steps done and keeps the panel until a label printed", async () => {
+    vi.mocked(listLocationPrinterSummaries).mockResolvedValue([
+      booth("online"),
+    ]);
+    render(await DashboardPage());
+    const items = screen.getAllByRole("listitem");
+    expect(items[0]).toHaveTextContent("(done)");
+    expect(items[1]).toHaveTextContent("(done)");
+    expect(items[2]).toHaveTextContent("(next)");
+  });
+
+  it("hides the first-run panel once a job has printed", async () => {
+    vi.mocked(listLocationPrinterSummaries).mockResolvedValue([
+      booth("online"),
+    ]);
+    vi.mocked(listPrintJobs).mockResolvedValue([
+      { id: "j1", status: "printed" } as PrintJob,
+    ]);
+    render(await DashboardPage());
+    expect(
+      screen.queryByRole("heading", { name: /first label/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("links each booth to its label designer", async () => {
+    vi.mocked(listLocationPrinterSummaries).mockResolvedValue([
+      booth("online"),
+    ]);
+    render(await DashboardPage());
+    expect(screen.getByRole("link", { name: "Design label" })).toHaveAttribute(
+      "href",
+      "/dashboard/printers/designer?location=loc-1",
+    );
   });
 
   it("shows the empty history state when there are no recent jobs", async () => {
@@ -104,14 +162,13 @@ describe("DashboardPage", () => {
   it("hides the unrouted-jobs callout when the count is zero", async () => {
     vi.mocked(countUnroutedJobs).mockResolvedValue(0);
     render(await DashboardPage());
-    expect(screen.queryByText(/unrouted print job/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/needs a booth/i)).not.toBeInTheDocument();
   });
 
-  it("shows the unrouted-jobs callout linking to filtered history when the count is positive", async () => {
+  it("shows the callout linking to filtered history when the count is positive", async () => {
     vi.mocked(countUnroutedJobs).mockResolvedValue(3);
     render(await DashboardPage());
-    const link = screen.getByText(/3 unrouted print jobs/i);
-    expect(link).toBeInTheDocument();
+    const link = screen.getByText(/needs a booth \(3\)/i);
     expect(link.closest("a")).toHaveAttribute(
       "href",
       "/dashboard/history?unrouted=1",
@@ -119,8 +176,14 @@ describe("DashboardPage", () => {
   });
 
   it.each([
-    [1, "1 unrouted print job needs a booth assigned before it can print."],
-    [3, "3 unrouted print jobs need a booth assigned before they can print."],
+    [
+      1,
+      "Needs a booth (1) This order has no booth yet, so it did not print. Choose a booth for it.",
+    ],
+    [
+      3,
+      "Needs a booth (3) These orders have no booth yet, so they did not print. Choose a booth for each.",
+    ],
   ])("agrees the callout with a count of %i", async (count, sentence) => {
     vi.mocked(countUnroutedJobs).mockResolvedValue(count);
     render(await DashboardPage());

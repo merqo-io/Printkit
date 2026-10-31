@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- The Overview shows three first-run steps (turn on printing in qkit, pick your printer, print a test label) with done marks until a label has printed. Set `NEXT_PUBLIC_QKIT_URL` to link the first step to qkit.
+- The Overview refreshes itself when you return to the tab and every 30 seconds while it is open, so printer and job status stay current.
+- Each booth on the Overview links to its label designer.
+
+### Changed
+
+- The "unrouted jobs" note on the Overview now reads "Needs a booth" and says in plain words that those orders did not print.
+
 ## [0.7.0] - 2026-10-31
 
 ### Added
