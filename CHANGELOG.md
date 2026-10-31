@@ -483,3 +483,4 @@ actions.ts` to import `LEGAL_VERSIONS`/`getLegalDocSource`/`isLegalCurrent`
 ## Unreleased: sticker designer foundation
 
 - Add a booth-scoped sticker design prototype and non-printing preview. Order printing integration remains unfinished.
+- Print live label jobs from the booth's saved sticker design, falling back to the default label when none exists or it cannot render. Long item names and options now wrap, shrink to a minimum size, then truncate with an ellipsis instead of failing the job.
