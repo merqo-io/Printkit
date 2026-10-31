@@ -9,8 +9,7 @@ import type { PrinterRow } from "@/lib/printers";
 import { createServiceClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/types";
 
-async function locationLabel(locationId: string | undefined): Promise<string> {
-  if (!locationId) return "";
+async function locationLabel(locationId: string): Promise<string> {
   try {
     const service = await createServiceClient();
     const { data } = await service
@@ -38,9 +37,12 @@ export async function renderJobForPrinter(
   payload: Json,
   printer: Pick<
     PrinterRow,
-    "label_width_mm" | "label_height_mm" | "catalog_id"
-  > &
-    Partial<Pick<PrinterRow, "location_id">>,
+    | "label_width_mm"
+    | "label_height_mm"
+    | "catalog_id"
+    | "location_id"
+    | "vendor_id"
+  >,
 ): Promise<Buffer> {
   const dpi = getCatalogEntry(printer.catalog_id)?.dpi ?? 203;
   const widthMm = Number(printer.label_width_mm);
@@ -52,6 +54,7 @@ export async function renderJobForPrinter(
     heightMm > 0;
   const designed = await renderSnapshotLabel(payload, {
     dpi,
+    owner: { vendorId: printer.vendor_id, locationId: printer.location_id },
     fitTo: sized ? { widthMm, heightMm } : undefined,
     boothFallback: needsBoothFallback(payload)
       ? await locationLabel(printer.location_id)

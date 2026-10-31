@@ -25,6 +25,7 @@ async function downloadFromBucket(path: string): Promise<Uint8Array | null> {
  */
 export async function loadStickerLogos(
   template: StickerTemplate,
+  owner: { vendorId: string; locationId: string },
   download: LogoDownload = downloadFromBucket,
   context = "",
 ): Promise<Map<string, Image>> {
@@ -33,19 +34,24 @@ export async function loadStickerLogos(
       element.kind === "logo" ? [element.path] : [],
     ),
   );
+  const prefix = `${owner.vendorId}/${owner.locationId}/`;
   const logos = new Map<string, Image>();
-  await Promise.all(
-    [...paths].map(async (path) => {
-      try {
-        const bytes = await download(path);
-        const image = bytes ? await decodeLogo(bytes) : null;
-        if (image) logos.set(path, image);
-        else console.error("sticker logo skipped", context, path);
-      } catch (err) {
-        console.error("sticker logo failed", context, path, err);
-      }
-    }),
-  );
+  // Sequential on purpose: decoded bitmaps are large, so only one is in flight at a time.
+  for (const path of paths) {
+    // The service role bypasses bucket RLS, so a path outside the owner's folder is never fetched.
+    if (!path.startsWith(prefix)) {
+      console.error("sticker logo outside owner folder", context, path);
+      continue;
+    }
+    try {
+      const bytes = await download(path);
+      const image = bytes ? await decodeLogo(bytes) : null;
+      if (image) logos.set(path, image);
+      else console.error("sticker logo skipped", context, path);
+    } catch (err) {
+      console.error("sticker logo failed", context, path, err);
+    }
+  }
   return logos;
 }
 

@@ -41,6 +41,8 @@ function valuesFrom(payload: Json, boothFallback: string): StickerValues {
 
 export type SnapshotRenderOptions = {
   dpi: number;
+  /** Whose logo folder this job may read from. */
+  owner: { vendorId: string; locationId: string };
   /** The printer's label size; the design is scaled to fit it. */
   fitTo?: { widthMm: number; heightMm: number };
   /** Location name used when the order carries no booth_name. */
@@ -65,7 +67,7 @@ export async function renderSnapshotLabel(
   try {
     const template = parseStickerTemplate(snapshot);
     const logos = template
-      ? await loadStickerLogos(template, undefined, ref)
+      ? await loadStickerLogos(template, options.owner, undefined, ref)
       : undefined;
     const result = renderStickerTemplate(
       snapshot,

@@ -48,7 +48,11 @@ export async function decodeLogo(bytes: Uint8Array): Promise<Image | null> {
   )
     return null;
   try {
-    return await loadImage(Buffer.from(bytes));
+    const image = await loadImage(Buffer.from(bytes));
+    // The decoder's own size is authoritative over the header it was pre-checked against.
+    if (image.width > LOGO_MAX_PIXELS || image.height > LOGO_MAX_PIXELS)
+      return null;
+    return image;
   } catch {
     return null;
   }

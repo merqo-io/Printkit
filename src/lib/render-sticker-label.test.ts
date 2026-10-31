@@ -38,6 +38,11 @@ const logo = {
   heightMm: 10,
 };
 
+const owner = {
+  vendorId: "20000000-0000-4000-8000-000000000002",
+  locationId: "20000000-0000-4000-8000-000000000003",
+};
+
 function solidPng(width: number, height: number): Uint8Array {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
@@ -51,6 +56,8 @@ import { mmToPx } from "./label-raster";
 import type { Json } from "./types";
 
 const printer = {
+  vendor_id: "20000000-0000-4000-8000-000000000002",
+  location_id: "20000000-0000-4000-8000-000000000003",
   label_width_mm: 50,
   label_height_mm: 30,
   catalog_id: "unknown-model",
@@ -119,10 +126,34 @@ describe("live label rendering from the saved template", () => {
         elements: [logo, ...defaultStickerTemplate.elements.slice(0, 1)],
       },
     } as Json;
-    const png = await renderSnapshotLabel(payload, { dpi: 203 });
+    const png = await renderSnapshotLabel(payload, { dpi: 203, owner });
     expect(png).not.toBeNull();
     expect(
       spy.mock.calls.some((call) => call[0] === "sticker logo skipped"),
+    ).toBe(true);
+  });
+
+  it("never reads a logo from another vendor's folder, and still prints the rest", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const foreign = {
+      ...logo,
+      path: logo.path.replace(/^[^/]+/, "30000000-0000-4000-8000-000000000009"),
+    };
+    storage.files.set(foreign.path, solidPng(20, 20));
+    const payload = {
+      ...base,
+      [STICKER_SNAPSHOT_KEY]: {
+        ...defaultStickerTemplate,
+        elements: [foreign, ...defaultStickerTemplate.elements.slice(0, 1)],
+      },
+    } as Json;
+    expect(
+      await renderSnapshotLabel(payload, { dpi: 203, owner }),
+    ).not.toBeNull();
+    expect(
+      spy.mock.calls.some(
+        (call) => call[0] === "sticker logo outside owner folder",
+      ),
     ).toBe(true);
   });
 
@@ -133,7 +164,9 @@ describe("live label rendering from the saved template", () => {
       ...base,
       [STICKER_SNAPSHOT_KEY]: { ...defaultStickerTemplate, elements: [logo] },
     } as Json;
-    expect(await renderSnapshotLabel(payload, { dpi: 203 })).not.toBeNull();
+    expect(
+      await renderSnapshotLabel(payload, { dpi: 203, owner }),
+    ).not.toBeNull();
   });
 
   it("does not fail when the storage download throws", async () => {
@@ -143,7 +176,9 @@ describe("live label rendering from the saved template", () => {
       ...base,
       [STICKER_SNAPSHOT_KEY]: { ...defaultStickerTemplate, elements: [logo] },
     } as Json;
-    expect(await renderSnapshotLabel(payload, { dpi: 203 })).not.toBeNull();
+    expect(
+      await renderSnapshotLabel(payload, { dpi: 203, owner }),
+    ).not.toBeNull();
     storage.throwOnDownload = false;
   });
 
@@ -153,7 +188,7 @@ describe("live label rendering from the saved template", () => {
       ...base,
       [STICKER_SNAPSHOT_KEY]: { ...defaultStickerTemplate, elements: [logo] },
     } as Json;
-    const png = await renderSnapshotLabel(payload, { dpi: 203 });
+    const png = await renderSnapshotLabel(payload, { dpi: 203, owner });
     expect(png).not.toBeNull();
     const image = await loadImage(png as Buffer);
     const canvas = createCanvas(image.width, image.height);
@@ -198,11 +233,13 @@ describe("booth name fallback", () => {
   it("uses the location name, and prints nothing when there is none", async () => {
     const withName = await renderSnapshotLabel(plain, {
       dpi: 203,
+      owner,
       boothFallback: "Kopitiam Cart",
     });
-    const without = await renderSnapshotLabel(plain, { dpi: 203 });
+    const without = await renderSnapshotLabel(plain, { dpi: 203, owner });
     const blank = await renderSnapshotLabel(plain, {
       dpi: 203,
+      owner,
       boothFallback: "   ",
     });
     expect(withName).not.toBeNull();
@@ -283,7 +320,7 @@ describe("snapshot fallback log", () => {
         label_index: "2",
         [STICKER_SNAPSHOT_KEY]: { version: 9 },
       } as Json,
-      { dpi: 203 },
+      { dpi: 203, owner },
     );
     expect(spy.mock.calls.at(-1)?.[1]).toBe("order 042 label 2");
   });

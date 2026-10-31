@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { createServerClient, createServiceClient } from "@/lib/supabase/server";
 import { readBoundedJson, RequestBodyError } from "@/lib/bounded-json";
 import { rateLimit, RATE_WINDOW_SECONDS } from "@/lib/rate-limit";
@@ -35,18 +36,20 @@ export async function POST(request: Request) {
     const status = error instanceof RequestBodyError ? error.status : 400;
     return NextResponse.json({ error: "Invalid design." }, { status });
   }
-  // The service role reads the logo bucket, so only the caller's own folder is ever fetched.
+  // Same folder rule as saveStickerDesign: the vendor's folder for the booth being designed.
+  const location = z
+    .uuid()
+    .safeParse(new URL(request.url).searchParams.get("location"));
   const template = parseStickerTemplate(body);
-  const ownTemplate = template && {
-    ...template,
-    elements: template.elements.filter(
-      (element) =>
-        element.kind !== "logo" || element.path.startsWith(`${user.id}/`),
-    ),
-  };
-  const logos = ownTemplate
-    ? await loadStickerLogos(ownTemplate, undefined, "preview")
-    : undefined;
+  const logos =
+    template && location.success
+      ? await loadStickerLogos(
+          template,
+          { vendorId: user.id, locationId: location.data },
+          undefined,
+          "preview",
+        )
+      : undefined;
   const result = renderStickerTemplate(
     body,
     {

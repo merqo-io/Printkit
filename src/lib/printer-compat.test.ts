@@ -66,6 +66,8 @@ describe.each(rasterPrinters.map((entry) => [entry.id, entry] as const))(
       ctx.fillRect(0, 0, 16, 16);
       store.bytes = new Uint8Array(canvas.toBuffer("image/png"));
       const printer = {
+        vendor_id: "20000000-0000-4000-8000-000000000002",
+        location_id: "20000000-0000-4000-8000-000000000003",
         catalog_id: entry.id,
         label_width_mm: entry.defaultLabelMm.width,
         label_height_mm: entry.defaultLabelMm.height,
