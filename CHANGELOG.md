@@ -484,3 +484,7 @@ actions.ts` to import `LEGAL_VERSIONS`/`getLegalDocSource`/`isLegalCurrent`
 
 - Add a booth-scoped sticker design prototype and non-printing preview. Order printing integration remains unfinished.
 - Print live label jobs from the booth's saved sticker design, falling back to the default label when none exists or it cannot render. Long item names and options now wrap, shrink to a minimum size, then truncate with an ellipsis instead of failing the job.
+
+## Unreleased: sticker logo upload
+
+- Let vendors upload and place one PNG or JPEG logo in the sticker designer. Logos live in a private `sticker-logos` bucket, readable only by their owner; writes go through the service role. Logos are not printed yet. Included in migration 0016.

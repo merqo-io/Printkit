@@ -78,3 +78,14 @@ begin
   return query select b.id, ids;
 end;
 $$;
+
+-- Private logo storage. Objects live under <vendor_id>/<location_id>/<file>; the bucket limits are a
+-- backstop for the Server Action's own PNG/JPEG, size and dimension checks. Vendors may only read their
+-- folder; every write goes through the service-role Server Actions, so no write policy exists.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('sticker-logos', 'sticker-logos', false, 524288, array['image/png', 'image/jpeg'])
+on conflict (id) do nothing;
+
+create policy sticker_logos_vendor_select on storage.objects
+  for select to authenticated
+  using (bucket_id = 'sticker-logos' and (storage.foldername(name))[1] = (select auth.uid())::text);

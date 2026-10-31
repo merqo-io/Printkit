@@ -3,7 +3,15 @@
 import Image from "next/image";
 import { saveStickerDesign } from "./actions";
 import { StickerSize } from "./sticker-size";
-import { examples, names } from "./sticker-content";
+import { AddFieldButtons } from "./add-field-buttons";
+import { names } from "./sticker-content";
+import {
+  discardLogo,
+  ElementFace,
+  LogoPanel,
+  newLogoElement,
+  uploadLogo,
+} from "./logo-panel";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
   defaultStickerTemplate,
@@ -16,10 +24,14 @@ type Element = StickerTemplate["elements"][number];
 export function StickerDesigner({
   locationId,
   initialTemplate,
+  initialLogoUrls = {},
 }: {
   locationId?: string;
   initialTemplate?: StickerTemplate;
+  initialLogoUrls?: Record<string, string>;
 }) {
+  const [logoUrls, setLogoUrls] = useState(initialLogoUrls);
+  const [uploading, setUploading] = useState(false);
   const [template, setTemplate] = useState<StickerTemplate>(
     initialTemplate ?? defaultStickerTemplate,
   );
@@ -78,7 +90,13 @@ export function StickerDesigner({
       const response = await fetch("/api/sticker-preview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(template),
+        // The print renderer cannot draw logos yet, so the preview covers text only.
+        body: JSON.stringify({
+          ...template,
+          elements: template.elements.filter(
+            (element) => element.kind !== "logo",
+          ),
+        }),
       });
       if (version !== previewVersion.current) return;
       if (!response.ok) {
@@ -115,6 +133,37 @@ export function StickerDesigner({
         element.id === id ? ({ ...element, ...values } as Element) : element,
       ),
     });
+  }
+
+  const logo = template.elements.find(
+    (element): element is Extract<Element, { kind: "logo" }> =>
+      element.kind === "logo",
+  );
+
+  const forgetLogoUrl = (path: string) =>
+    setLogoUrls((urls) =>
+      Object.fromEntries(Object.entries(urls).filter(([key]) => key !== path)),
+    );
+
+  async function chooseLogo(file: File) {
+    if (!locationId) return;
+    setUploading(true);
+    setError("");
+    const result = await uploadLogo(locationId, file);
+    setUploading(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setLogoUrls((urls) => ({ ...urls, [result.path]: result.url }));
+    if (logo) {
+      updateElement(logo.id, { path: result.path });
+      discardLogo(locationId, logo.path, forgetLogoUrl);
+      return;
+    }
+    const added = newLogoElement(template, result.path);
+    update({ ...template, elements: [...template.elements, added] });
+    setSelectedId(added.id);
   }
 
   function startDrag(event: PointerEvent<HTMLButtonElement>, element: Element) {
@@ -268,7 +317,7 @@ export function StickerDesigner({
                     element.kind === "field" ? element.align : "center",
                 }}
               >
-                {element.kind === "field" ? examples[element.field] : "Logo"}
+                <ElementFace element={element} logoUrls={logoUrls} />
               </button>
             ))}
           </div>
@@ -294,62 +343,23 @@ export function StickerDesigner({
               ))}
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {(
-              [
-                "order_number",
-                "customer_name",
-                "item_name",
-                "item_options",
-                "unit_position",
-                "booth_name",
-              ] as const
-            )
-              .filter(
-                (field) =>
-                  !template.elements.some(
-                    (element) =>
-                      element.kind === "field" && element.field === field,
-                  ),
-              )
-              .map((field) => (
-                <button
-                  key={field}
-                  type="button"
-                  className="border-input rounded-md border px-3 py-2 text-sm"
-                  onClick={() => {
-                    const id = crypto.randomUUID();
-                    update({
-                      ...template,
-                      elements: [
-                        ...template.elements,
-                        {
-                          id,
-                          kind: "field",
-                          field,
-                          xMm: template.marginMm,
-                          yMm: template.marginMm,
-                          widthMm: Math.min(
-                            30,
-                            template.widthMm - 2 * template.marginMm,
-                          ),
-                          heightMm: Math.min(
-                            6,
-                            template.heightMm - 2 * template.marginMm,
-                          ),
-                          fontSizeMm: 3,
-                          bold: false,
-                          align: "left",
-                        },
-                      ],
-                    });
-                    setSelectedId(id);
-                  }}
-                >
-                  Add {names[field]}
-                </button>
-              ))}
-          </div>
+          <AddFieldButtons
+            template={template}
+            onAdd={(element) => {
+              update({
+                ...template,
+                elements: [...template.elements, element],
+              });
+              setSelectedId(element.id);
+            }}
+          />
+          {locationId && (
+            <LogoPanel
+              hasLogo={Boolean(logo)}
+              uploading={uploading}
+              onFile={(file) => void chooseLogo(file)}
+            />
+          )}
           {selected && (
             <div className="space-y-3">
               <h2 className="text-lg font-semibold">Position and size</h2>
@@ -445,10 +455,12 @@ export function StickerDesigner({
                   if (elements.length) {
                     update({ ...template, elements });
                     setSelectedId(elements[0].id);
+                    if (selected.kind === "logo" && locationId)
+                      discardLogo(locationId, selected.path, forgetLogoUrl);
                   }
                 }}
               >
-                Remove field
+                {selected.kind === "logo" ? "Remove logo" : "Remove field"}
               </button>
             </div>
           )}

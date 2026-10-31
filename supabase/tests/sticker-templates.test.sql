@@ -1,5 +1,5 @@
 begin;
-select plan(13);
+select plan(22);
 insert into auth.users (id, email) values
   ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'sticker-a@test.dev'),
   ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'sticker-b@test.dev');
@@ -26,5 +26,30 @@ set local request.jwt.claims = '{"sub":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"}';
 select results_eq($$ select count(*) from printkit.sticker_templates $$, $$ values (0::bigint) $$, 'another vendor cannot read designs');
 set local request.jwt.claims = '{"sub":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"}';
 select results_eq($$ select count(*) from printkit.sticker_templates $$, $$ values (3::bigint) $$, 'owner can read their designs');
+
+-- Logo bucket isolation: vendor A owns the 'aaaa...' folder, vendor B the 'bbbb...' one.
+reset role;
+insert into storage.objects (bucket_id, name, owner_id) values
+  ('sticker-logos', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/loc/a.png', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'),
+  ('sticker-logos', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/loc/b.png', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb');
+select results_eq($$ select public, file_size_limit from storage.buckets where id = 'sticker-logos' $$, $$ values (false, 524288::bigint) $$, 'logo bucket is private with a 512 KB limit');
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"}';
+select results_eq($$ select name from storage.objects where bucket_id = 'sticker-logos' $$, $$ values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/loc/a.png'::text) $$, 'vendor reads only their own logos');
+-- Writes are service-role only: even a vendor's own folder is read-only to them.
+select throws_ok($$ insert into storage.objects (bucket_id, name, owner_id) values ('sticker-logos', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/loc/new.png', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') $$, '42501', null, 'vendor cannot insert into their own folder');
+select throws_ok($$ insert into storage.objects (bucket_id, name, owner_id) values ('sticker-logos', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/loc/evil.png', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') $$, '42501', null, 'vendor cannot insert into another vendor folder');
+select results_eq($$ with u as (update storage.objects set metadata = '{}'::jsonb where bucket_id = 'sticker-logos' and name like 'aaaaaaaa%' returning 1) select count(*) from u $$, $$ values (0::bigint) $$, 'vendor cannot update their own logo');
+select results_eq($$ with u as (update storage.objects set name = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/loc/moved.png' where bucket_id = 'sticker-logos' and name like 'aaaaaaaa%' returning 1) select count(*) from u $$, $$ values (0::bigint) $$, 'vendor cannot rename a logo into another vendor folder');
+-- Storage blocks direct SQL deletes with its own trigger, so deletion is proven by the absence of any
+-- non-select policy: with RLS on and no delete policy, the API cannot delete either.
+select results_eq($$ select count(*) from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname like 'sticker_logos%' and cmd <> 'SELECT' $$, $$ values (0::bigint) $$, 'no insert, update or delete policy exists for the logo bucket');
+reset role;
+set local role anon;
+select results_eq($$ select count(*) from storage.objects where bucket_id = 'sticker-logos' $$, $$ values (0::bigint) $$, 'anonymous users cannot read logos');
+reset role;
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"}';
+select results_eq($$ select count(*) from storage.objects where bucket_id = 'sticker-logos' and name like 'aaaaaaaa%' $$, $$ values (0::bigint) $$, 'another vendor cannot read these logos');
 select * from finish();
 rollback;
