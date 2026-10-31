@@ -12,3 +12,5 @@ staging-migrate.sh applies `supabase/migrations` to the shared staging Supabase 
 [Parent](../README.md)
 
 `test-label-batches.mjs` runs the batch migration regression suite against a disposable local PostgreSQL cluster, including concurrent submissions and completions.
+
+`cleanup-sticker-logos.mjs` deletes orphaned sticker logos from the private `sticker-logos` bucket: objects no saved design version and no print job snapshot references, older than the grace period (default 24 hours, `--grace-hours N`). It is a dry run that prints the orphan paths and counts unless `--apply` is given. Run `node scripts/cleanup-sticker-logos.mjs`, review the list, then `node scripts/cleanup-sticker-logos.mjs --apply`. It needs `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SECRET_KEY` in the shell and aborts without deleting if any stored design cannot be read.
