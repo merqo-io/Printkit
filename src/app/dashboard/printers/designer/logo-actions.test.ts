@@ -196,12 +196,18 @@ describe("uploadStickerLogo", () => {
 
 describe("removeStickerLogo", () => {
   it("deletes an unused logo in the vendor's own folder", async () => {
-    expect(await removeStickerLogo(location, ownPath)).toEqual({ ok: true });
+    expect(await removeStickerLogo(location, ownPath)).toEqual({
+      ok: true,
+      kept: false,
+    });
     expect(mocks.remove).toHaveBeenCalledWith([ownPath]);
   });
   it("keeps a logo that a saved version still uses", async () => {
     mocks.used.mockResolvedValue({ data: [{ id: "t" }], error: null });
-    expect(await removeStickerLogo(location, ownPath)).toEqual({ ok: true });
+    expect(await removeStickerLogo(location, ownPath)).toEqual({
+      ok: true,
+      kept: true,
+    });
     expect(mocks.remove).not.toHaveBeenCalled();
   });
   it("refuses another vendor's path and malformed paths", async () => {

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { StickerTemplate } from "@/lib/sticker-template";
-import { uploadStickerLogo } from "./actions";
+import { removeStickerLogo, uploadStickerLogo } from "./actions";
 import { examples } from "./sticker-content";
 
 type Element = StickerTemplate["elements"][number];
@@ -21,6 +21,20 @@ export async function uploadLogo(
     ok: false as const,
     error: "Could not upload the logo. Please try again.",
   }));
+}
+
+// The server keeps files that saved versions still use, so the preview URL is only dropped once the
+// file is really gone; Undo can still show a kept logo.
+export function discardLogo(
+  locationId: string,
+  path: string,
+  onGone: (path: string) => void,
+) {
+  void removeStickerLogo(locationId, path)
+    .then((result) => {
+      if (result.ok && !result.kept) onGone(path);
+    })
+    .catch(() => undefined);
 }
 
 export function newLogoElement(

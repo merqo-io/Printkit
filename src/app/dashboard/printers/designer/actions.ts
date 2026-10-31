@@ -18,9 +18,9 @@ import {
   LOGO_BUCKET,
   LOGO_MAX_BYTES,
   LOGO_MAX_PIXELS,
+  LOGO_URL_SECONDS,
 } from "./logo-image";
 
-const LOGO_URL_SECONDS = 3600;
 const uploadSchema = z.object({
   locationId: z.uuid(),
   file: z.instanceof(File),
@@ -91,11 +91,12 @@ export async function uploadStickerLogo(
   return { ok: true, path, url: signed.signedUrl };
 }
 
-// Saved designs are immutable snapshots, so a logo any saved version still uses is kept.
+// Saved designs are immutable snapshots, so a logo any saved version still uses is kept;
+// `kept` tells the client the file survived so it does not assume deletion.
 export async function removeStickerLogo(
   locationId: string,
   path: string,
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ ok: true; kept: boolean } | { ok: false; error: string }> {
   const location = z.uuid().safeParse(locationId);
   const logo = logoPathSchema.safeParse(path);
   if (!location.success || !logo.success)
@@ -111,12 +112,12 @@ export async function removeStickerLogo(
     .limit(1);
   if (usedError)
     return { ok: false, error: "Could not remove the logo. Please try again." };
-  if (used.length) return { ok: true };
+  if (used.length) return { ok: true, kept: true };
   const service = await createServiceClient();
   const { error } = await service.storage.from(LOGO_BUCKET).remove([logo.data]);
   if (error)
     return { ok: false, error: "Could not remove the logo. Please try again." };
-  return { ok: true };
+  return { ok: true, kept: false };
 }
 
 async function logosStored(

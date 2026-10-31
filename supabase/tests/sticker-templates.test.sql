@@ -1,5 +1,5 @@
 begin;
-select plan(21);
+select plan(23);
 insert into auth.users (id, email) values
   ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'sticker-a@test.dev'),
   ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'sticker-b@test.dev');
@@ -36,10 +36,13 @@ select results_eq($$ select public, file_size_limit from storage.buckets where i
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"}';
 select results_eq($$ select name from storage.objects where bucket_id = 'sticker-logos' $$, $$ values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/loc/a.png'::text) $$, 'vendor reads only their own logos');
-select lives_ok($$ insert into storage.objects (bucket_id, name, owner_id) values ('sticker-logos', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/loc/new.png', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') $$, 'vendor can write inside their own folder');
-select throws_ok($$ insert into storage.objects (bucket_id, name, owner_id) values ('sticker-logos', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/loc/evil.png', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') $$, '42501', null, 'vendor cannot write into another vendor folder');
+-- Writes are service-role only: even a vendor's own folder is read-only to them.
+select throws_ok($$ insert into storage.objects (bucket_id, name, owner_id) values ('sticker-logos', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/loc/new.png', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') $$, '42501', null, 'vendor cannot insert into their own folder');
+select throws_ok($$ insert into storage.objects (bucket_id, name, owner_id) values ('sticker-logos', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/loc/evil.png', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') $$, '42501', null, 'vendor cannot insert into another vendor folder');
+select results_eq($$ with u as (update storage.objects set metadata = '{}'::jsonb where bucket_id = 'sticker-logos' and name like 'aaaaaaaa%' returning 1) select count(*) from u $$, $$ values (0::bigint) $$, 'vendor cannot update their own logo');
+select results_eq($$ with u as (update storage.objects set name = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb/loc/moved.png' where bucket_id = 'sticker-logos' and name like 'aaaaaaaa%' returning 1) select count(*) from u $$, $$ values (0::bigint) $$, 'vendor cannot rename a logo into another vendor folder');
+select results_eq($$ with d as (delete from storage.objects where bucket_id = 'sticker-logos' and name like 'aaaaaaaa%' returning 1) select count(*) from d $$, $$ values (0::bigint) $$, 'vendor cannot delete their own logo');
 select results_eq($$ with d as (delete from storage.objects where bucket_id = 'sticker-logos' and name like 'bbbbbbbb%' returning 1) select count(*) from d $$, $$ values (0::bigint) $$, 'vendor cannot delete another vendor logo');
-select results_eq($$ with u as (update storage.objects set name = name where bucket_id = 'sticker-logos' and name like 'bbbbbbbb%' returning 1) select count(*) from u $$, $$ values (0::bigint) $$, 'vendor cannot update another vendor logo');
 reset role;
 set local role anon;
 select results_eq($$ select count(*) from storage.objects where bucket_id = 'sticker-logos' $$, $$ values (0::bigint) $$, 'anonymous users cannot read logos');

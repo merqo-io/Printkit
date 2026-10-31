@@ -1,5 +1,5 @@
 import type { StickerTemplate } from "@/lib/sticker-template";
-import { LOGO_BUCKET } from "./logo-image";
+import { LOGO_BUCKET, LOGO_URL_SECONDS } from "./logo-image";
 
 type Storage = {
   from: (bucket: string) => {
@@ -24,7 +24,7 @@ export async function signLogoUrls(
   if (!paths.length) return urls;
   const { data } = await storage
     .from(LOGO_BUCKET)
-    .createSignedUrls(paths, 3600);
+    .createSignedUrls(paths, LOGO_URL_SECONDS);
   for (const item of data ?? [])
     if (item.path && item.signedUrl) urls[item.path] = item.signedUrl;
   return urls;

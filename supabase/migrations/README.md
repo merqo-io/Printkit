@@ -46,4 +46,4 @@ job; scheduling is best-effort, so the migration still applies where
 
 Migration 0010 limits `is_admin(uuid)` to the signed-in user or trusted service-role administration. Anonymous and foreign-user membership probing is denied; existing self-scoped RLS policies retain their behavior.
 
-`0016_sticker_templates.sql` prepares versioned, vendor-readable booth templates and a service-only atomic save function. It must be reviewed and applied by the owner before dependent code is enabled. It also creates the private `sticker-logos` storage bucket (PNG/JPEG only, 512 KB limit) with `storage.objects` policies that confine each vendor to the `<vendor_id>/` folder.
+`0016_sticker_templates.sql` prepares versioned, vendor-readable booth templates and a service-only atomic save function. It must be reviewed and applied by the owner before dependent code is enabled. It also creates the private `sticker-logos` storage bucket (PNG/JPEG only, 512 KB limit) with a single `storage.objects` select policy confining each vendor to the `<vendor_id>/` folder. There are no write policies: uploads and deletes go through the service-role Server Actions.

@@ -1,6 +1,7 @@
 export const LOGO_BUCKET = "sticker-logos";
 export const LOGO_MAX_BYTES = 512 * 1024;
 export const LOGO_MAX_PIXELS = 1024;
+export const LOGO_URL_SECONDS = 3600;
 
 export type LogoImage = {
   ext: "png" | "jpg";
@@ -30,6 +31,11 @@ function readPng(bytes: Uint8Array): LogoImage | null {
   };
 }
 
+// TEM and RSTn markers stand alone, with no length field to skip.
+function isStandalone(marker: number): boolean {
+  return marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7);
+}
+
 function readJpeg(bytes: Uint8Array): LogoImage | null {
   if (bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) return null;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -39,6 +45,10 @@ function readJpeg(bytes: Uint8Array): LogoImage | null {
     const marker = bytes[offset + 1];
     if (marker === 0xff) {
       offset += 1;
+      continue;
+    }
+    if (isStandalone(marker)) {
+      offset += 2;
       continue;
     }
     if (SOF_MARKERS.has(marker)) {

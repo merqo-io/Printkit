@@ -145,7 +145,7 @@ describe("sticker designer prototype", () => {
           path: second,
           url: "https://signed/2",
         });
-      removeLogo.mockResolvedValue({ ok: true });
+      removeLogo.mockResolvedValue({ ok: true, kept: false });
       render(<StickerDesigner locationId="booth" />);
       pick("Upload logo");
       const image = await screen.findByAltText("Logo");
@@ -177,7 +177,7 @@ describe("sticker designer prototype", () => {
         path: first,
         url: "https://signed/1",
       });
-      removeLogo.mockResolvedValue({ ok: true });
+      removeLogo.mockResolvedValue({ ok: true, kept: false });
       render(<StickerDesigner locationId="booth" />);
       pick("Upload logo");
       await screen.findByAltText("Logo");
@@ -185,6 +185,24 @@ describe("sticker designer prototype", () => {
       expect(screen.queryByAltText("Logo")).not.toBeInTheDocument();
       expect(removeLogo).toHaveBeenCalledWith("booth", first);
       expect(screen.getByLabelText("Upload logo")).toBeInTheDocument();
+    });
+    it("keeps showing a logo the server kept when the removal is undone", async () => {
+      upload.mockResolvedValueOnce({
+        ok: true,
+        path: first,
+        url: "https://signed/1",
+      });
+      removeLogo.mockResolvedValue({ ok: true, kept: true });
+      render(<StickerDesigner locationId="booth" />);
+      pick("Upload logo");
+      await screen.findByAltText("Logo");
+      fireEvent.click(screen.getByRole("button", { name: "Remove logo" }));
+      await waitFor(() => expect(removeLogo).toHaveBeenCalled());
+      fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+      expect(await screen.findByAltText("Logo")).toHaveAttribute(
+        "src",
+        "https://signed/1",
+      );
     });
     it("leaves the logo out of the text-only print preview", async () => {
       upload.mockResolvedValueOnce({

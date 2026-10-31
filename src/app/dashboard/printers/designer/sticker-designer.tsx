@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { removeStickerLogo, saveStickerDesign } from "./actions";
+import { saveStickerDesign } from "./actions";
 import { StickerSize } from "./sticker-size";
 import { AddFieldButtons } from "./add-field-buttons";
 import { names } from "./sticker-content";
 import {
+  discardLogo,
   ElementFace,
   LogoPanel,
   newLogoElement,
@@ -139,6 +140,11 @@ export function StickerDesigner({
       element.kind === "logo",
   );
 
+  const forgetLogoUrl = (path: string) =>
+    setLogoUrls((urls) =>
+      Object.fromEntries(Object.entries(urls).filter(([key]) => key !== path)),
+    );
+
   async function chooseLogo(file: File) {
     if (!locationId) return;
     setUploading(true);
@@ -152,7 +158,7 @@ export function StickerDesigner({
     setLogoUrls((urls) => ({ ...urls, [result.path]: result.url }));
     if (logo) {
       updateElement(logo.id, { path: result.path });
-      void removeStickerLogo(locationId, logo.path).catch(() => undefined);
+      discardLogo(locationId, logo.path, forgetLogoUrl);
       return;
     }
     const added = newLogoElement(template, result.path);
@@ -450,9 +456,7 @@ export function StickerDesigner({
                     update({ ...template, elements });
                     setSelectedId(elements[0].id);
                     if (selected.kind === "logo" && locationId)
-                      void removeStickerLogo(locationId, selected.path).catch(
-                        () => undefined,
-                      );
+                      discardLogo(locationId, selected.path, forgetLogoUrl);
                   }
                 }}
               >
