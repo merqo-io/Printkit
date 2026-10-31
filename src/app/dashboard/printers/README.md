@@ -18,11 +18,13 @@ is online or it is not.
   "Choose a printer". A booth with a printer shows its main action (Printer
   address, Edit SN and KEY, or Open bridge mode) and a "More" group with View
   setup steps, Design label, Use a different printer and Remove printer
-  (`printer-actions.tsx`, confirm panel first). An offline printer also shows
+  (`printer-actions.tsx`; the confirm panel takes focus, Escape cancels, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
   a one-line check for its type. With no booths the page lists three numbered
   steps, linking to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
 - `actions.ts` — `removePrinter`: vendor session, Zod-checked booth id, delete
-  scoped to the vendor, `admin_audit` entry `printer_removed`. Device
+  scoped to the vendor, `admin_audit` entry `printer_removed` (detail: booth,
+  type, model). A 4G printer is first unregistered from the maker's account,
+  best effort: a failure is logged and the removal still goes ahead. Device
   credentials cascade; queued jobs stay on the booth for the next printer.
   Each row carries the id `booth-<location id>` (`locationRowId`), which the
   status API's `manage_url` names so a calling kit's "manage this booth's

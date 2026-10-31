@@ -13,7 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- The cloud printer setup keeps a "Make a new address" button after the address is shown.
+- The cloud printer setup keeps a "Make a new address" button after the address is shown, and asks before retiring the old address.
+- Removing a 4G printer also unregisters it from the maker's account (best effort), and the removal audit entry records the booth, type and model.
 
 ## [0.7.0] - 2026-10-31
 

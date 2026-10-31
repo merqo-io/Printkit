@@ -78,6 +78,30 @@ it("sends the vendor to the picker after changing printer", async () => {
   );
 });
 
+it("moves focus to the heading, describes the consequences and closes the menu", async () => {
+  const user = userEvent.setup();
+  const { container } = render(<PrinterActions {...props} />);
+  const menu = container.querySelector("details") as HTMLDetailsElement;
+  menu.open = true;
+  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  const dialog = screen.getByRole("alertdialog");
+  expect(menu.open).toBe(false);
+  expect(screen.getByText(/Remove the printer from Stall/)).toHaveFocus();
+  const described = dialog.getAttribute("aria-describedby") ?? "";
+  expect(document.getElementById(described)).toHaveTextContent(/30 minutes/);
+  expect(dialog).toHaveTextContent(/no printer until you set up a new one/);
+});
+
+it("cancels on Escape and returns focus to the More trigger", async () => {
+  const user = userEvent.setup();
+  render(<PrinterActions {...props} />);
+  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("alertdialog")).toBeNull();
+  expect(screen.getByText("More")).toHaveFocus();
+  expect(m.remove).not.toHaveBeenCalled();
+});
+
 it("keeps the printer and shows the error when removal fails", async () => {
   const user = userEvent.setup();
   m.remove.mockResolvedValue({ ok: false, error: "Nope" });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -31,13 +31,32 @@ export function PrinterActions(props: PrinterActionsProps) {
   const router = useRouter();
   const [pending, setPending] = useState<Pending>(null);
   const [busy, setBusy] = useState(false);
+  const menuRef = useRef<HTMLDetailsElement>(null);
+  const triggerRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLParagraphElement>(null);
   const location = encodeURIComponent(props.locationId);
+  const headingId = `confirm-${props.locationId}`;
+  const detailsId = `confirm-details-${props.locationId}`;
   const setupHref = `/dashboard/printers/setup?location=${location}&model=${encodeURIComponent(props.catalogId)}`;
   const primaryHref =
     props.connector === "bridge"
       ? `/dashboard/bridge?booth=${encodeURIComponent(props.boothRef)}`
       : setupHref;
   const primaryLabel = PRIMARY[props.connector];
+
+  useEffect(() => {
+    if (pending) headingRef.current?.focus();
+  }, [pending]);
+
+  const ask = (kind: Exclude<Pending, null>) => {
+    if (menuRef.current) menuRef.current.open = false;
+    setPending(kind);
+  };
+
+  const cancel = () => {
+    setPending(null);
+    triggerRef.current?.focus();
+  };
 
   const confirm = async () => {
     if (!pending || busy) return;
@@ -73,8 +92,11 @@ export function PrinterActions(props: PrinterActionsProps) {
           <Link href={primaryHref}>{primaryLabel}</Link>
         </Button>
       )}
-      <details className="relative">
-        <summary className="border-input hover:bg-accent inline-flex h-8 cursor-pointer list-none items-center rounded-md border px-3 text-sm font-medium pointer-coarse:h-10 [&::-webkit-details-marker]:hidden">
+      <details ref={menuRef} className="relative">
+        <summary
+          ref={triggerRef}
+          className="border-input hover:bg-accent inline-flex h-8 cursor-pointer list-none items-center rounded-md border px-3 text-sm font-medium pointer-coarse:h-10 [&::-webkit-details-marker]:hidden"
+        >
           More
         </summary>
         <div className="bg-popover absolute right-0 z-10 mt-1 flex min-w-48 flex-col gap-1 rounded-md border p-1 shadow-md">
@@ -90,7 +112,7 @@ export function PrinterActions(props: PrinterActionsProps) {
             variant="ghost"
             size="sm"
             className="justify-start"
-            onClick={() => setPending("change")}
+            onClick={() => ask("change")}
           >
             Use a different printer
           </Button>
@@ -98,7 +120,7 @@ export function PrinterActions(props: PrinterActionsProps) {
             variant="ghost"
             size="sm"
             className="text-destructive justify-start"
-            onClick={() => setPending("remove")}
+            onClick={() => ask("remove")}
           >
             Remove printer
           </Button>
@@ -108,22 +130,39 @@ export function PrinterActions(props: PrinterActionsProps) {
       {pending && (
         <div
           role="alertdialog"
-          aria-labelledby={`confirm-${props.locationId}`}
+          aria-labelledby={headingId}
+          aria-describedby={detailsId}
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && !busy) cancel();
+          }}
           className="bg-muted/50 mt-2 w-full space-y-3 rounded-md border p-4"
         >
-          <p id={`confirm-${props.locationId}`} className="font-medium">
+          <p
+            id={headingId}
+            ref={headingRef}
+            tabIndex={-1}
+            className="font-medium outline-none"
+          >
             {pending === "change"
               ? `Use a different printer for ${props.boothLabel}?`
               : `Remove the printer from ${props.boothLabel}?`}
           </p>
-          <ul className="text-muted-foreground list-disc space-y-1 pl-5 text-sm">
+          <ul
+            id={detailsId}
+            className="text-muted-foreground list-disc space-y-1 pl-5 text-sm"
+          >
             <li>
               This printer is unpaired and its address or login stops working.
             </li>
             <li>
-              Orders that arrive now wait for a new printer. They print once one
-              is online, but only within 30 minutes of the order. After that
-              they fail and can be reprinted from History.
+              {props.boothLabel} will have no printer until you set up a new
+              one.
+            </li>
+            <li>
+              Orders still waiting stay queued for a new printer, but only for
+              30 minutes after the order. An order already sent to this printer
+              that has not printed may fail. Failed orders can be reprinted from
+              History.
             </li>
             {pending === "change" && (
               <li>You will pick the new printer next.</li>
@@ -141,7 +180,7 @@ export function PrinterActions(props: PrinterActionsProps) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPending(null)}
+              onClick={cancel}
               disabled={busy}
             >
               Keep it

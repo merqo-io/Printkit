@@ -16,6 +16,7 @@ export function CloudPollSetup({
   locationId: string;
 }) {
   const [url, setUrl] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const { pending: busy, run } = useAsyncAction();
 
   const onCreate = async () => {
@@ -28,6 +29,7 @@ export function CloudPollSetup({
           return;
         }
         setUrl(result.url);
+        setConfirming(false);
       } catch {
         toast.error("Could not complete setup. Please try again.");
       }
@@ -58,14 +60,54 @@ export function CloudPollSetup({
               Keep this private. Anyone with it can print to this booth. Make a
               new one if it leaks. The old one stops working.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onCreate}
-              disabled={busy}
-            >
-              {busy ? "Working…" : "Make a new address"}
-            </Button>
+            {confirming ? (
+              <div
+                role="alertdialog"
+                aria-labelledby="new-address-title"
+                aria-describedby="new-address-details"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" && !busy) setConfirming(false);
+                }}
+                className="bg-muted/50 space-y-3 rounded-md border p-4"
+              >
+                <p id="new-address-title" className="font-medium">
+                  Make a new address?
+                </p>
+                <p
+                  id="new-address-details"
+                  className="text-muted-foreground text-sm"
+                >
+                  The old address stops working at once. The printer will not
+                  print again until you paste the new address into its settings.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={onCreate}
+                    disabled={busy}
+                  >
+                    {busy ? "Working…" : "Make a new address"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setConfirming(false)}
+                    disabled={busy}
+                  >
+                    Keep the old one
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirming(true)}
+              >
+                Make a new address
+              </Button>
+            )}
           </div>
         ) : (
           <Button onClick={onCreate} disabled={busy}>
