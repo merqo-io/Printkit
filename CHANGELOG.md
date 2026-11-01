@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- The staging sync workflow pushes `staging` with a `merqo-staging-sync` GitHub App token instead of `GITHUB_TOKEN`, so a ruleset can limit pushes to `staging` to that app.
 - The cloud printer setup keeps a "Make a new address" button after the address is shown, and asks before retiring the old address.
 - Removing a 4G printer also unregisters it from the maker's account (best effort), and the removal audit entry records the booth, type and model.
 - The "unrouted jobs" note on the Overview now reads "Needs a booth" and says in plain words that those orders did not print.
