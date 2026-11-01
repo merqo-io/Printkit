@@ -1,9 +1,21 @@
-export function parseKeyOptions(args) {
-  const [kitSlug, ...rest] = args;
+// Must match TEST_PRINT_SOURCE_KIT in src/lib/test-print.ts (this script cannot import TS).
+// kit-callback.ts skips callbacks for it, so a real kit with this slug would lose callbacks.
+const RESERVED_KIT_SLUG = "printkit-test";
+
+function assertKitSlug(kitSlug) {
   if (!kitSlug || !/^[a-z][a-z\d_-]{0,31}$/.test(kitSlug))
     throw new Error(
       "Use a lowercase kit slug, followed by optional --callback-url URL --callback-secret-stdin.",
     );
+  if (kitSlug === RESERVED_KIT_SLUG)
+    throw new Error(
+      `Kit slug "${RESERVED_KIT_SLUG}" is reserved for test prints.`,
+    );
+}
+
+export function parseKeyOptions(args) {
+  const [kitSlug, ...rest] = args;
+  assertKitSlug(kitSlug);
   let callbackUrl;
   let readSecret = false;
   for (let index = 0; index < rest.length; index++) {
