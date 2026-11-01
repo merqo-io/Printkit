@@ -8,11 +8,16 @@ The setup wizard for the chosen printer, one flow per kind of printer.
 
 - `page.tsx` — resolves the booth and catalog entry, and renders a `PageHeader` with a way back to Printers. The tab title is a static "Set up a printer"; the heading names the model. An unknown booth or model goes to the root `not-found.tsx`.
 - `setup-wizard.tsx` — compatibility exports for the connector components.
-- `setup-step.tsx` — re-exports `Step`/`Steps` from `@/components/steps` and owns `WaitingForPrinter`, the printer-state poll with teardown (announced as `role="status"`, success in `success-text`).
+- `setup-step.tsx` — re-exports `Step`/`Steps` from `@/components/steps` and owns `WaitingForPrinter`, the printer-state poll with teardown (announced as `role="status"`, success in `success-text`). Once connected it also shows the shared "Print test label" button from `../test-print-button.tsx`.
 - In `bridge-setup.tsx` the help icon after the helper-device buttons sits 4px
   further right (`ml-1`): its 44px touch area reaches 10px past the 24px icon,
   and the row's 8px gap alone let it cover the last button's edge.
-- `cloud-poll-setup.tsx`, `vendor-cloud-setup.tsx`, `bridge-setup.tsx` — cloud printer (copy its private address), brand-cloud
+- `cloud-poll-setup.tsx` also keeps a "Make a new address" button after the
+  address is shown. It asks first, because the old address stops working at
+  once, and the prompt takes focus and returns it on Escape or cancel.
+- `actions.ts` refusals for a booth that already has a different printer now
+  point to More on the Printers row, where it can be removed.
+- `cloud-poll-setup.tsx`, `vendor-cloud-setup.tsx`, `bridge-setup.tsx` — cloud printer (copy its private address), 4G
   printer (SN and KEY), Bluetooth (a Chrome helper device: an Android
   phone, a Windows laptop or a Mac, never an iPad, or a Raspberry Pi
   pairing code), each ending in a live wait for the printer's first check-in.

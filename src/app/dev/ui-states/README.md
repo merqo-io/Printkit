@@ -16,8 +16,8 @@ can check them in a real browser. Not a vendor page.
 - `error/` — `/dev/ui-states/error`: a Server Component that throws while a
   cookie is set, caught by the real dashboard error page — see its own
   README.
-- `ui-states.dom.test.tsx` — the production 404, the frame, both notice
-  counts, and the error page throwing and recovering by cookie.
+- `ui-states.dom.test.tsx` — the production 404, the frame, both "Needs a
+  booth" notice counts, and the error page throwing and recovering by cookie.
 
 ## Connectivity
 

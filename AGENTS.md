@@ -82,8 +82,9 @@ supabase/tests/rls.test.sql       — pgTAP RLS suite
 - `admins`/`is_admin(uid)`/`admin_audit`: internal platform-operator
   allow-list + immutable audit trail (service-role insert/select only, no
   update/delete grant ever issued, RLS admin-read-only). Logs bridge
-  connected/disconnected, printer paired, manual reprint triggered, qkit
-  link connected/disconnected, print-job config changed.
+  connected/disconnected, printer paired, printer removed, test print sent,
+  manual reprint triggered, qkit link connected/disconnected, print-job
+  config changed.
 
 ## Rules (always)
 

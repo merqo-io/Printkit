@@ -2,8 +2,10 @@ import { DataTable, type DataTableColumn } from "@merqo/ui";
 import { JobStatusBadge } from "../job-status-badge";
 import { ReprintButton } from "./reprint-button";
 import { AssignLocationControl } from "./assign-location-control";
+import { failureReasonText } from "./failure-reason-copy";
 import { formatDateTime } from "@/lib/utils";
 import { payloadField } from "@/lib/print-job-payload";
+import { isTestPrint } from "@/lib/test-print";
 import type { PrintJob } from "@/lib/print-jobs-list";
 
 export function JobHistoryTable({
@@ -26,27 +28,45 @@ export function JobHistoryTable({
   const columns: DataTableColumn<PrintJob>[] = [
     {
       header: "Customer",
-      cell: (job) => payloadField(job.payload, "customer_name"),
+      cell: (job) =>
+        isTestPrint(job.source_kit)
+          ? "Test print"
+          : payloadField(job.payload, "customer_name"),
     },
     {
       header: "Order #",
-      cell: (job) => payloadField(job.payload, "order_number"),
+      cell: (job) =>
+        isTestPrint(job.source_kit)
+          ? "—"
+          : payloadField(job.payload, "order_number"),
     },
     {
       header: "Booth",
       cell: (job) =>
         job.location_id === null ? (
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-sm">Unrouted</span>
+            <span className="text-muted-foreground text-sm">Needs a booth</span>
             {job.status === "queued" && (
               <AssignLocationControl jobId={job.id} locations={locations} />
             )}
           </div>
         ) : (
-          (job.print_locations?.label ?? "Unrouted")
+          (job.print_locations?.label ?? "Needs a booth")
         ),
     },
-    { header: "Status", cell: (job) => <JobStatusBadge status={job.status} /> },
+    {
+      header: "Status",
+      cell: (job) => (
+        <div className="space-y-1">
+          <JobStatusBadge status={job.status} />
+          {job.status === "failed" && (
+            <p className="text-muted-foreground max-w-xs text-xs">
+              {failureReasonText(job.failure_reason)}
+            </p>
+          )}
+        </div>
+      ),
+    },
     {
       header: "Created",
       className: "text-muted-foreground text-sm",
@@ -56,7 +76,10 @@ export function JobHistoryTable({
       header: "Action",
       cell: (job) =>
         job.status === "failed" || job.status === "printed" ? (
-          <ReprintButton jobId={job.id} />
+          <ReprintButton
+            jobId={job.id}
+            boothLabel={job.print_locations?.label}
+          />
         ) : null,
     },
   ];

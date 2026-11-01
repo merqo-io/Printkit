@@ -1,5 +1,11 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { getCatalogEntry } from "@/lib/printer-catalog";
@@ -9,6 +15,7 @@ const m = vi.hoisted(() => ({
   register: vi.fn(),
   pair: vi.fn(),
   state: vi.fn(),
+  test: vi.fn(),
   error: vi.fn(),
   success: vi.fn(),
 }));
@@ -18,6 +25,7 @@ vi.mock("./actions", () => ({
   createBridgePairingCode: m.pair,
   readPrinterState: m.state,
 }));
+vi.mock("../actions", () => ({ sendTestPrint: m.test }));
 vi.mock("sonner", () => ({ toast: { error: m.error, success: m.success } }));
 function entry(id: string) {
   const result = getCatalogEntry(id);
@@ -62,6 +70,71 @@ it("retries address creation and reports clipboard outcomes", async () => {
   await user.click(screen.getByRole("button", { name: "Copy address" }));
   await waitFor(() => expect(m.success).toHaveBeenCalledWith("Address copied"));
   expect(write).toHaveBeenCalledWith("https://test.invalid/printer/token");
+});
+it("offers a new address after one is shown", async () => {
+  const user = userEvent.setup();
+  m.url
+    .mockResolvedValueOnce({ ok: true, url: "https://test.invalid/one" })
+    .mockResolvedValueOnce({ ok: true, url: "https://test.invalid/two" });
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await user.click(screen.getByRole("button", { name: "Create the address" }));
+  await user.click(
+    await screen.findByRole("button", { name: "Make a new address" }),
+  );
+  expect(screen.getByRole("alertdialog")).toHaveTextContent(/stops working/);
+  expect(m.url).toHaveBeenCalledTimes(1);
+  await user.click(
+    within(screen.getByRole("alertdialog")).getByRole("button", {
+      name: "Make a new address",
+    }),
+  );
+  expect(await screen.findByText("https://test.invalid/two")).toBeTruthy();
+  expect(m.url).toHaveBeenCalledTimes(2);
+});
+it("keeps the old address when the new-address prompt is cancelled", async () => {
+  const user = userEvent.setup();
+  m.url.mockResolvedValueOnce({ ok: true, url: "https://test.invalid/one" });
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await user.click(screen.getByRole("button", { name: "Create the address" }));
+  await user.click(
+    await screen.findByRole("button", { name: "Make a new address" }),
+  );
+  await user.click(screen.getByRole("button", { name: "Keep the old one" }));
+  expect(screen.queryByRole("alertdialog")).toBeNull();
+  expect(m.url).toHaveBeenCalledTimes(1);
+  expect(screen.getByText("https://test.invalid/one")).toBeTruthy();
+});
+it("moves focus into the new-address prompt and back on Escape or cancel", async () => {
+  const user = userEvent.setup();
+  m.url.mockResolvedValueOnce({ ok: true, url: "https://test.invalid/one" });
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await user.click(screen.getByRole("button", { name: "Create the address" }));
+  const trigger = () =>
+    screen.getByRole("button", { name: "Make a new address" });
+  await user.click(
+    await screen.findByRole("button", { name: "Make a new address" }),
+  );
+  expect(screen.getByText("Make a new address?")).toHaveFocus();
+  await user.keyboard("{Escape}");
+  expect(trigger()).toHaveFocus();
+  await user.click(trigger());
+  await user.click(screen.getByRole("button", { name: "Keep the old one" }));
+  expect(trigger()).toHaveFocus();
+  m.url.mockResolvedValueOnce({ ok: true, url: "https://test.invalid/two" });
+  await user.click(trigger());
+  await user.click(
+    within(screen.getByRole("alertdialog")).getByRole("button", {
+      name: "Make a new address",
+    }),
+  );
+  expect(await screen.findByText("https://test.invalid/two")).toBeTruthy();
+  expect(trigger()).toHaveFocus();
 });
 it.each([
   ["feie-fp-n20w", "online"],
@@ -169,4 +242,26 @@ it("numbers the Bluetooth steps without a gap before a helper is chosen", () => 
   expect(
     screen.getByText("Choose the helper device above first."),
   ).toBeVisible();
+});
+
+it("offers a test label once the printer is connected", async () => {
+  const user = userEvent.setup();
+  m.state.mockResolvedValue("online");
+  m.test.mockResolvedValue({ ok: true, offline: false });
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await user.click(
+    await screen.findByRole("button", { name: "Print test label" }),
+  );
+  expect(m.test).toHaveBeenCalledWith("location");
+  expect(await screen.findByText(/Test label sent/)).toBeInTheDocument();
+});
+
+it("hides the test label button until the printer connects", async () => {
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await screen.findByText(/Waiting for your printer/);
+  expect(screen.queryByRole("button", { name: "Print test label" })).toBeNull();
 });
