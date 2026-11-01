@@ -49,7 +49,9 @@ Design: `docs/superpowers/specs/2026-08-21-printkit-v0.1-design.md`,
 `docs/superpowers/specs/2026-09-20-printer-connectors-design.md`
 
 Deploy and staging (`printkit-staging.merqo.io`, previews on the shared staging
-Supabase project, `scripts/staging-migrate.sh`): `docs/DEPLOY.md`.
+Supabase project, `scripts/staging-migrate.sh`): `docs/DEPLOY.md`. The
+`staging-sync` workflow pushes the `staging` branch with the `merqo-staging-sync`
+GitHub App token, because a ruleset limits pushes to `staging` to that app.
 
 Operator cleanup of orphaned sticker logos: `node scripts/cleanup-sticker-logos.mjs`
 is a dry run; add `--apply` to delete and `--grace-hours N` to change the
