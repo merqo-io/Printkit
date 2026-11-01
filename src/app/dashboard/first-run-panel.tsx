@@ -38,7 +38,7 @@ export function FirstRunPanel({
   if (isFirstRunComplete(progress)) return null;
 
   const qkit = safeQkitUrl(qkitUrl);
-  const steps: { done: boolean; body: ReactNode }[] = [
+  const raw: { done: boolean; body: ReactNode }[] = [
     {
       done: progress.hasBooth,
       body: qkit ? (
@@ -61,6 +61,12 @@ export function FirstRunPanel({
       ),
     },
   ];
+  // A step only counts once every earlier step is done, so the marks stay in
+  // order even when old jobs exist without a printer.
+  const steps = raw.map((step, index) => ({
+    ...step,
+    done: raw.slice(0, index + 1).every((s) => s.done),
+  }));
   const currentIndex = steps.findIndex((step) => !step.done);
 
   return (

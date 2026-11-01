@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { TextLink } from "@/components/text-link";
 import type { CatalogEntry } from "@/lib/printer-catalog";
 import { createPrinterUrl } from "./actions";
 import { Step, Steps, WaitingForPrinter } from "./setup-step";
@@ -55,6 +56,33 @@ export function CloudPollSetup({
       }
     });
   };
+
+  if (entry.id === "virtual") {
+    // The virtual printer mints its own token on its own page, so no
+    // address is made here.
+    return (
+      <Steps>
+        <Step number={1} title="Open the virtual printer page">
+          <p className="text-muted-foreground text-sm">
+            <TextLink href="/dashboard/dev/virtual-printer">
+              Open the virtual printer.
+            </TextLink>
+          </p>
+        </Step>
+
+        <Step number={2} title="Start it for this booth">
+          <p className="text-muted-foreground text-sm">
+            Pick this booth and press &quot;Start virtual printer&quot;. Keep
+            that page open while you test.
+          </p>
+        </Step>
+
+        <Step number={3} title="Wait for it to connect">
+          <WaitingForPrinter locationId={locationId} />
+        </Step>
+      </Steps>
+    );
+  }
 
   return (
     <Steps>

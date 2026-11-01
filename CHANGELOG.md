@@ -13,6 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- First-run steps only show done when every earlier step is done, so "Print your first label" is no longer ticked while "Pick your printer" is open.
+- Setting up the virtual printer shows its own steps (open the virtual printer page, start it for the booth, wait) instead of the Star CloudPRNT and WiFi steps.
+
 ### Added
 
 - Operator script `scripts/cleanup-sticker-logos.mjs` removes orphaned sticker logos (unreferenced by any saved design or job snapshot and older than a grace period); dry run by default, `--apply` to delete.
