@@ -25,6 +25,14 @@ test("callback configuration uses a piped secret", () =>
       readSecret: true,
     },
   ));
+test("rejects the reserved test-print slug", () =>
+  assert.throws(() => parseKeyOptions(["printkit-test"]), /reserved/));
+for (const slug of [" PrintKit-Test ", "PRINTKIT-TEST"])
+  test(
+    "rejects uppercase or padded variants via the format check " +
+      JSON.stringify(slug),
+    () => assert.throws(() => parseKeyOptions([slug]), /lowercase kit slug/),
+  );
 for (const args of [
   ["QKIT"],
   ["qkit", "https://example.com", "plaintext"],
