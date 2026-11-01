@@ -15,6 +15,7 @@ const m = vi.hoisted(() => ({
   register: vi.fn(),
   pair: vi.fn(),
   state: vi.fn(),
+  test: vi.fn(),
   error: vi.fn(),
   success: vi.fn(),
 }));
@@ -24,6 +25,7 @@ vi.mock("./actions", () => ({
   createBridgePairingCode: m.pair,
   readPrinterState: m.state,
 }));
+vi.mock("../actions", () => ({ sendTestPrint: m.test }));
 vi.mock("sonner", () => ({ toast: { error: m.error, success: m.success } }));
 function entry(id: string) {
   const result = getCatalogEntry(id);
@@ -240,4 +242,26 @@ it("numbers the Bluetooth steps without a gap before a helper is chosen", () => 
   expect(
     screen.getByText("Choose the helper device above first."),
   ).toBeVisible();
+});
+
+it("offers a test label once the printer is connected", async () => {
+  const user = userEvent.setup();
+  m.state.mockResolvedValue("online");
+  m.test.mockResolvedValue({ ok: true, offline: false });
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await user.click(
+    await screen.findByRole("button", { name: "Print test label" }),
+  );
+  expect(m.test).toHaveBeenCalledWith("location");
+  expect(await screen.findByText(/Test label sent/)).toBeInTheDocument();
+});
+
+it("hides the test label button until the printer connects", async () => {
+  render(
+    <CloudPollSetup entry={entry("star-mc-label2")} locationId="location" />,
+  );
+  await screen.findByText(/Waiting for your printer/);
+  expect(screen.queryByRole("button", { name: "Print test label" })).toBeNull();
 });

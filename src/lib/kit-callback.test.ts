@@ -16,6 +16,7 @@ const originalFetch = global.fetch;
 describe("notifyKitPrintStatus", () => {
   beforeEach(() => {
     maybeSingleMock.mockReset();
+    selectMock.mockClear();
   });
   afterEach(() => {
     global.fetch = originalFetch;
@@ -32,6 +33,19 @@ describe("notifyKitPrintStatus", () => {
     await expect(
       notifyKitPrintStatus("qkit", "order-1", "failed", ATTEMPT_AT),
     ).resolves.toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("never looks up or calls a kit for a dashboard test print", async () => {
+    maybeSingleMock.mockResolvedValue({
+      data: { callback_url: "https://qkit.test/cb", callback_secret: "s" },
+      error: null,
+    });
+    const fetchMock = vi.fn();
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await notifyKitPrintStatus("printkit-test", "ref", "printed", ATTEMPT_AT);
+    expect(selectMock).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

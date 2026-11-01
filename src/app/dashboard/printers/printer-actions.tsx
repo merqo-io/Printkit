@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { removePrinter } from "./actions";
+import { TestPrintButton } from "./test-print-button";
 
 export type PrinterActionsProps = {
   locationId: string;
@@ -92,6 +93,7 @@ export function PrinterActions(props: PrinterActionsProps) {
           <Link href={primaryHref}>{primaryLabel}</Link>
         </Button>
       )}
+      <TestPrintButton locationId={props.locationId} />
       <details ref={menuRef} className="relative">
         <summary
           ref={triggerRef}
