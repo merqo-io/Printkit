@@ -15,6 +15,9 @@ The setup wizard for the chosen printer, one flow per kind of printer.
 - `cloud-poll-setup.tsx` also keeps a "Make a new address" button after the
   address is shown. It asks first, because the old address stops working at
   once, and the prompt takes focus and returns it on Escape or cancel.
+- `cloud-poll-setup.tsx` shows three steps of its own for the `virtual`
+  catalog entry (open the virtual printer page, start it for the booth, wait).
+  That page mints the token, so no address is made here.
 - `actions.ts` refusals for a booth that already has a different printer now
   point to More on the Printers row, where it can be removed.
 - `cloud-poll-setup.tsx`, `vendor-cloud-setup.tsx`, `bridge-setup.tsx` — cloud printer (copy its private address), 4G

@@ -64,7 +64,7 @@ flagged; it is safe to re-run.
 for the security context). The Vercel build does not use
 `output: "standalone"`; that config was dropped.
 
-The Overview shows three first-run steps (booth, printer, first label) until a label has printed, refreshes itself on tab focus and every 30 seconds while visible, and links each booth to its label designer. Set the optional `NEXT_PUBLIC_QKIT_URL` (see `.env.example`) before building to make the first step link to qkit.
+The Overview shows three first-run steps (booth, printer, first label) until a label has printed (a step shows done only when every earlier step is done), refreshes itself on tab focus and every 30 seconds while visible, and links each booth to its label designer. Set the optional `NEXT_PUBLIC_QKIT_URL` (see `.env.example`) before building to make the first step link to qkit.
 
 The Printers page lets a vendor remove or swap a booth's printer (with a confirm), regenerate a cloud printer's address, edit a Feie SN and KEY, and reach the designer, and print a test label to any booth's printer (it goes through the normal queue, never reaches a calling kit, and shows as "Test print" in History). The page refreshes itself. Overview and printers share a vendor-scoped batch loader. Connector setup flows live in separate local components; history uses shared DataTable with Printkit-specific action eligibility.
 

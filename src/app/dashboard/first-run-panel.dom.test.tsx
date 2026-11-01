@@ -21,6 +21,18 @@ describe("FirstRunPanel", () => {
     expect(items[2]).not.toHaveTextContent("(next)");
   });
 
+  it("does not tick step 3 when a job printed but no printer exists", () => {
+    render(
+      <FirstRunPanel
+        progress={{ hasBooth: true, hasPrinter: false, hasPrintedJob: true }}
+      />,
+    );
+    const items = screen.getAllByRole("listitem");
+    expect(items[0]).toHaveTextContent("(done)");
+    expect(items[1]).toHaveTextContent("(next)");
+    expect(items[2]).not.toHaveTextContent("(done)");
+  });
+
   it("links steps 2 and 3 to the printers page", () => {
     render(<FirstRunPanel progress={none} />);
     expect(
