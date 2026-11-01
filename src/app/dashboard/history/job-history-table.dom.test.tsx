@@ -198,3 +198,22 @@ it("does not offer assignment for unrouted terminal jobs", () => {
     screen.queryByRole("button", { name: /assign/i }),
   ).not.toBeInTheDocument();
 });
+
+describe("JobHistoryTable test prints", () => {
+  it("labels a dashboard test label as a test print, not an order", () => {
+    render(
+      <JobHistoryTable
+        jobs={[
+          {
+            ...JOB,
+            source_kit: "printkit-test",
+            payload: { customer_name: "Printer A", order_number: "TEST" },
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByText("Test print")).toBeInTheDocument();
+    expect(screen.queryByText("Printer A")).toBeNull();
+    expect(screen.queryByText("TEST")).toBeNull();
+  });
+});

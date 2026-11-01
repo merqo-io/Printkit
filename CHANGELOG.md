@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Print test label: every printer row and the setup wizard's connected state can send a sample label through the normal queue, for Star, Feie 4G and bridge printers. A second test within a minute is refused, an offline printer is told it will print when it is back online, and the send is audited as `test_print_sent`. Test labels never notify a calling kit and read as "Test print" in History.
+- The Printers page refreshes by itself (`AutoRefresh`) so status and last seen update without a reload.
 - Printers page: each booth row now has one action group per printer type (Printer address, Edit SN and KEY, or Open bridge mode) with the rest under More: View setup steps, Design label, Use a different printer and Remove printer. Removing asks first and says what happens to waiting orders.
 - Offline printers show a one-line check for their type, with a link to the setup steps. The empty state lists three numbered steps and links to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
 - The Overview shows three first-run steps (turn on printing in qkit, pick your printer, print your first label) with done marks until a label has printed. Set `NEXT_PUBLIC_QKIT_URL` to link the first step to qkit; it is optional again (callbacks still ignore it) and is inlined at build time, so set it before building.

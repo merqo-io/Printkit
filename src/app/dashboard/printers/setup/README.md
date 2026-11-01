@@ -8,7 +8,7 @@ The setup wizard for the chosen printer, one flow per kind of printer.
 
 - `page.tsx` — resolves the booth and catalog entry, and renders a `PageHeader` with a way back to Printers. The tab title is a static "Set up a printer"; the heading names the model. An unknown booth or model goes to the root `not-found.tsx`.
 - `setup-wizard.tsx` — compatibility exports for the connector components.
-- `setup-step.tsx` — re-exports `Step`/`Steps` from `@/components/steps` and owns `WaitingForPrinter`, the printer-state poll with teardown (announced as `role="status"`, success in `success-text`).
+- `setup-step.tsx` — re-exports `Step`/`Steps` from `@/components/steps` and owns `WaitingForPrinter`, the printer-state poll with teardown (announced as `role="status"`, success in `success-text`). Once connected it also shows the shared "Print test label" button from `../test-print-button.tsx`.
 - In `bridge-setup.tsx` the help icon after the helper-device buttons sits 4px
   further right (`ml-1`): its 44px touch area reaches 10px past the 24px icon,
   and the row's 8px gap alone let it cover the last button's edge.

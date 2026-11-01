@@ -140,6 +140,7 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
   bearer token against `MERQO_METRICS_SECRET`.
 - `list-all-users.ts` — `listAllUsers(supabase)`: every auth user across
   `listUsers()` pages (1000 per page, 50-page ceiling), for the email lookup.
+- `test-print.ts` - `TEST_PRINT_SOURCE_KIT` / `isTestPrint`: the `source_kit` of dashboard test labels; `notifyKitPrintStatus` returns early for it.
 - `kit-callback.ts` — `notifyKitPrintStatus(kitSlug, sourceRef, status)`:
   fire-and-forget outbound callback on job status change, kit-agnostic —
   looks the calling kit's `callback_url`/`callback_secret` up from

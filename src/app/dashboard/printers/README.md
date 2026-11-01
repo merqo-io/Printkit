@@ -21,11 +21,13 @@ is online or it is not.
   (`printer-actions.tsx`; the confirm panel takes focus, Escape cancels, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
   a one-line check for its type. With no booths the page lists three numbered
   steps, linking to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
+- `test-print-button.tsx` - the "Print test label" button on each printer row and the setup wizard's connected state; shows sent, offline and error messages inline and disables itself while sending.
 - `actions.ts` — `removePrinter`: vendor session, Zod-checked booth id, delete
   scoped to the vendor, `admin_audit` entry `printer_removed` (detail: booth,
   type, model). A 4G printer is first unregistered from the maker's account,
   best effort: a failure is logged and the removal still goes ahead. Device
   credentials cascade; queued jobs stay on the booth for the next printer.
+  `sendTestPrint`: vendor session, Zod-checked booth id, printer looked up by vendor and booth, one test per booth per minute, a `print_jobs` row with `source_kit` `printkit-test` (so no kit callback), dispatched at once for 4G printers, audited as `test_print_sent`.
   Each row carries the id `booth-<location id>` (`locationRowId`), which the
   status API's `manage_url` names so a calling kit's "manage this booth's
   printer" link lands on the right row, which is outlined while it is the

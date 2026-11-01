@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createServiceClient } from "@/lib/supabase/server";
+import { isTestPrint } from "@/lib/test-print";
 
 // Outbound, per-kit callback on a print job's status change -- looks the
 // target kit's callback_url/callback_secret up from kit_api_keys instead of
@@ -12,6 +13,8 @@ export async function notifyKitPrintStatus(
   status: "printed" | "failed",
   attemptAt: string,
 ): Promise<void> {
+  // A dashboard test label belongs to no order, so there is nobody to tell.
+  if (isTestPrint(kitSlug)) return;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5000);
 

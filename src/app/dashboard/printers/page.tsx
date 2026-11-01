@@ -9,6 +9,7 @@ import { Panel } from "@/components/panel";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AutoRefresh } from "../auto-refresh";
 import { PrinterActions } from "./printer-actions";
 
 export const metadata: Metadata = {
@@ -40,6 +41,7 @@ export default async function PrintersPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
+      <AutoRefresh />
       <PageHeader
         title="Printers"
         description="One printer per booth. New orders print by themselves once a booth has a printer that is online."

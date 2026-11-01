@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { readPrinterState } from "./actions";
+import { TestPrintButton } from "../test-print-button";
 
 export { Step, Steps } from "@/components/steps";
 
@@ -37,9 +38,12 @@ export function WaitingForPrinter({ locationId }: { locationId: string }) {
 
   if (state === "online") {
     return (
-      <p role="status" className="text-success-text text-sm font-medium">
-        Connected. Your next order will print here.
-      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <p role="status" className="text-success-text text-sm font-medium">
+          Connected. Your next order will print here.
+        </p>
+        <TestPrintButton locationId={locationId} />
+      </div>
     );
   }
   return (

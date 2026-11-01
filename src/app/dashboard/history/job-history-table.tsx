@@ -5,6 +5,7 @@ import { AssignLocationControl } from "./assign-location-control";
 import { failureReasonText } from "./failure-reason-copy";
 import { formatDateTime } from "@/lib/utils";
 import { payloadField } from "@/lib/print-job-payload";
+import { isTestPrint } from "@/lib/test-print";
 import type { PrintJob } from "@/lib/print-jobs-list";
 
 export function JobHistoryTable({
@@ -27,11 +28,17 @@ export function JobHistoryTable({
   const columns: DataTableColumn<PrintJob>[] = [
     {
       header: "Customer",
-      cell: (job) => payloadField(job.payload, "customer_name"),
+      cell: (job) =>
+        isTestPrint(job.source_kit)
+          ? "Test print"
+          : payloadField(job.payload, "customer_name"),
     },
     {
       header: "Order #",
-      cell: (job) => payloadField(job.payload, "order_number"),
+      cell: (job) =>
+        isTestPrint(job.source_kit)
+          ? "—"
+          : payloadField(job.payload, "order_number"),
     },
     {
       header: "Booth",

@@ -4,7 +4,10 @@ import { expect, it, vi } from "vitest";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }));
-vi.mock("./actions", () => ({ removePrinter: vi.fn() }));
+vi.mock("./actions", () => ({
+  removePrinter: vi.fn(),
+  sendTestPrint: vi.fn(),
+}));
 const summaries = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/vendor-session", () => ({
   getVendorSession: async () => ({ user: { id: "vendor-a" } }),

@@ -11,12 +11,16 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const m = vi.hoisted(() => ({
   remove: vi.fn(),
+  test: vi.fn(),
   push: vi.fn(),
   refresh: vi.fn(),
   error: vi.fn(),
   success: vi.fn(),
 }));
-vi.mock("./actions", () => ({ removePrinter: m.remove }));
+vi.mock("./actions", () => ({
+  removePrinter: m.remove,
+  sendTestPrint: m.test,
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: m.push, refresh: m.refresh }),
 }));
@@ -115,4 +119,48 @@ it("keeps the printer and shows the error when removal fails", async () => {
   await waitFor(() => expect(m.error).toHaveBeenCalledWith("Nope"));
   expect(m.push).not.toHaveBeenCalled();
   expect(m.refresh).not.toHaveBeenCalled();
+});
+
+it("disables the test button while sending, then confirms", async () => {
+  const user = userEvent.setup();
+  let finish: (value: { ok: true; offline: boolean }) => void = () => {};
+  m.test.mockReturnValue(
+    new Promise((resolve) => {
+      finish = resolve;
+    }),
+  );
+  render(<PrinterActions {...props} />);
+  await user.click(screen.getByRole("button", { name: "Print test label" }));
+  expect(screen.getByRole("button", { name: "Sending…" })).toBeDisabled();
+  finish({ ok: true, offline: false });
+  expect(await screen.findByRole("status")).toHaveTextContent(
+    "Test label sent. It should print in a few seconds.",
+  );
+  expect(m.test).toHaveBeenCalledWith("loc-1");
+  expect(m.test).toHaveBeenCalledTimes(1);
+});
+
+it("says an offline printer will print when it is back online", async () => {
+  const user = userEvent.setup();
+  m.test.mockResolvedValue({ ok: true, offline: true });
+  render(<PrinterActions {...props} />);
+  await user.click(screen.getByRole("button", { name: "Print test label" }));
+  expect(await screen.findByRole("status")).toHaveTextContent(
+    "It will print when the printer is back online.",
+  );
+});
+
+it("shows the refusal or a failure of the test label", async () => {
+  const user = userEvent.setup();
+  m.test.mockResolvedValueOnce({ ok: false, error: "Wait a minute" });
+  render(<PrinterActions {...props} />);
+  await user.click(screen.getByRole("button", { name: "Print test label" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Wait a minute");
+  m.test.mockRejectedValueOnce(new Error("network"));
+  await user.click(screen.getByRole("button", { name: "Print test label" }));
+  await waitFor(() =>
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Could not send the test label. Please try again.",
+    ),
+  );
 });
