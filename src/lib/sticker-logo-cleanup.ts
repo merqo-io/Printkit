@@ -72,6 +72,14 @@ export function planCleanup(input: {
   return plan;
 }
 
+/** Removes candidates a later reference read shows are now in use. */
+export function dropNowReferenced(
+  candidates: string[],
+  referenced: ReadonlySet<string>,
+): string[] {
+  return candidates.filter((path) => !referenced.has(path));
+}
+
 type ListEntry = {
   name: string;
   id: string | null;

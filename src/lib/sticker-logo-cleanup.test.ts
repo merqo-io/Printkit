@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   CleanupError,
   collectLogoPaths,
+  dropNowReferenced,
   listAllLogos,
   planCleanup,
   removeInBatches,
@@ -145,6 +146,15 @@ describe("listAllLogos", () => {
       remove: async () => ({ error: null }),
     };
     await expect(listAllLogos(storage)).rejects.toThrow(CleanupError);
+  });
+});
+
+describe("dropNowReferenced", () => {
+  it("drops candidates that became referenced", () => {
+    expect(dropNowReferenced(["a", "b", "c"], new Set(["b", "x"]))).toEqual([
+      "a",
+      "c",
+    ]);
   });
 });
 

@@ -4,6 +4,7 @@ import {
   collectLogoPaths,
   listAllLogos,
   planCleanup,
+  dropNowReferenced,
   removeInBatches,
 } from "../src/lib/sticker-logo-cleanup.ts";
 
@@ -13,6 +14,8 @@ const HELP = `Usage: node scripts/cleanup-sticker-logos.mjs [--apply] [--grace-h
 
 Deletes sticker logos in the "${BUCKET}" bucket that no saved design and no
 print job snapshot uses and that are older than the grace period (default 24).
+Only <vendor>/<booth>/<file>.png|jpg objects are ever touched; everything else
+is kept.
 Without --apply it only prints what it would delete.
 Needs NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY in the environment.`;
 
@@ -98,7 +101,7 @@ try {
       // A designer session open since before the first read may have saved
       // since; re-reading drops any candidate that is now in use.
       const latest = await readReferences();
-      orphans = orphans.filter((path) => !latest.has(path));
+      orphans = dropNowReferenced(orphans, latest);
     }
     for (const path of orphans) console.log(path);
     if (options.apply) deleted = await removeInBatches(storage, orphans);
