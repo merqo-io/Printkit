@@ -51,6 +51,10 @@ Design: `docs/superpowers/specs/2026-08-21-printkit-v0.1-design.md`,
 Deploy and staging (`printkit-staging.merqo.io`, previews on the shared staging
 Supabase project, `scripts/staging-migrate.sh`): `docs/DEPLOY.md`.
 
+Operator cleanup of orphaned sticker logos: `node scripts/cleanup-sticker-logos.mjs`
+is a dry run; add `--apply` to delete and `--grace-hours N` to change the
+24-hour grace period (see `scripts/README.md`).
+
 Migration `0015_fk_indexes.sql` indexes the foreign keys the Supabase advisor
 flagged; it is safe to re-run.
 

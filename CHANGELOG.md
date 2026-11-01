@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Operator script `scripts/cleanup-sticker-logos.mjs` removes orphaned sticker logos (unreferenced by any saved design or job snapshot and older than a grace period); dry run by default, `--apply` to delete.
 - `create-kit-key` refuses the reserved kit slug `printkit-test` (used by test prints, which never send callbacks). `TEST_PRINT_SOURCE_KIT` is pinned by a test, and the script hardcodes the same value with a comment pointing to it.
 - Print test label: every printer row and the setup wizard's connected state can send a sample label through the normal queue, for Star, Feie 4G and bridge printers. A second test within a minute is refused, an offline printer is told it will print when it is back online, and the send is audited as `test_print_sent`. Test labels never notify a calling kit and read as "Test print" in History.
 - The Printers page refreshes by itself (`AutoRefresh`) so status and last seen update without a reload.
