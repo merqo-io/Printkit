@@ -60,7 +60,7 @@
       "path": ".claude/hooks/subagent-stop.sh"
     },
     ".claude/skills/next-verify/SKILL.md": {
-      "origin_hash": "bce9095dcc32ca4e80409d009e99c3980d9cf52664bfbe8ba74d97e48fe31a80",
+      "origin_hash": "d2b09ac8f0e939d3d1b908cc9eb9827042ff78a6372c7b6fe0963f0f64bc716c",
       "path": ".claude/skills/next-verify/SKILL.md"
     },
     ".claude/skills/supabase-migrate/SKILL.md": {
