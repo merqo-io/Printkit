@@ -12,3 +12,5 @@ staging-migrate.sh applies `supabase/migrations` to the shared staging Supabase 
 [Parent](../README.md)
 
 `test-label-batches.mjs` runs the batch migration regression suite against a disposable local PostgreSQL cluster, including concurrent submissions and completions.
+
+`create-kit-key.mjs` rejects the reserved kit slug `printkit-test`, which dashboard test labels use as their `source_kit` and which never triggers a callback.
