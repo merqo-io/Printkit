@@ -9,6 +9,7 @@ import { Panel } from "@/components/panel";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PrinterActions } from "./printer-actions";
 
 export const metadata: Metadata = {
   title: "Printers",
@@ -16,12 +17,25 @@ export const metadata: Metadata = {
 
 const CONNECTOR_LABEL: Record<string, string> = {
   cloud_poll: "Cloud printer",
-  vendor_cloud: "Brand-cloud printer",
+  vendor_cloud: "4G printer",
   bridge: "Bluetooth printer with a helper device",
 };
 
+const OFFLINE_HINT: Record<string, string> = {
+  cloud_poll: "Check it is on and connected to WiFi.",
+  vendor_cloud: "Check it is on and has signal.",
+  bridge: "Open bridge mode on the helper device.",
+};
+
+function setupStepsHref(locationId: string, catalogId: string): string {
+  return `/dashboard/printers/setup?location=${encodeURIComponent(
+    locationId,
+  )}&model=${encodeURIComponent(catalogId)}`;
+}
+
 export default async function PrintersPage() {
   const { user } = await getVendorSession();
+  const qkitUrl = process.env.NEXT_PUBLIC_QKIT_URL || null;
   const rows = await listLocationPrinterSummaries(user.id);
 
   return (
@@ -33,10 +47,22 @@ export default async function PrintersPage() {
 
       {rows.length === 0 ? (
         <Panel>
-          <p className="text-muted-foreground text-sm">
-            No booths have printing enabled yet. Turn it on in qkit&apos;s booth
-            settings, then come back here.
-          </p>
+          <p className="font-medium">No booths have printing turned on yet.</p>
+          <ol className="text-muted-foreground mt-2 list-decimal space-y-1 pl-5 text-sm">
+            <li>
+              In{" "}
+              {qkitUrl ? (
+                <a href={qkitUrl} className="text-foreground underline">
+                  qkit
+                </a>
+              ) : (
+                "qkit"
+              )}
+              , turn on printing for your booth.
+            </li>
+            <li>Pick your printer here.</li>
+            <li>Print a test label.</li>
+          </ol>
         </Panel>
       ) : (
         <ul className="space-y-3">
@@ -54,6 +80,19 @@ export default async function PrintersPage() {
                 lastSeenAt={printer?.last_seen_at ?? null}
               />
 
+              {state === "offline" && printer && (
+                <p className="text-muted-foreground mt-3 text-sm">
+                  {OFFLINE_HINT[printer.connector] ??
+                    "Check the printer is on."}{" "}
+                  <Link
+                    href={setupStepsHref(location.id, printer.catalog_id)}
+                    className="text-foreground underline"
+                  >
+                    View setup steps
+                  </Link>
+                </p>
+              )}
+
               <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t pt-4">
                 {printer ? (
                   <>
@@ -66,26 +105,13 @@ export default async function PrintersPage() {
                       </Badge>
                     )}
                     <span className="grow" />
-                    {printer.connector === "bridge" && (
-                      <Button asChild variant="outline" size="sm">
-                        <Link
-                          href={`/dashboard/bridge?booth=${encodeURIComponent(
-                            location.source_ref,
-                          )}`}
-                        >
-                          Open bridge mode
-                        </Link>
-                      </Button>
-                    )}
-                    <Button asChild variant="outline" size="sm">
-                      <Link
-                        href={`/dashboard/printers/setup?location=${encodeURIComponent(
-                          location.id,
-                        )}&model=${encodeURIComponent(printer.catalog_id)}`}
-                      >
-                        Setup steps
-                      </Link>
-                    </Button>
+                    <PrinterActions
+                      locationId={location.id}
+                      boothRef={location.source_ref}
+                      boothLabel={location.label}
+                      catalogId={printer.catalog_id}
+                      connector={printer.connector}
+                    />
                   </>
                 ) : (
                   <Button asChild size="sm">

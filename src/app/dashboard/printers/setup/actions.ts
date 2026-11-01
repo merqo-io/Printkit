@@ -93,7 +93,8 @@ export async function createPrinterUrl(
   if (!printer) {
     return {
       ok: false,
-      error: "That booth already has a different printer. Remove it first.",
+      error:
+        "That booth already has a different printer. Remove it from the Printers page first, using More on its row.",
     };
   }
 
@@ -145,7 +146,8 @@ export async function registerBrandCloudPrinter(
   if (!printer) {
     return {
       ok: false,
-      error: "That booth already has a different printer. Remove it first.",
+      error:
+        "That booth already has a different printer. Remove it from the Printers page first, using More on its row.",
     };
   }
 
@@ -190,7 +192,8 @@ export async function createBridgePairingCode(
   if (!printer) {
     return {
       ok: false,
-      error: "That booth already has a different printer. Remove it first.",
+      error:
+        "That booth already has a different printer. Remove it from the Printers page first, using More on its row.",
     };
   }
 

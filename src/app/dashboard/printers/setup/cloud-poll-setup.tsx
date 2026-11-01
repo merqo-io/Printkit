@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,27 @@ export function CloudPollSetup({
   locationId: string;
 }) {
   const [url, setUrl] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const { pending: busy, run } = useAsyncAction();
+  const titleRef = useRef<HTMLParagraphElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const restoreFocus = useRef(false);
+
+  // The trigger is unmounted while the panel is open, so focus can only go
+  // back to it after the re-render that brings it back.
+  useEffect(() => {
+    if (confirming) {
+      titleRef.current?.focus();
+    } else if (restoreFocus.current) {
+      restoreFocus.current = false;
+      triggerRef.current?.focus();
+    }
+  }, [confirming]);
+
+  const cancelConfirm = () => {
+    restoreFocus.current = true;
+    setConfirming(false);
+  };
 
   const onCreate = async () => {
     return run(async () => {
@@ -28,6 +48,8 @@ export function CloudPollSetup({
           return;
         }
         setUrl(result.url);
+        restoreFocus.current = true;
+        setConfirming(false);
       } catch {
         toast.error("Could not complete setup. Please try again.");
       }
@@ -56,8 +78,62 @@ export function CloudPollSetup({
             </Button>
             <p className="text-muted-foreground text-xs">
               Keep this private. Anyone with it can print to this booth. Make a
-              new one here if it leaks.
+              new one if it leaks. The old one stops working.
             </p>
+            {confirming ? (
+              <div
+                role="alertdialog"
+                aria-labelledby="new-address-title"
+                aria-describedby="new-address-details"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" && !busy) cancelConfirm();
+                }}
+                className="bg-muted/50 space-y-3 rounded-md border p-4"
+              >
+                <p
+                  id="new-address-title"
+                  ref={titleRef}
+                  tabIndex={-1}
+                  className="font-medium outline-none"
+                >
+                  Make a new address?
+                </p>
+                <p
+                  id="new-address-details"
+                  className="text-muted-foreground text-sm"
+                >
+                  The old address stops working at once. The printer will not
+                  print again until you paste the new address into its settings.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={onCreate}
+                    disabled={busy}
+                  >
+                    {busy ? "Working…" : "Make a new address"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={cancelConfirm}
+                    disabled={busy}
+                  >
+                    Keep the old one
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                ref={triggerRef}
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirming(true)}
+              >
+                Make a new address
+              </Button>
+            )}
           </div>
         ) : (
           <Button onClick={onCreate} disabled={busy}>

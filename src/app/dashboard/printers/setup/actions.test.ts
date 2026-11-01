@@ -154,7 +154,8 @@ describe("createPrinterUrl", () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "That booth already has a different printer. Remove it first.",
+      error:
+        "That booth already has a different printer. Remove it from the Printers page first, using More on its row.",
     });
   });
 
