@@ -2,8 +2,8 @@
 
 ## Purpose
 
-The Supabase auth callback (`GET /auth/callback`). Google sign-in, the
-sign-up confirmation link and the password-reset link all land here with a
+The Supabase auth callback (`GET /auth/callback`). Google sign-in and the
+password-reset link both land here with a
 one-time `code`.
 
 ## Contents

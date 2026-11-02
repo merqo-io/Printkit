@@ -2,8 +2,8 @@
 
 ## Purpose
 
-The single sign-in/sign-up page (`/login`) — email+password and Google
-OAuth, plus password reset. Sign-up is a client-side toggle; `/reset-password` completes emailed recovery links.
+The sign-in page (`/login`) — email+password and Google
+OAuth, plus password reset. There is no sign-up: a footer line says printkit is the print companion for qkit booths and new vendors start with qkit. `/reset-password` completes emailed recovery links.
 
 ## Contents
 
@@ -14,12 +14,8 @@ OAuth, plus password reset. Sign-up is a client-side toggle; `/reset-password` c
   - Google OAuth via `supabase.auth.signInWithOAuth`, redirecting through
     `/auth/callback`; `queryParams: { hl: "en" }` forces an English consent
     screen regardless of the visitor's browser/account locale.
-  - Email+password sign-in/sign-up via `supabase.auth.signInWithPassword`/
-    `signUp`. A sign-up that returns no session (email confirmation on)
-    shows a "Check your email" state instead of silently redirecting to a
-    dashboard the unconfirmed user can't reach yet; "Back to sign in"
-    returns to the normal form in sign-in mode.
-  - "Forgot password?" (sign-in mode only) calls
+  - Email+password sign-in via `supabase.auth.signInWithPassword`.
+  - "Forgot password?" calls
     `supabase.auth.resetPasswordForEmail`, toasting an error if the email
     field is empty or the call fails, and a success toast otherwise. The
     reset link lands on the bare `/auth/callback` URL, which recognises the
@@ -31,8 +27,8 @@ OAuth, plus password reset. Sign-up is a client-side toggle; `/reset-password` c
   - The return path. `returnPath()` reads `?next=` through
     `safeRedirectPath` (`@/lib/safe-redirect`), so an absolute URL, a
     `//host` or a backslash path falls back to `/dashboard`. Password
-    sign-in pushes to it. Google sign-in and the sign-up confirmation link
-    send the bare `/auth/callback` URL as `redirectTo`/`emailRedirectTo`
+    sign-in pushes to it. Google sign-in
+    sends the bare `/auth/callback` URL as `redirectTo`
     (`authCallbackUrl()`): Supabase honours only an exact allowed Redirect
     URL, and with a query string it fell back to the shared project's Site
     URL (merqo). The return path rides in the `printkit_auth_next` cookie
@@ -42,12 +38,10 @@ OAuth, plus password reset. Sign-up is a client-side toggle; `/reset-password` c
     (`#booth-<id>`) is put back on a valid `next`: the server never sees a
     fragment, but the browser keeps it across the proxy's redirect here.
 - `page.test.tsx` — RTL/jsdom tests: the `?error=oauth` banner, the
-  check-your-email state on a sessionless sign-up (and returning from it via
-  "Back to sign in"), the redirect-on-session-present path, and the Forgot
-  password flow (visible only in sign-in mode, sends a reset email, toasts
-  an error on an empty email or a failed reset call). Also the return
-  path: a valid `next` is honoured by password sign-in and saved in the
-  cookie for Google sign-in and sign-up, every flow (reset included) sends
+  qkit pointer replacing sign-up, a rejected password sign-in showing its error, and the Forgot password flow (sends a
+  reset email, toasts an error on an empty email or a failed reset call).
+  Also the return path: a valid `next` is honoured by password sign-in and
+  saved in the cookie for Google sign-in, every flow (reset included) sends
   the bare callback URL, an unsafe `next` falls back to `/dashboard` and
   saves nothing, and a fragment is kept.
 - `login-page.dom.test.tsx` — RTL/jsdom test asserting the page renders a
@@ -69,6 +63,6 @@ into.
 
 [printkit](../../../README.md)
 
-Unexpected OAuth or password request failures restore the controls and retain credentials for retry. Successful navigation retains the pending state while leaving the page; signup without a session displays email confirmation.
+Unexpected OAuth or password request failures restore the controls and retain credentials for retry. Successful navigation retains the pending state while leaving the page.
 
 `layout.tsx` also forces per-request rendering so the nonce CSP from `proxy.ts` reaches this page's scripts.

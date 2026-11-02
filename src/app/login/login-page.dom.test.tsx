@@ -4,7 +4,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 const auth = vi.hoisted(() => ({
   signInWithOAuth: vi.fn(),
-  signUp: vi.fn(),
   signInWithPassword: vi.fn(),
   resetPasswordForEmail: vi.fn(),
 }));
@@ -18,7 +17,6 @@ beforeEach(() => {
   vi.resetAllMocks();
   auth.signInWithOAuth.mockResolvedValue({ error: null });
   auth.signInWithPassword.mockResolvedValue({ error: null });
-  auth.signUp.mockResolvedValue({ data: { session: null }, error: null });
 });
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
@@ -60,43 +58,17 @@ it("recovers OAuth controls after a rejected request and permits retry", async (
     screen.getByRole("button", { name: "Continue with Google" }),
   ).toBeDisabled();
 });
-it.each(["signin", "signup"])(
-  "recovers %s on unexpected rejection without losing entered credentials",
-  async (mode) => {
-    const action = mode === "signup" ? auth.signUp : auth.signInWithPassword;
-    action.mockRejectedValueOnce(new Error("offline"));
-    render(<LoginPage />);
-    if (mode === "signup")
-      fireEvent.click(
-        screen.getByRole("button", { name: "Create an account" }),
-      );
-    fillCredentials();
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: mode === "signup" ? "Create account" : "Sign in",
-      }),
-    );
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Check your connection",
-    );
-    expect(screen.getByLabelText("Email")).toHaveValue("vendor@example.com");
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: mode === "signup" ? "Create account" : "Sign in",
-      }),
-    );
-    await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
-  },
-);
-it("shows confirmation when signup succeeds without a session", async () => {
+it("recovers sign-in on unexpected rejection without losing entered credentials", async () => {
+  auth.signInWithPassword.mockRejectedValueOnce(new Error("offline"));
   render(<LoginPage />);
-  fireEvent.click(screen.getByRole("button", { name: "Create an account" }));
   fillCredentials();
-  fireEvent.click(screen.getByRole("button", { name: "Create account" }));
-  expect(
-    await screen.findByRole("heading", { name: "Check your email" }),
-  ).toBeInTheDocument();
-  expect(router.push).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "Check your connection",
+  );
+  expect(screen.getByLabelText("Email")).toHaveValue("vendor@example.com");
+  fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+  await waitFor(() => expect(auth.signInWithPassword).toHaveBeenCalledTimes(2));
 });
 it("keeps controls busy while successful sign-in navigates", async () => {
   render(<LoginPage />);

@@ -15,4 +15,12 @@ describe("root layout metadata", () => {
       template: "%s | printkit",
     });
   });
+
+  it("keeps the whole site out of search indexes", () => {
+    expect(metadata.robots).toEqual({ index: false, follow: false });
+  });
+
+  it("describes printkit as the print companion for qkit booths", () => {
+    expect(metadata.description).toMatch(/for qkit booths/);
+  });
 });

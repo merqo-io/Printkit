@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.0] - 2026-11-02
+
+### Changed
+
+- printkit is presented as the print companion for qkit booths. The root metadata is noindex/nofollow, `robots.ts` disallows every crawler in every environment, and the guide opens with the qkit framing.
+- The sign-in page no longer offers email sign-up; it points new vendors to qkit.
+- `@merqo/ui` pinned to v0.36.0.
+
 ## Unreleased: plainer history and printer picker
 
 ### Changed
