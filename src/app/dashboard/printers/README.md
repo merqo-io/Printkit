@@ -19,7 +19,7 @@ is online or it is not.
   address, Edit SN and KEY, or Open bridge mode) and a "More" group with View
   setup steps, Design label, Use a different printer and Remove printer
   (`printer-actions.tsx`; the confirm panel takes focus, Escape cancels, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
-  a one-line check for its type. With no booths the page lists three numbered
+  a one-line check for its type (the virtual printer is told to press Start on its page instead of checking WiFi). With no booths the page lists three numbered
   steps, linking to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
 - `test-print-button.tsx` - the "Print test label" button on each printer row and the setup wizard's connected state; shows sent, offline and error messages inline and disables itself while sending.
 - `actions.ts` — `removePrinter`: vendor session, Zod-checked booth id, delete

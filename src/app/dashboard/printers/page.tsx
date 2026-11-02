@@ -28,6 +28,12 @@ const OFFLINE_HINT: Record<string, string> = {
   bridge: "Open bridge mode on the helper device.",
 };
 
+// The virtual printer shares the cloud_poll connector but runs in a browser
+// tab, so the WiFi advice would mislead.
+const OFFLINE_HINT_BY_CATALOG: Record<string, string> = {
+  virtual: "Open the virtual printer page and press Start for this booth.",
+};
+
 function setupStepsHref(locationId: string, catalogId: string): string {
   return `/dashboard/printers/setup?location=${encodeURIComponent(
     locationId,
@@ -84,7 +90,8 @@ export default async function PrintersPage() {
 
               {state === "offline" && printer && (
                 <p className="text-muted-foreground mt-3 text-sm">
-                  {OFFLINE_HINT[printer.connector] ??
+                  {OFFLINE_HINT_BY_CATALOG[printer.catalog_id] ??
+                    OFFLINE_HINT[printer.connector] ??
                     "Check the printer is on."}{" "}
                   <Link
                     href={setupStepsHref(location.id, printer.catalog_id)}
