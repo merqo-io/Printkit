@@ -65,9 +65,10 @@ export default function BluetoothPrintersGuide() {
         </Notice>
 
         <p className="text-muted-foreground mt-6 text-sm leading-relaxed">
-          This page is for vendors who already own a Bluetooth label printer and
-          want to keep using it. Everything below is the extra work that printer
-          needs. A printer that reaches printkit by itself needs none of it.
+          printkit is the print companion for qkit booths. This page is for
+          vendors who already own a Bluetooth label printer and want to keep
+          using it. Everything below is the extra work that printer needs. A
+          printer that reaches printkit by itself needs none of it.
         </p>
 
         <Section id="why" title="Why a second device is needed">

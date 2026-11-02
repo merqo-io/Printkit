@@ -124,7 +124,7 @@ The AI harness follows templateCentral 6.0.4: hook commands are anchored on the 
 
 ## Security headers
 
-`src/proxy.ts` sets the CSP (nonce on per-request routes) and `X-Robots-Tag` off production; see `docs/security/`.
+`src/proxy.ts` sets the CSP (nonce on per-request routes) and `X-Robots-Tag` off production; see `docs/security/`. The site is noindex in every environment (root `metadata.robots`, `robots.ts` disallow-all) and presents printkit as the print companion for qkit booths.
 
 ## Lint
 

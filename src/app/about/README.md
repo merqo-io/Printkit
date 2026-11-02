@@ -13,8 +13,7 @@ printkit, the same way qkit and loopkit do, so that link never lands on the
   with a "Set up a printer" button to `/dashboard/printers` (signed-out
   visitors are sent to sign in first by `src/proxy.ts`), and `SiteFooter`
   with the sign-in link shown. Its tab title is "About".
-- `page.dom.test.tsx` — the heading names printkit, the button links to
-  printer setup, and the footer shows sign-in.
+- `page.dom.test.tsx` — renders the real `AboutMerqo` copy: it names printkit, the button links to printer setup, and it has no `$`, em dash or banned words.
 
 ## Parent
 

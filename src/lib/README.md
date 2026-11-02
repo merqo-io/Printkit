@@ -32,7 +32,7 @@ everything else sits flat here.
 - `auth-return.ts` — `authNextCookie(next, secure)`: the `document.cookie`
   string that saves the login page's return path as `printkit_auth_next`
   (`Path=/auth`, `Max-Age=600`, `SameSite=Lax`, `Secure` on https), or
-  clears it for a null `next`. `/auth/callback` reads and clears it.
+  clears it for a null `next`. `/auth/callback` reads and clears it for Google sign-in and password reset.
 - `recovery-window.ts` — the password-reset recovery window.
   `mintRecoveryWindow(sessionId)` returns `<expiresAt>.<hmac>`, an
   HMAC-SHA256 (keyed by `SUPABASE_SECRET_KEY`) over the Supabase session id

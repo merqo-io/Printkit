@@ -15,7 +15,7 @@ least recommended way to print, then gives complete steps.
   and a troubleshooting FAQ.
   Headings use the display face; "Read this first" is a warning `Notice`; step numbers match the setup flows' `Step` marker.
   Opens with `SiteNav` and ends with `SiteFooter` (sign-in shown) and the shared `BackToTop`, like every public page.
-  Its tab title "Bluetooth printers" goes through the root template.
+  Opens by naming printkit the print companion for qkit booths. Its tab title "Bluetooth printers" goes through the root template.
 
 ## Parent
 
