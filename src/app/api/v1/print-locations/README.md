@@ -36,4 +36,4 @@ this route creates.
 
 ## Rate limits
 
-Per-IP before authentication: 300 requests per 60 seconds (kit-ip:<ip>, from the Vercel/real-IP/last-forwarded hop; skipped when no IP is resolvable). Per kit after authentication: 600 per 60 seconds (kit:<slug>). Over either: 429 with Retry-After: 60. A limiter outage fails open so orders still print.
+Per-IP before authentication: 300 requests per 60 seconds (`kit-ip:<ip>`, from the Vercel/real-IP/last-forwarded hop; skipped when no IP is resolvable). Per kit after authentication: 600 per 60 seconds (`kit:<slug>`). Over either: 429 with `Retry-After: 60`. A limiter outage fails open so orders still print.
