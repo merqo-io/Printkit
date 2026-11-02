@@ -85,6 +85,26 @@ describe("LoginPage", () => {
     });
   });
 
+  it("shows the Supabase error and stays on the page when password sign-in is rejected", async () => {
+    signInWithPasswordMock.mockResolvedValue({
+      error: { message: "Invalid login credentials" },
+    });
+    const push = vi.fn();
+    useRouterMock.mockReturnValue({ push, refresh: vi.fn() });
+    const user = userEvent.setup();
+    render(<LoginPage />);
+
+    await user.type(screen.getByLabelText("Email"), "vendor@example.com");
+    await user.type(screen.getByLabelText("Password"), "wrong-password");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Invalid login credentials",
+    );
+    expect(push).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Sign in" })).toBeEnabled();
+  });
+
   it("sends a reset email from Forgot password", async () => {
     const user = userEvent.setup();
     const { default: LoginPage } = await import("./page");
