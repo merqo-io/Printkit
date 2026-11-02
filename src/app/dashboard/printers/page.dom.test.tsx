@@ -105,6 +105,12 @@ it.each([
   render(await PrintersPage());
   expect(screen.getByText(hint)).toBeVisible();
 });
+it("shows the virtual printer its own offline hint, not the WiFi one", async () => {
+  summaries.mockResolvedValue([row("cloud_poll", "virtual", "offline")]);
+  render(await PrintersPage());
+  expect(screen.getByText(/press Start for this booth/)).toBeVisible();
+  expect(screen.queryByText(/connected to WiFi/)).toBeNull();
+});
 it("shows no offline hint for an online printer", async () => {
   summaries.mockResolvedValue([row("cloud_poll", "star-mc-label2", "online")]);
   render(await PrintersPage());

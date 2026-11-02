@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- An offline Merqo Virtual printer on the Printers page tells the vendor to open the virtual printer page and press Start, instead of the WiFi advice.
 - Failed jobs in History explain why in plain words. Reprint asks "Print this label again?" first, ignores a double tap, and names the booth when it succeeds. Jobs without a booth read "Needs a booth".
 - Printer picker cards show only how it connects, label width, price and whether it works with an iPad alone, with one info button. Setup, monthly cost and notes are behind a "Details" disclosure.
 
