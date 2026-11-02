@@ -29,7 +29,8 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: { default: "printkit", template: "%s | printkit" },
   description:
-    "Label printing for Merqo vendors: connect a printer to each booth.",
+    "The print companion for qkit booths: connect a printer to each booth.",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({

@@ -4,13 +4,8 @@ import robots from "./robots";
 afterEach(() => vi.unstubAllEnvs());
 
 describe("robots", () => {
-  it("disallows everything outside production", () => {
-    vi.stubEnv("VERCEL_ENV", "preview");
+  it.each(["preview", "production"])("disallows everything in %s", (env) => {
+    vi.stubEnv("VERCEL_ENV", env);
     expect(robots().rules).toEqual({ userAgent: "*", disallow: "/" });
-  });
-
-  it("allows crawling in production", () => {
-    vi.stubEnv("VERCEL_ENV", "production");
-    expect(robots().rules).toEqual({ userAgent: "*", allow: "/" });
   });
 });

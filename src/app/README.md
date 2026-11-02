@@ -32,8 +32,8 @@ for this project.
 - `globals.css` — Tailwind v4 entry point: theme tokens, base layer, and custom utility classes; `@source` includes `node_modules/@merqo/ui/dist` so its components' Tailwind classes get compiled here too. Colour tokens are the "Ink and paper" palette: black-ink primary on receipt-paper background (inverted in `.dark`), the warm-grey secondary, and process magenta as the one accent (`magenta` for dots and marks, `magenta-text` for words, `magenta-foreground` for text on a magenta fill). The shadcn `accent` stays a neutral hover surface. `chart-1..5` and `sidebar-*` complete the shadcn set. Neutrals take the paper's warm hue; `muted-foreground` and every `*-text` token clear 4.5:1 on the page. `success`, `warning` and `info` each have a base (dots, fills, tints) and a `-text` variant (words).
 - `globals.contrast.test.ts` — parses the `:root` and `.dark` tokens from `globals.css` and asserts WCAG AA for the key pairs (4.5:1 text, 3:1 for input, ring, magenta and chart colours), using `test/color.ts`.
 - `icon.tsx` — `Icon` route handler; renders `brandIcon(32)` as a 32×32 PNG favicon (paper "P" on ink with a magenta dot).
-- `layout.tsx` — `RootLayout`. Loads `Fraunces`/`Inter`/`JetBrains_Mono` via `next/font/google`, sets `metadata` (title template `%s | printkit`, default `printkit`), wraps children in `next-themes`' `ThemeProvider` (`attribute="class"`, system default), then `TooltipProvider` + `Toaster`.
-- `login/` — combined sign-in/sign-up page, including the "Forgot password?" flow — see its own README.
+- `layout.tsx` — `RootLayout`. Loads `Fraunces`/`Inter`/`JetBrains_Mono` via `next/font/google`, sets `metadata` (title template `%s | printkit`, default `printkit`, noindex/nofollow robots), wraps children in `next-themes`' `ThemeProvider` (`attribute="class"`, system default), then `TooltipProvider` + `Toaster`.
+- `login/` — sign-in page (no sign-up; new vendors start with qkit), including the "Forgot password?" flow — see its own README.
 - `page-titles.test.ts` — checks every page exports its own `metadata.title`, matching its heading, including the two `dev/ui-states/` previews.
 - `page.tsx` — `Home`. Redirects to `/dashboard` (which `src/proxy.ts` bounces on to `/login` if unauthenticated) — printkit has no cold-acquisition funnel, so `/` is not a marketing landing page (see the design spec's "Internal Merqo product" section).
 
@@ -68,4 +68,4 @@ marketing footer. No `admin/` directory exists yet.
 
 Request boundaries use bounded body parsing before privileged work. Pending form states and bridge wake-lock cleanup are covered by component regressions.
 
-`robots.ts` disallows crawling except on production. The login layout forces per-request rendering so the nonce CSP reaches its scripts.
+`robots.ts` disallows crawling in every environment and the root `metadata.robots` is noindex/nofollow, so printkit is never indexed. The login layout forces per-request rendering so the nonce CSP reaches its scripts.

@@ -1,6 +1,6 @@
 {
   "name": "printkit",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "packageManager": "pnpm@11.10.0",
   "engines": {
@@ -21,7 +21,7 @@
     "test:operators": "node --test test/operators/*.test.mjs"
   },
   "dependencies": {
-    "@merqo/ui": "github:merqo-io/merqo-ui#5577c4cbef0ef107c351826911264d7dce0cb132",
+    "@merqo/ui": "github:merqo-io/merqo-ui#06e51555e57689f912c3e90b5dd5a76e93e9e344",
     "@mmote/niimbluelib": "0.0.1-alpha.43",
     "@napi-rs/canvas": "^1.0.9",
     "@supabase/ssr": "^0.10.3",

@@ -13,8 +13,6 @@ import { Wordmark } from "@/components/wordmark";
 import { ElevatedCard } from "@/components/elevated-card";
 import { GoogleMark } from "@merqo/ui";
 
-type Mode = "signin" | "signup";
-
 const DEFAULT_RETURN_PATH = "/dashboard";
 
 const OAUTH_ERROR_MESSAGE =
@@ -31,18 +29,12 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(
     searchParams.get("error") === "oauth" ? OAUTH_ERROR_MESSAGE : null,
   );
   const [busy, setBusy] = useState(false);
-  // Set once signUp() succeeds without a session (email confirmation on) —
-  // shows a "check your email" state instead of bouncing to a dashboard the
-  // unconfirmed user can't reach.
-  const [checkEmail, setCheckEmail] = useState<string | null>(null);
-  const isSignin = mode === "signin";
 
   // A URL fragment never reaches the server, but the browser carries it across
   // the proxy's redirect to this page. It is put back on a valid `next`, so a
@@ -119,34 +111,14 @@ function LoginForm() {
     setError(null);
     try {
       const supabase = createClient();
-      if (mode === "signup") {
-        const { data: result, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: authCallbackUrl(),
-          },
-        });
-        if (error) {
-          setError(error.message);
-          setBusy(false);
-          return;
-        }
-        if (!result.session) {
-          setCheckEmail(email);
-          setBusy(false);
-          return;
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) {
-          setError(error.message);
-          setBusy(false);
-          return;
-        }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        setError(error.message);
+        setBusy(false);
+        return;
       }
       router.push(returnPath());
       router.refresh();
@@ -156,39 +128,7 @@ function LoginForm() {
     }
   }
 
-  if (checkEmail) {
-    return (
-      <main className="flex min-h-screen items-center justify-center p-5">
-        <div className="w-full max-w-md text-center">
-          <ElevatedCard className="px-7 py-10">
-            <Wordmark className="text-2xl" />
-            <h1 className="mt-6 font-display text-3xl font-bold tracking-tight">
-              Check your email
-            </h1>
-            <p className="mt-3 text-sm text-muted-foreground">
-              We sent a confirmation link to{" "}
-              <span className="font-medium text-foreground">{checkEmail}</span>.
-              Click it to activate your account, then sign in.
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-7 h-11 w-full rounded-xl"
-              onClick={() => {
-                setCheckEmail(null);
-                setMode("signin");
-              }}
-            >
-              Back to sign in
-            </Button>
-          </ElevatedCard>
-        </div>
-      </main>
-    );
-  }
-
-  let submitLabel = isSignin ? "Sign in" : "Create account";
-  if (busy) submitLabel = "Please wait…";
+  const submitLabel = busy ? "Please wait…" : "Sign in";
 
   return (
     <main className="flex min-h-screen items-center justify-center p-5">
@@ -203,12 +143,10 @@ function LoginForm() {
         <ElevatedCard>
           <div className="px-7 pt-9 pb-8">
             <h1 className="font-display text-3xl font-bold tracking-tight">
-              {isSignin ? "Welcome back" : "Create your account"}
+              Welcome back
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              {isSignin
-                ? "Sign in to your printkit dashboard."
-                : "Set up a printkit account in seconds."}
+              Sign in to your printkit dashboard.
             </p>
 
             <Button
@@ -257,22 +195,20 @@ function LoginForm() {
                   >
                     Password
                   </Label>
-                  {isSignin && (
-                    <button
-                      type="button"
-                      onClick={sendReset}
-                      disabled={busy}
-                      className="text-xs font-semibold text-primary underline-offset-4 hover:underline disabled:opacity-50"
-                    >
-                      Forgot password?
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={sendReset}
+                    disabled={busy}
+                    className="text-xs font-semibold text-primary underline-offset-4 hover:underline disabled:opacity-50"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
                 <Input
                   id="password"
                   type="password"
                   required
-                  autoComplete={isSignin ? "current-password" : "new-password"}
+                  autoComplete="current-password"
                   placeholder="••••••••"
                   className="h-11 rounded-xl"
                   value={password}
@@ -300,17 +236,8 @@ function LoginForm() {
 
           <div className="border-t" />
           <p className="px-7 py-4 text-center text-sm text-muted-foreground">
-            {isSignin ? "New to printkit? " : "Already have an account? "}
-            <button
-              type="button"
-              className="font-semibold text-primary underline-offset-4 hover:underline"
-              onClick={() => {
-                setMode(isSignin ? "signup" : "signin");
-                setError(null);
-              }}
-            >
-              {isSignin ? "Create an account" : "Sign in"}
-            </button>
+            printkit is the print companion for qkit booths. New vendors start
+            with qkit.
           </p>
         </ElevatedCard>
       </div>
