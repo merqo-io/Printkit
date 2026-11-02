@@ -38,3 +38,7 @@ Request parsing rejects oversized bodies before privileged creation. Connector p
 ## Label batches
 
 Set `job_type` to `label_batch` and send `labels: [{ item_name, item_options? }, ...]` (1–100 units). Common `payload` still holds `customer_name` and `order_number`. The response `id` is a batch UUID. Identical retries return the same batch without duplicating children. Changed snapshots return 422; a pre-existing legacy job returns 409. Callback `source_ref` remains the original order reference and reports printed only after all children succeed. Migration 0011 is required; legacy bodies retain their original behavior. Request bodies are bounded at 64 KiB.
+
+## Rate limits
+
+Per-IP before authentication: 300 requests per 60 seconds (kit-ip:<ip>, from the Vercel/real-IP/last-forwarded hop; skipped when no IP is resolvable). Per kit after authentication: 600 per 60 seconds (kit:<slug>). Over either: 429 with Retry-After: 60. A limiter outage fails open so orders still print.

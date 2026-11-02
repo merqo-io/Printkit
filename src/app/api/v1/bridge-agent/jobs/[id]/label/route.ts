@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveAgent } from "@/lib/agent-auth";
+import { enforceIpLimit, AGENT_IP_LIMIT } from "@/lib/rate-limit";
 import { renderJobForPrinter } from "@/lib/render-job";
 import { createServiceClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/types";
@@ -13,6 +14,8 @@ type RouteContext = { params: Promise<{ id: string }> };
  * labels, which would leak customer names.
  */
 export async function GET(request: Request, context: RouteContext) {
+  const ipLimited = await enforceIpLimit(request, "agent-ip", AGENT_IP_LIMIT);
+  if (ipLimited) return ipLimited;
   const printer = await resolveAgent(request);
   if (!printer) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

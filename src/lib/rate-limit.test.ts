@@ -1,18 +1,45 @@
 import { describe, expect, it, vi } from "vitest";
-import { clientIp, rateLimit } from "./rate-limit";
+
+vi.mock("@/lib/supabase/server", () => ({ createServiceClient: vi.fn() }));
+
+import { clientIp, rateLimit, rateLimitStrict } from "./rate-limit";
 
 describe("clientIp", () => {
-  it("takes the trimmed first hop of x-forwarded-for", () => {
+  it("prefers x-vercel-forwarded-for over every other header", () => {
     expect(
-      clientIp(new Headers({ "x-forwarded-for": " 203.0.113.5 , 70.41.3.18" })),
+      clientIp(
+        new Headers({
+          "x-vercel-forwarded-for": " 203.0.113.5 , 10.0.0.1",
+          "x-real-ip": "198.51.100.7",
+          "x-forwarded-for": "1.1.1.1, 2.2.2.2",
+        }),
+      ),
     ).toBe("203.0.113.5");
   });
 
-  it("falls back to x-real-ip, then to unknown", () => {
-    expect(clientIp(new Headers({ "x-real-ip": "198.51.100.7" }))).toBe(
-      "198.51.100.7",
-    );
-    expect(clientIp(new Headers())).toBe("unknown");
+  it("uses x-real-ip when the Vercel header is absent", () => {
+    expect(
+      clientIp(
+        new Headers({
+          "x-real-ip": "198.51.100.7",
+          "x-forwarded-for": "1.1.1.1, 2.2.2.2",
+        }),
+      ),
+    ).toBe("198.51.100.7");
+  });
+
+  it("uses the last x-forwarded-for hop and ignores a spoofed first hop", () => {
+    expect(
+      clientIp(
+        new Headers({
+          "x-forwarded-for": "6.6.6.6, 70.41.3.18 , 203.0.113.5 ",
+        }),
+      ),
+    ).toBe("203.0.113.5");
+  });
+
+  it("returns null when no header names a client", () => {
+    expect(clientIp(new Headers())).toBeNull();
   });
 });
 
@@ -51,5 +78,27 @@ describe("rateLimit", () => {
       rpc: vi.fn().mockRejectedValue(new Error("network")),
     } as unknown as Parameters<typeof rateLimit>[0];
     await expect(rateLimit(supabase, "k", 1, 1)).resolves.toBe(true);
+  });
+
+  it("strict variant returns the limiter's answer", async () => {
+    await expect(rateLimitStrict(supabaseStub(true), "k", 1, 1)).resolves.toBe(
+      true,
+    );
+    await expect(rateLimitStrict(supabaseStub(false), "k", 1, 1)).resolves.toBe(
+      false,
+    );
+  });
+
+  it("strict variant fails closed on an error", async () => {
+    await expect(
+      rateLimitStrict(supabaseStub(null, { message: "reset" }), "k", 1, 1),
+    ).resolves.toBe(false);
+  });
+
+  it("strict variant fails closed when the call rejects", async () => {
+    const supabase = {
+      rpc: vi.fn().mockRejectedValue(new Error("network")),
+    } as unknown as Parameters<typeof rateLimit>[0];
+    await expect(rateLimitStrict(supabase, "k", 1, 1)).resolves.toBe(false);
   });
 });

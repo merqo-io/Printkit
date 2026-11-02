@@ -5,7 +5,8 @@ import { redeemPairingCode } from "@/lib/bridge-pairing";
 import { mintDeviceCredential } from "@/lib/device-credentials";
 import {
   clientIp,
-  rateLimit,
+  rateLimitStrict,
+  tooManyRequests,
   PAIR_LIMIT,
   RATE_WINDOW_SECONDS,
 } from "@/lib/rate-limit";
@@ -20,14 +21,14 @@ const bodySchema = z.object({ code: z.string().min(4).max(32) });
  * printer.
  */
 export async function POST(request: Request) {
-  const allowed = await rateLimit(
+  const allowed = await rateLimitStrict(
     await createServiceClient(),
-    `pair:${clientIp(request.headers)}`,
+    `pair:${clientIp(request.headers) ?? "noip"}`,
     PAIR_LIMIT,
     RATE_WINDOW_SECONDS,
   );
   if (!allowed) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    return tooManyRequests();
   }
 
   let json: unknown;

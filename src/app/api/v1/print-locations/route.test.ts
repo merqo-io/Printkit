@@ -10,7 +10,18 @@ vi.mock("@/lib/print-locations", () => ({
     createOrUpdatePrintLocation(...a),
 }));
 
+const rpcMock = vi.fn();
+vi.mock("@/lib/supabase/server", () => ({
+  createServiceClient: () => Promise.resolve({ rpc: rpcMock }),
+}));
+
 import { POST } from "./route";
+import { beforeEach } from "vitest";
+
+beforeEach(() => {
+  verifyKitAuth.mockReset();
+  rpcMock.mockReset().mockResolvedValue({ data: true, error: null });
+});
 
 function req(body: unknown) {
   return new Request("http://localhost/api/v1/print-locations", {
@@ -20,6 +31,29 @@ function req(body: unknown) {
 }
 
 describe("POST /api/v1/print-locations", () => {
+  it("answers 429 with Retry-After before touching auth when the IP is limited", async () => {
+    rpcMock.mockResolvedValue({ data: false, error: null });
+    const request = req({});
+    request.headers.set("x-vercel-forwarded-for", "203.0.113.9");
+    const res = await POST(request);
+    expect(res.status).toBe(429);
+    expect(res.headers.get("Retry-After")).toBe("60");
+    expect(verifyKitAuth).not.toHaveBeenCalled();
+  });
+
+  it("rejects source_ref over 128 characters", async () => {
+    verifyKitAuth.mockResolvedValue({ kitSlug: "qkit" });
+    const res = await POST(
+      req({
+        vendor_id: "11111111-1111-1111-8111-111111111111",
+        source_ref: "x".repeat(129),
+        label: "Booth",
+        active: true,
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("returns 401 when the bearer secret doesn't verify", async () => {
     verifyKitAuth.mockResolvedValue(null);
     const res = await POST(req({}));

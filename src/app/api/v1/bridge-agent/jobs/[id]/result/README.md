@@ -22,3 +22,9 @@ The location, sent state and attempt timestamp are rechecked in the UPDATE.
 An identical terminal result for the same attempt is acknowledged without a
 second write or callback. An older attempt or opposite terminal result is rejected.
 Missing or malformed timestamps fail closed with HTTP 400.
+
+## Rate limits
+
+Per-IP before the agent token is resolved: 240 requests per 60 seconds (gent-ip:<ip>; the agent polls next-job 20 times a minute). Over the limit: 429 with Retry-After: 60. A limiter outage fails open.
+
+The body is capped at 4 KiB (413 beyond that).
