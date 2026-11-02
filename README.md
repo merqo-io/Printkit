@@ -28,7 +28,7 @@ kit links to it instead of building printkit paths.
 `GET /api/merqo/vendor-activity` (bearer `MERQO_METRICS_SECRET`) gives merqo's
 admin vendor page a vendor's printer and job activity plus recent failures
 from the `ops_events` log (30-day retention).
-Kit routes are rate limited per IP before auth (300/min) and per kit after (600/min), agent token routes per IP (240/min), and pairing 10/min per IP failing closed; the client IP comes from x-vercel-forwarded-for, x-real-ip, then the last x-forwarded-for hop. Kit-supplied source_ref/location_ref are capped at 128 characters.
+Kit routes are rate limited per IP before auth (300/min) and per kit after (600/min), agent token routes per IP (240/min), and pairing 10/min per IP failing closed; the client IP comes from `x-vercel-forwarded-for`, `x-real-ip`, then the last `x-forwarded-for` hop. Kit-supplied `source_ref`/`location_ref` are capped at 128 characters.
 `next.config.ts` keeps `@napi-rs/canvas` (the label rasterizer's native
 module) out of the bundle and traces `src/assets/fonts/` into every API
 route.
