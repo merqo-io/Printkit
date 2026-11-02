@@ -38,7 +38,7 @@ OAuth, plus password reset. There is no sign-up: a footer line says printkit is 
     (`#booth-<id>`) is put back on a valid `next`: the server never sees a
     fragment, but the browser keeps it across the proxy's redirect here.
 - `page.test.tsx` — RTL/jsdom tests: the `?error=oauth` banner, the
-  qkit pointer replacing sign-up, and the Forgot password flow (sends a
+  qkit pointer replacing sign-up, a rejected password sign-in showing its error, and the Forgot password flow (sends a
   reset email, toasts an error on an empty email or a failed reset call).
   Also the return path: a valid `next` is honoured by password sign-in and
   saved in the cookie for Google sign-in, every flow (reset included) sends
