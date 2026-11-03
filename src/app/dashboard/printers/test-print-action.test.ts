@@ -7,7 +7,11 @@ vi.mock("@/lib/connectors/vendor-cloud/drivers", () => ({
   getVendorCloudDriver: () => null,
 }));
 const access = vi.hoisted(() => vi.fn());
-vi.mock("@/lib/vendor-entitlement", () => ({ vendorHasLabelAccess: access }));
+vi.mock("@/lib/vendor-entitlement", () => ({
+  LABELS_UPGRADE_MESSAGE:
+    "Label printing needs a paid plan or an active event pass.",
+  vendorHasLabelAccess: access,
+}));
 const dispatch = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/job-dispatch", () => ({ dispatchJob: dispatch }));
 

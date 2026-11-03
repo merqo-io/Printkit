@@ -1,6 +1,6 @@
 # docs
 
-- `DEPLOY.md` — Supabase/Vercel deployment runbook (on the shared Merqo
+- `DEPLOY.md` - also covers the Merqo entitlement rollout order (migration 0017, `MERQO_PROVISION_SECRET`, resync). Supabase/Vercel deployment runbook (on the shared Merqo
   project), with a Staging section for printkit's `Preview` values on the
   shared staging project and the staging-first migration gate, including the
   per-calling-kit callback config migration note (env vars → `kit_api_keys`

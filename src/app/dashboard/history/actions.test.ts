@@ -16,6 +16,12 @@ vi.mock("@/lib/print-jobs", () => ({
     updatePrintJobStatusMock(...args),
 }));
 
+const hasAccessMock = vi.fn();
+vi.mock("@/lib/vendor-entitlement", () => ({
+  LABELS_UPGRADE_MESSAGE: "upgrade message",
+  vendorHasLabelAccess: (...args: unknown[]) => hasAccessMock(...args),
+}));
+
 const dispatchJobMock = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/lib/job-dispatch", () => ({
   dispatchJob: (...args: unknown[]) => dispatchJobMock(...args),
@@ -86,6 +92,7 @@ describe("reprintJob", () => {
   beforeEach(() => {
     getVendorSessionMock.mockReset();
     updatePrintJobStatusMock.mockReset();
+    hasAccessMock.mockReset().mockResolvedValue(true);
     maybeSingleMock.mockReset();
     insertMock.mockReset().mockResolvedValue({ error: null });
     sessionFromMock.mockClear();
@@ -95,6 +102,30 @@ describe("reprintJob", () => {
       supabase: { from: sessionFromMock },
       user: { id: "vendor-1" },
     });
+  });
+
+  it("refuses a reprint with the upgrade message when label access is denied", async () => {
+    hasAccessMock.mockResolvedValue(false);
+    maybeSingleMock.mockResolvedValue({ data: { status: "failed" } });
+
+    const result = await reprintJob("11111111-1111-4111-8111-111111111111");
+
+    expect(result).toEqual({ success: false, error: "upgrade message" });
+    expect(updatePrintJobStatusMock).not.toHaveBeenCalled();
+    expect(dispatchJobMock).not.toHaveBeenCalled();
+  });
+
+  it("fails closed with a generic error when the entitlement lookup errors", async () => {
+    hasAccessMock.mockResolvedValue(null);
+    maybeSingleMock.mockResolvedValue({ data: { status: "failed" } });
+
+    const result = await reprintJob("11111111-1111-4111-8111-111111111111");
+
+    expect(result).toEqual({
+      success: false,
+      error: "Could not reprint the job",
+    });
+    expect(updatePrintJobStatusMock).not.toHaveBeenCalled();
   });
 
   it("returns an error when the job doesn't belong to this vendor", async () => {

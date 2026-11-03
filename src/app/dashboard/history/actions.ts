@@ -3,6 +3,10 @@ import { revalidatePath } from "next/cache";
 import { getVendorSession } from "@/lib/vendor-session";
 import { updatePrintJobStatus } from "@/lib/print-jobs";
 import { dispatchJob } from "@/lib/job-dispatch";
+import {
+  LABELS_UPGRADE_MESSAGE,
+  vendorHasLabelAccess,
+} from "@/lib/vendor-entitlement";
 // eslint-disable-next-line no-restricted-imports -- RLS has no client policy for this write; the caller is verified first
 import { createServiceClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/action-result";
@@ -35,6 +39,13 @@ export async function reprintJob(input: string): Promise<ActionResult> {
       error: "Only a failed or already-printed job can be reprinted",
     };
   }
+
+  // A requeue prints again, so a lapsed vendor must not reprint old jobs.
+  const access = await vendorHasLabelAccess(user.id);
+  if (access === null) {
+    return { success: false, error: "Could not reprint the job" };
+  }
+  if (!access) return { success: false, error: LABELS_UPGRADE_MESSAGE };
 
   const result = await updatePrintJobStatus(jobId, "queued", undefined, {
     expectedStatus: job.status,

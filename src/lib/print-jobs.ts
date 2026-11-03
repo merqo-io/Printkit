@@ -133,7 +133,8 @@ async function createLabelBatch(
 export async function createPrintJob(
   input: CreatePrintJobInput,
 ): Promise<CreatePrintJobResult> {
-  // Every job type the DB accepts is a label, so the gate covers all of them.
+  // Every print_jobs row is a label, so each path that inserts or requeues one
+  // must pass this gate or a lapsed vendor could print around it.
   const access = await vendorHasLabelAccess(input.vendorId);
   if (access === null) {
     return { ok: false, status: 503, error: "Could not create print job." };

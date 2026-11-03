@@ -8,7 +8,10 @@ import { uuidSchema } from "@/lib/schemas";
 import { dispatchJob } from "@/lib/job-dispatch";
 import { printerState } from "@/lib/printers";
 import { TEST_PRINT_SOURCE_KIT } from "@/lib/test-print";
-import { vendorHasLabelAccess } from "@/lib/vendor-entitlement";
+import {
+  LABELS_UPGRADE_MESSAGE,
+  vendorHasLabelAccess,
+} from "@/lib/vendor-entitlement";
 
 export type RemovePrinterResult = { ok: true } | { ok: false; error: string };
 
@@ -101,9 +104,7 @@ const TEST_PRINT_COOLDOWN_MS = 60_000;
 async function labelAccessError(vendorId: string): Promise<string | null> {
   const access = await vendorHasLabelAccess(vendorId);
   if (access === null) return "Could not send the test label.";
-  if (!access) {
-    return "Label printing needs a paid plan or an active event pass. Upgrade in your Merqo account to print labels.";
-  }
+  if (!access) return LABELS_UPGRADE_MESSAGE;
   return null;
 }
 
