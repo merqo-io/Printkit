@@ -146,7 +146,9 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
 - `vendor-entitlement.ts` - `vendorHasLabelAccess(vendorId)`: calls the
   `vendor_has_label_access` SQL helper (live paid entitlement or running event
   pass). Returns `null` on a failed lookup so callers fail closed.
-  `LABELS_NOT_ENTITLED` is the stable `labels_not_entitled` error code.
+  `LABELS_NOT_ENTITLED` is the stable `labels_not_entitled` error code, and
+  `LABELS_UPGRADE_MESSAGE` is the dashboard copy shown by `sendTestPrint` and
+  `reprintJob` when access is denied.
 - `list-all-users.ts` — `listAllUsers(supabase)`: every auth user across
   `listUsers()` pages (1000 per page, 50-page ceiling), for the email lookup.
 - `test-print.ts` - `TEST_PRINT_SOURCE_KIT` / `isTestPrint`: the `source_kit` of dashboard test labels; `notifyKitPrintStatus` returns early for it. `test-print.test.ts` pins the value, which `scripts/create-kit-key-input.mjs` hardcodes as a reserved kit slug.

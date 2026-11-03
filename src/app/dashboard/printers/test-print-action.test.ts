@@ -79,6 +79,7 @@ vi.mock("@/lib/supabase/server", () => ({
     }),
 }));
 
+import { LABELS_UPGRADE_MESSAGE } from "@/lib/vendor-entitlement";
 import { sendTestPrint } from "./actions";
 
 beforeEach(() => {
@@ -118,8 +119,7 @@ describe("sendTestPrint", () => {
   it("shows a friendly message and queues nothing without label access", async () => {
     access.mockResolvedValue(false);
     const result = await sendTestPrint(L);
-    expect(result).toMatchObject({ ok: false });
-    expect(result.ok === false && result.error).toMatch(/paid plan/);
+    expect(result).toEqual({ ok: false, error: LABELS_UPGRADE_MESSAGE });
     expect(state.inserted).toHaveLength(0);
     expect(dispatch).not.toHaveBeenCalled();
   });
