@@ -32,8 +32,15 @@ schema (it calls `merqo.*` RPCs there), Vercel-deployed from
 
 ## Staging
 
-Vercel `Preview` deployments use the shared staging Supabase project
-(`merqo-staging`), not production. The `staging` branch, kept on `main` by
+Only `main` deploys from git (`vercel.json` `git.deploymentEnabled`, using
+`**` because `*` does not match branch names containing `/`), so PRs get no
+automatic preview and the Hobby daily deployment cap is not spent on branch
+pushes. Staging deploys through the `VERCEL_STAGING_DEPLOY_HOOK` call in the
+`staging-sync` workflow, which the setting does not gate. For an ad-hoc preview
+run the `vercel` CLI.
+
+Vercel `Preview` deployments (the staging branch and CLI previews) use the
+shared staging Supabase project (`merqo-staging`), not production. The `staging` branch, kept on `main` by
 the `staging sync` workflow, is served at `printkit-staging.merqo.io`. Full
 setup, the env model and the rollout checklist live in merqo's
 `docs/STAGING.md`. printkit's `Preview` values:
@@ -46,7 +53,7 @@ setup, the env model and the rollout checklist live in merqo's
   so one sign-in covers the staging hosts. Never on other previews, where the
   browser rejects the cookie and sign-in breaks.
 - `PRINTKIT_PUBLIC_URL`: `https://printkit-staging.merqo.io` for Git branch
-  `staging` only. Per-PR previews fall back to their own deployment URL.
+  `staging` only. CLI previews fall back to their own deployment URL.
 - qkit's staging caller row in `printkit.kit_api_keys` comes from
   `supabase/seed/staging-kit-keys.sql` (run in the staging SQL Editor), not
   from `scripts/create-kit-key.mjs`. Its two secrets must equal qkit's
@@ -69,8 +76,9 @@ Before merging a PR that adds a file under `supabase/migrations/`:
    `STAGING_DB_URL` set to the staging session pooler URI (merqo's
    `docs/STAGING.md`, setup step 2):
    `docker run --rm -e STAGING_DB_URL -v "${PWD}:/repo:ro" postgres:17.6-alpine sh /repo/scripts/staging-migrate.sh supabase/migrations/<new-file>.sql`
-2. Check the PR's own Vercel preview end to end. It already uses the staging
-   database and the other apps' staging hosts.
+2. Check the change end to end on a `vercel` CLI preview (PRs get no automatic
+   preview). It already uses the staging database and the other apps' staging
+   hosts.
 3. Merge the PR.
 4. Apply the same file to production the usual way (Supabase SQL Editor).
 
