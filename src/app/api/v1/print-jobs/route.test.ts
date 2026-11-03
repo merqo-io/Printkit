@@ -226,6 +226,15 @@ describe("batch API boundary", () => {
     expect((await POST(requestWith({ ...body, ...invalid }))).status).toBe(400);
     expect(createPrintJobMock).not.toHaveBeenCalled();
   });
+  it.each(["receipt", "a".repeat(10_000)])(
+    "rejects an unknown or oversized job_type",
+    async (jobType) => {
+      expect(
+        (await POST(requestWith({ ...body, job_type: jobType }))).status,
+      ).toBe(400);
+      expect(createPrintJobMock).not.toHaveBeenCalled();
+    },
+  );
   it("bounds the full request body before parsing", async () => {
     expect(
       (

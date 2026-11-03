@@ -17,8 +17,8 @@ Feie's own markup for Feie. Architecture is job-type-agnostic for later job
 types (receipt, kitchen-ticket, shelf-label, invoice). Internal-only —
 reached through a vendor's existing sibling-kit relationship (qkit today),
 no public marketing site or pricing; `/` redirects straight to
-`/dashboard`. `POST /api/v1/print-jobs` accepts an optional `job_type`
-field (the DB still only allows `'label'` for now). The outbound
+`/dashboard`. `POST /api/v1/print-jobs` accepts an optional `job_type`,
+limited to `label` or `label_batch` (anything else returns 400). The outbound
 print-status callback is kit-agnostic too — configured per calling kit in
 `kit_api_keys` (`callback_url`/`callback_secret`), not hardcoded to qkit.
 Its body names the job `source_ref`, with `order_id` kept beside it until
