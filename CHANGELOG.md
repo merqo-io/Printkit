@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Security
+
+- Rate limiter picks the client IP from `x-vercel-forwarded-for`, then `x-real-ip`, then the last `x-forwarded-for` hop (the first hop is client-spoofable) and returns null instead of a shared `unknown` bucket.
+- Pairing fails closed when the limiter is down; requests with no IP share one `pair:noip` bucket (10/min).
+- New limits (60s window): kit routes 300/min per IP before auth and 600/min per kit after; bridge-agent token routes 240/min per IP before auth. 429 carries `Retry-After: 60`.
+- `source_ref`, `location_ref` and location `label` capped at 128 characters; the agent result body is bounded to 4 KiB and the print-locations body to 16 KiB.
+
 ## [0.8.0] - 2026-11-02
 
 ### Changed

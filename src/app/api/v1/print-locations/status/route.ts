@@ -6,8 +6,13 @@ import { getPrinterByLocation, printerState } from "@/lib/printers";
 import { sweepLocation } from "@/lib/job-dispatch";
 import { getCatalogEntry } from "@/lib/printer-catalog";
 import { locationManageUrl } from "@/lib/manage-url";
+import {
+  enforceIpLimit,
+  enforceKitLimit,
+  KIT_IP_LIMIT,
+} from "@/lib/rate-limit";
 
-const querySchema = z.object({ source_ref: z.string().min(1) });
+const querySchema = z.object({ source_ref: z.string().trim().min(1).max(128) });
 
 /**
  * A calling kit asks whether one of its locations has a printer and whether
@@ -17,10 +22,14 @@ const querySchema = z.object({ source_ref: z.string().min(1) });
  * links there without knowing printkit's routes.
  */
 export async function GET(request: Request) {
+  const ipLimited = await enforceIpLimit(request, "kit-ip", KIT_IP_LIMIT);
+  if (ipLimited) return ipLimited;
   const auth = await verifyKitAuth(request);
   if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const kitLimited = await enforceKitLimit(auth.kitSlug);
+  if (kitLimited) return kitLimited;
 
   const url = new URL(request.url);
   const parsed = querySchema.safeParse({

@@ -18,3 +18,7 @@ The Raspberry Pi agent's poll: claim the next job for its printer, if any.
 The response is `{job_id, sent_at}`. Keep the complete timestamp, including
 microseconds and timezone, and echo it in the result request. It identifies
 this claim, even when a vendor requeues and claims the same job again.
+
+## Rate limits
+
+Per-IP before the agent token is resolved: 240 requests per 60 seconds (`agent-ip:<ip>`; the agent polls `next-job` 20 times a minute). Over the limit: 429 with `Retry-After: 60`. A limiter outage fails open.

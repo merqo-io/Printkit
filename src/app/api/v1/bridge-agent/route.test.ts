@@ -40,9 +40,10 @@ vi.mock("@/lib/print-jobs", () => ({
 }));
 
 const selectMock = vi.fn();
+const rpcMock = vi.fn();
 vi.mock("@/lib/supabase/server", () => ({
   createServiceClient: () =>
-    Promise.resolve({ from: () => ({ select: selectMock }) }),
+    Promise.resolve({ from: () => ({ select: selectMock }), rpc: rpcMock }),
 }));
 
 import { POST as pair } from "./pair/route";
@@ -101,6 +102,50 @@ beforeEach(() => {
   renderJobForPrinterMock.mockReset().mockResolvedValue(Buffer.from([1, 2, 3]));
   updatePrintJobStatusMock.mockReset().mockResolvedValue({ ok: true });
   selectMock.mockReset();
+  rpcMock.mockReset().mockResolvedValue({ data: true, error: null });
+});
+
+function limitedAgentRequest(init?: RequestInit) {
+  return agentRequest({
+    ...init,
+    headers: {
+      authorization: "Bearer agent-token",
+      "x-vercel-forwarded-for": "203.0.113.9",
+    },
+  });
+}
+
+describe("agent per-IP limit", () => {
+  beforeEach(() => {
+    rpcMock.mockResolvedValue({ data: false, error: null });
+  });
+
+  it("429s next-job with Retry-After before resolving the agent", async () => {
+    const res = await nextJob(limitedAgentRequest());
+    expect(res.status).toBe(429);
+    expect(res.headers.get("Retry-After")).toBe("60");
+    expect(rpcMock).toHaveBeenCalledWith("check_rate_limit", {
+      p_key: "agent-ip:203.0.113.9",
+      p_limit: 240,
+      p_window_seconds: 60,
+    });
+    expect(resolveAgentMock).not.toHaveBeenCalled();
+  });
+
+  it("429s the label route before resolving the agent", async () => {
+    const res = await label(limitedAgentRequest(), context);
+    expect(res.status).toBe(429);
+    expect(resolveAgentMock).not.toHaveBeenCalled();
+  });
+
+  it("429s the result route before resolving the agent", async () => {
+    const res = await result(
+      limitedAgentRequest({ method: "POST", body: "{}" }),
+      context,
+    );
+    expect(res.status).toBe(429);
+    expect(resolveAgentMock).not.toHaveBeenCalled();
+  });
 });
 
 describe("POST /api/v1/bridge-agent/pair", () => {
@@ -235,6 +280,19 @@ describe("POST /api/v1/bridge-agent/jobs/[id]/result", () => {
       },
     );
   }
+
+  it("rejects a result body over 4 KiB with 413", async () => {
+    const res = await result(
+      new Request("https://printkit.test/api/v1/bridge-agent/jobs/x/result", {
+        method: "POST",
+        headers: { authorization: "Bearer agent-token" },
+        body: "x".repeat(4 * 1024 + 1),
+      }),
+      context,
+    );
+    expect(res.status).toBe(413);
+    expect(selectMock).not.toHaveBeenCalled();
+  });
 
   it("rejects a request with no valid token", async () => {
     resolveAgentMock.mockResolvedValue(null);

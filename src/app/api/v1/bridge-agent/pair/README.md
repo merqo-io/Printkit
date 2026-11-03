@@ -18,3 +18,7 @@ device token.
 [bridge-agent](../README.md)
 
 Public pairing JSON is capped at 16 KiB of streamed bytes before pairing storage is queried. Oversized input returns 413 even without Content-Length or with an understated value; malformed JSON returns 400.
+
+## Rate limits
+
+10 attempts per 60 seconds per IP (`pair:<ip>`); requests with no resolvable IP share one `pair:noip` bucket at the same limit. This is the one limiter that fails closed: if the limiter is unavailable the answer is 429, because the 8-character code is brute-forceable. 429 carries `Retry-After: 60`.

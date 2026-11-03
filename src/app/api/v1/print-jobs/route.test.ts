@@ -10,6 +10,11 @@ vi.mock("@/lib/print-jobs", () => ({
   createPrintJob: (...args: unknown[]) => createPrintJobMock(...args),
 }));
 
+const rpcMock = vi.fn();
+vi.mock("@/lib/supabase/server", () => ({
+  createServiceClient: () => Promise.resolve({ rpc: rpcMock }),
+}));
+
 import { POST } from "./route";
 
 function requestWith(body: unknown, authorization = "Bearer qkit:secret") {
@@ -24,6 +29,57 @@ describe("POST /api/v1/print-jobs", () => {
   beforeEach(() => {
     verifyKitAuthMock.mockReset();
     createPrintJobMock.mockReset();
+    rpcMock.mockReset().mockResolvedValue({ data: true, error: null });
+  });
+
+  it("answers 429 with Retry-After before touching auth when the IP is limited", async () => {
+    rpcMock.mockResolvedValue({ data: false, error: null });
+    const req = requestWith({});
+    req.headers.set("x-real-ip", "203.0.113.9");
+
+    const res = await POST(req);
+
+    expect(res.status).toBe(429);
+    expect(res.headers.get("Retry-After")).toBe("60");
+    expect(rpcMock).toHaveBeenCalledWith("check_rate_limit", {
+      p_key: "kit-ip:203.0.113.9",
+      p_limit: 300,
+      p_window_seconds: 60,
+    });
+    expect(verifyKitAuthMock).not.toHaveBeenCalled();
+  });
+
+  it("answers 429 when the kit is over its own limit", async () => {
+    verifyKitAuthMock.mockResolvedValue({ kitSlug: "qkit" });
+    rpcMock.mockResolvedValue({ data: false, error: null });
+
+    const res = await POST(requestWith({}));
+
+    expect(res.status).toBe(429);
+    expect(rpcMock).toHaveBeenCalledWith("check_rate_limit", {
+      p_key: "kit:qkit",
+      p_limit: 600,
+      p_window_seconds: 60,
+    });
+    expect(createPrintJobMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects source_ref and location_ref over 128 characters", async () => {
+    verifyKitAuthMock.mockResolvedValue({ kitSlug: "qkit" });
+    const base = {
+      vendor_id: "11111111-1111-1111-8111-111111111111",
+      payload: {},
+    };
+    const tooLong = "x".repeat(129);
+
+    const a = await POST(requestWith({ ...base, source_ref: tooLong }));
+    const b = await POST(
+      requestWith({ ...base, source_ref: "ok", location_ref: tooLong }),
+    );
+
+    expect(a.status).toBe(400);
+    expect(b.status).toBe(400);
+    expect(createPrintJobMock).not.toHaveBeenCalled();
   });
 
   it("returns 401 when the bearer secret doesn't verify", async () => {

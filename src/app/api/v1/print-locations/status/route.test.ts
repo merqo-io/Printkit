@@ -32,6 +32,11 @@ vi.mock("@/lib/site-url", () => ({
   publicSiteUrl: () => publicSiteUrlMock(),
 }));
 
+const rpcMock = vi.fn();
+vi.mock("@/lib/supabase/server", () => ({
+  createServiceClient: () => Promise.resolve({ rpc: rpcMock }),
+}));
+
 import { GET } from "./route";
 
 function request(ref = "booth-1"): Request {
@@ -42,6 +47,7 @@ function request(ref = "booth-1"): Request {
 
 beforeEach(() => {
   verifyKitAuthMock.mockReset().mockResolvedValue({ kitSlug: "qkit" });
+  rpcMock.mockReset().mockResolvedValue({ data: true, error: null });
   resolveActiveLocationMock.mockReset();
   getPrinterByLocationMock.mockReset();
   sweepLocationMock.mockClear();
@@ -49,6 +55,21 @@ beforeEach(() => {
 });
 
 describe("GET /api/v1/print-locations/status", () => {
+  it("answers 429 with Retry-After before touching auth when the IP is limited", async () => {
+    rpcMock.mockResolvedValue({ data: false, error: null });
+    const req = request();
+    req.headers.set("x-real-ip", "203.0.113.9");
+    const res = await GET(req);
+    expect(res.status).toBe(429);
+    expect(res.headers.get("Retry-After")).toBe("60");
+    expect(verifyKitAuthMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a source_ref over 128 characters", async () => {
+    const res = await GET(request("x".repeat(129)));
+    expect(res.status).toBe(400);
+  });
+
   it("rejects an unauthenticated caller", async () => {
     verifyKitAuthMock.mockResolvedValue(null);
     const res = await GET(request());

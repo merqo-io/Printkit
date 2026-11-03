@@ -36,3 +36,5 @@ The agent program itself lives in `bridge-agent/` at the repo root.
 Pairing bodies are size bounded. Result reports conditionally match the current sent attempt and location; persistence failure returns a retryable server error rather than a successful acknowledgement.
 
 The job id in `jobs/[id]/label` is parsed as a UUID before the read.
+
+Rate limits: the token routes (`next-job`, `jobs/[id]/label`, `jobs/[id]/result`) are limited to 240 requests per minute per IP before the token is resolved (429 with `Retry-After: 60`). `pair` allows 10 per minute per IP, and requests with no client IP share one `pair:noip` bucket; it fails closed if the limiter is unavailable. The result body is capped at 4 KiB.

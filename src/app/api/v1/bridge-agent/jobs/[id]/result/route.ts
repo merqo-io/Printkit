@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { printAttemptSchema } from "@/lib/print-attempt";
 import { resolveAgent } from "@/lib/agent-auth";
+import { enforceIpLimit, AGENT_IP_LIMIT } from "@/lib/rate-limit";
 import { updatePrintJobStatus } from "@/lib/print-jobs";
+import { readBoundedJson, RequestBodyError } from "@/lib/bounded-json";
 import { createServiceClient } from "@/lib/supabase/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -18,6 +20,8 @@ const bodySchema = z.object({
  * callback, tell a different vendor their label printed.
  */
 export async function POST(request: Request, context: RouteContext) {
+  const ipLimited = await enforceIpLimit(request, "agent-ip", AGENT_IP_LIMIT);
+  if (ipLimited) return ipLimited;
   const printer = await resolveAgent(request);
   if (!printer) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -25,9 +29,10 @@ export async function POST(request: Request, context: RouteContext) {
 
   let json: unknown;
   try {
-    json = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    json = await readBoundedJson(request, 4 * 1024);
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    return NextResponse.json({ error: "Invalid request" }, { status });
   }
   const parsed = bodySchema.safeParse(json);
   if (!parsed.success) {

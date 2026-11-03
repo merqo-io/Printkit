@@ -4,13 +4,18 @@ import { verifyKitAuth } from "@/lib/kit-auth";
 import { createPrintJob } from "@/lib/print-jobs";
 import { labelBatchSchema } from "@/lib/label-batch";
 import { readBoundedJson, RequestBodyError } from "@/lib/bounded-json";
+import {
+  enforceIpLimit,
+  enforceKitLimit,
+  KIT_IP_LIMIT,
+} from "@/lib/rate-limit";
 
 const bodySchema = z
   .object({
     vendor_id: z.uuid(),
     payload: z.record(z.string(), z.unknown()),
-    source_ref: z.string().min(1),
-    location_ref: z.string().optional(),
+    source_ref: z.string().trim().min(1).max(128),
+    location_ref: z.string().trim().max(128).optional(),
     // DB still only accepts 'label' today — accepted here so the API shape
     // isn't hardcoded to one job type ahead of the DB constraint widening.
     job_type: z.string().optional(),
@@ -24,10 +29,14 @@ const bodySchema = z
   );
 
 export async function POST(request: Request) {
+  const ipLimited = await enforceIpLimit(request, "kit-ip", KIT_IP_LIMIT);
+  if (ipLimited) return ipLimited;
   const auth = await verifyKitAuth(request);
   if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const kitLimited = await enforceKitLimit(auth.kitSlug);
+  if (kitLimited) return kitLimited;
 
   let json: unknown;
   try {

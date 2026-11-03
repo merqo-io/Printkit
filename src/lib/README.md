@@ -218,7 +218,7 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
 - `utils.ts` � `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
 - `location-printer-summaries.ts` � reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
 - `bluetooth-support.ts`: `getBluetoothSupport(nav, ua)`: `supported`, `ios` (iPhone, iPad including the Mac-UA iPad, Chrome for iOS), `unsupported-browser` or `insecure-context`, for the Bridge page.
-- `rate-limit.ts`: `clientIp(headers)` and `rateLimit(supabase, key, limit, windowSeconds)` over the `check_rate_limit` RPC, same contract as paykit; fails open. Limits: pairing 10 per IP, CloudPRNT 120 per token, per 60 seconds.
+- `rate-limit.ts`: `clientIp(headers)` picks `x-vercel-forwarded-for`, then `x-real-ip`, then the LAST `x-forwarded-for` hop (the first is client-spoofable) and returns null when none is set. `rateLimit(supabase, key, limit, windowSeconds)` runs the `check_rate_limit` RPC and fails open; `rateLimitStrict` is the same but fails closed (used for pairing). `tooManyRequests()` builds the 429 with `Retry-After: 60`; `enforceIpLimit` (pre-auth, `kit-ip`/`agent-ip` buckets, skipped when no IP) and `enforceKitLimit` (post-auth, `kit:<slug>`) wrap it for routes. Limits per 60 seconds: pairing 10 per IP (shared `pair:noip` bucket when no IP), CloudPRNT 120 per token, kit routes 300 per IP and 600 per kit, agent routes 240 per IP.
 
 ## Connectivity
 

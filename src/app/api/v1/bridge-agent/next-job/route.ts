@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveAgent } from "@/lib/agent-auth";
+import { enforceIpLimit, AGENT_IP_LIMIT } from "@/lib/rate-limit";
 import { claimJob, sweepLocation } from "@/lib/job-dispatch";
 import { touchPrinterSeen } from "@/lib/printers";
 
@@ -10,6 +11,8 @@ import { touchPrinterSeen } from "@/lib/printers";
  * normal answer most of the time.
  */
 export async function GET(request: Request) {
+  const ipLimited = await enforceIpLimit(request, "agent-ip", AGENT_IP_LIMIT);
+  if (ipLimited) return ipLimited;
   const printer = await resolveAgent(request);
   if (!printer) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
