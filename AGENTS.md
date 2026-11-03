@@ -48,43 +48,16 @@ pnpm format       # prettier --write
 
 ## File Layout
 
-```
-src/app/                          — app router (dashboard, login, API routes)
-src/proxy.ts                      — Supabase session refresh + /dashboard guard (Next 16)
-src/lib/supabase/                 — browser / server / service clients (schema=printkit)
-src/lib/kit-auth.ts               — bearer-secret verification for calling kits
-src/lib/vendor-session.ts         — shared dashboard auth guard (getVendorSession)
-src/lib/types.ts                  — DB types, generated via `supabase gen types`
-scripts/create-kit-key.mjs        — mint + store a hashed bearer secret for a calling kit
-supabase/migrations/              — SQL schema + RLS + grants
-supabase/tests/rls.test.sql       — pgTAP RLS suite
-```
+See `docs/FILE-LAYOUT.md` (app router, `src/proxy.ts`, `src/lib/supabase/`,
+`kit-auth.ts`, `vendor-session.ts`, `types.ts`, migrations, pgTAP suite).
 
 ## Data model
 
-- `print_jobs`: core table, also the vendor-facing job/transaction history.
-  `job_type` (`'label'` only in v0.1, column designed to hold future types),
-  `status` (`queued`→`sent`→`printed`|`failed`), `source_kit`/`source_ref`
-  identify the calling kit's order. RLS: vendor reads (not writes) only their
-  own rows; writes are service-role + bearer-secret, server-only.
-- `print_locations`: one row per `(source_kit, source_ref)` — a calling
-  kit's own opaque location id (e.g. qkit's `booths.id`), never
-  interpreted by printkit itself. Lets a vendor pair a separate physical
-  bridge to each location instead of one shared bridge per vendor.
-  `print_jobs.location_id` (nullable) references it; RLS: vendor
-  read-only own rows, writes service-role + bearer-secret.
-- `printers` (one per location, connector + driver + catalog id +
-  `last_seen_at`), `device_credentials` (SHA-256 hashes only: CloudPRNT URL
-  tokens, Pi agent tokens) and `bridge_pairing_codes` (8 chars, 10 minutes,
-  single use). Vendor reads own `printers`; the other two are service-role
-  only.
-- `kit_api_keys`: one hashed bearer secret per calling kit, service-role only.
-- `admins`/`is_admin(uid)`/`admin_audit`: internal platform-operator
-  allow-list + immutable audit trail (service-role insert/select only, no
-  update/delete grant ever issued, RLS admin-read-only). Logs bridge
-  connected/disconnected, printer paired, printer removed, test print sent,
-  manual reprint triggered, qkit link connected/disconnected, print-job
-  config changed.
+Full detail in `docs/DATA-MODEL.md`. In short: `print_jobs` (vendor reads own
+rows only; writes are service-role + bearer-secret, server-only),
+`print_locations`, `printers`, `device_credentials`, `bridge_pairing_codes`,
+`kit_api_keys` (service-role only), and `admins`/`admin_audit` (immutable
+platform-operator audit trail, service-role insert/select only).
 
 ## Rules (always)
 
@@ -129,93 +102,43 @@ no realtime). Use only the stack-agnostic ones here:
 Do **not** run `templatecentral:add (auth)` or `(database)` — they install
 better-auth / Drizzle and will break RLS.
 
-**templateCentral 6.0.4 review (2026-10-12):** `harness.json` moved 5.15.0 →
-6.0.4, porting the harness qkit adopted in its own 6.0.1 and 6.0.4 reviews
-(qkit's `AGENTS.md` holds the full reasoning). The scripts were 3-way merged
-against qkit's, so this repo's local lines are kept. Adopted:
-
-- Hook commands anchored on `${CLAUDE_PROJECT_DIR}`, each with a timeout. The
-  old relative paths resolved against the shell's current directory.
-- `stop-checks.sh` skips the test run on a clean tree; `subagent-stop.sh`
-  skips read-only agents; `post-edit-typecheck.sh` reports through
-  `additionalContext`.
-- The skill-usage matcher (`Skill__.*` never matched; now `Skill`), and
-  `NotebookEdit` on the `protect-files.sh` matcher.
-- The per-segment `block-no-verify.sh`: closes a hook-skipping flag on push,
-  `--force-with-lease`, `HEAD:main`, deleting a protected branch and
-  `bash -c` wrappers. A bare `git commit` / `git push` is judged by the
-  branch it can land on (the hook input's `cwd` plus every literal `cd`
-  target), so a worktree commit is no longer blocked by the main checkout
-  sitting on `main`. Anything the hook cannot resolve also judges the
-  project root: use a bare `git commit` or `git -C <literal path>`.
-- `protect-files.sh`: symlinked parents resolved, `notebook_path` read,
-  relative paths anchored on the project root.
-- `verify-harness.sh` fails on an unreadable or empty manifest.
-- The commit-msg gate accepts `type(scope)!:` and the messages git writes
-  itself (`Revert "…"`, `fixup!`, `squash!`, `amend!`).
-- The PR-only CI gates (changelog, readme, comment hygiene) fail when
-  `origin/<base>` is missing and read the base branch from `env`.
-- `post-tool-failure.sh` removed (the agent already sees tool errors).
-
-Not adopted, for qkit's reasons: exec-form hooks (`"command": "bash",
-"args": [...]`; a bare `bash` resolved without a shell on Windows can be
-the WSL launcher, so any hook that used that form here is now a shell
-string), the gitleaks command and allowlist syntax changes, the shared
-`.claude/ci-gates.sh`, `.claude/hooks/local/`, and every Azure DevOps and
-OpenCode item.
+The templateCentral 6.0.4 review (adopted / not-adopted history, 2026-10-12)
+is in `docs/meta/templatecentral-adoption-log.md`.
 
 ## AI Harness
 
-PreToolUse(Read|Edit|Write): normalize Windows and relative paths; hard-block
-secret-file reads and writes (environment files except the blank templates,
-secret directories and certificate/credential files). Governance and CI/CD
-writes require human approval; their reads are allowed. Ordinary application
-code, skills and specifications remain unrestricted. The Bash guard continues
-to block hook bypasses, protected-branch force pushes and destructive guard edits.
-UserPromptSubmit: credential-shaped input is blocked; injection-phrase matches
-produce advisory context so quoted security research can proceed.
-PostToolUse: `tsc --noEmit --incremental` after every Edit/Write, plus a
-comment-hygiene scan (`post-edit-comment-check.sh`) flagging change-narration
-comments (`was`/`added`/dated/ticket-ref-shaped openers, per
-`.claude/comment-hygiene-patterns.txt`) and oversized comment blocks on the
-edited file. Both feedback-only, never block.
-Stop: exits 0 when `stop_hook_active` (no re-entry loop); else runs the test
-suite, exit 2 feeds failures back, exit 0 on pass.
-SessionStart (startup|resume|compact): re-injects first 30 lines of this file.
-`permissions`: max-privilege — bare-tool `allow` (Bash/Read/Edit/Write/web/Skill/
-Task) so common work doesn't prompt; `deny` covers secret reads/edits (`.env.local`
-and other `.env.<env>` variants, `./secrets/**` — `.env.example` is the one
-whitelisted env file) and irreversible ops (`rm -rf`, `git push --force`/`-f`,
-`git reset --hard`, `git clean -fd/-fx`, `git filter-branch`, ref-delete). `ask`
-gates `Edit(...)` (covers both Edit and Write) on the medium-security governance
-files: `AGENTS.md`, `CLAUDE.md`, `docs/CONSTITUTION.md`, `.claude/harness.json`,
-`.claude/settings.json`, `.claude/settings.local.json`. Deny always wins (enforced
-even under bypass); it's a guardrail, not a sandbox.
-Git hooks (husky): pre-commit runs format/lint/typecheck, a
-`--frozen-lockfile` install gated on `package.json` changes
-(lockfile-in-sync — also re-checked in CI), gitleaks secret-scan on staged
-files, a readme-coupling staleness warning, and a comment-hygiene warning
-(same pattern list as the PostToolUse hook, both warn-only); commit-msg enforces
-Conventional Commits; pre-push runs the harness integrity check + quality
-gate. Hard-local; coverage/changed-line gates run in CI. Migrated
-2026-08-01 off lefthook, whose unsigned `lefthook.exe` Windows Smart App
-Control blocks unconditionally.
-CI (GitHub Actions): `test` (check + unit + coverage) with a hard gate on
-changed-line coverage (`diff-cover` ≥80%), `build` (`next build` — the one
-job that catches Next.js client/server bundle-boundary errors `pnpm
-check`/`pnpm test` miss), existing `db` (pgTAP RLS) and `mutation`
-(Stryker, advisory) jobs, a lockfile-in-sync re-check, a changelog-touched
-check, a readme-freshness check, a comment-hygiene check (hard gate, scoped
-to added lines only, against the first 10 lines of
-`.claude/comment-hygiene-patterns.txt` — the narration-keyword patterns, not
-the lower-precision date/ticket-ref ones; `skip-comment-check` label
-bypasses), harness integrity, and (via `security.yml`) a full-history
-gitleaks scan + `pnpm audit` + CodeQL.
-RLS isolation: `supabase/tests/rls.test.sql` via `supabase test db`.
-Project skills (directory form, `<name>/SKILL.md`): `.claude/skills/` |
-Manifest: `.claude/harness.json`. Fully armed: every `.claude/harness.json`
-entry carries a real sha256 as of the 2026-08-01 husky migration's
-`regen-harness.sh` run.
+Full hook-by-hook, husky and CI detail: `docs/meta/ai-harness-reference.md`.
+Enforcement points an agent must obey:
+
+- PreToolUse(Read|Edit|Write): secret-file reads and writes are hard-blocked
+  (environment files except the blank templates, secret directories,
+  certificate/credential files). Governance and CI/CD writes require human
+  approval; their reads are allowed. The Bash guard blocks hook bypasses,
+  protected-branch force pushes and destructive guard edits.
+- UserPromptSubmit: credential-shaped input is blocked; injection-phrase
+  matches add advisory context.
+- PostToolUse: `tsc --noEmit --incremental` and a comment-hygiene scan after
+  every Edit/Write (feedback-only, never block).
+- Stop: runs the test suite; exit 2 feeds failures back.
+- SessionStart: re-injects the first 30 lines of this file.
+- `permissions`: `deny` covers secret reads/edits (`.env.local` and other
+  `.env.<env>` variants, `./secrets/**`; `.env.example` is the one whitelisted
+  env file) and irreversible ops (`rm -rf`, `git push --force`/`-f`,
+  `git reset --hard`, `git clean -fd/-fx`, `git filter-branch`, ref-delete).
+  `ask` gates `Edit(...)` (covers Edit and Write) on `AGENTS.md`, `CLAUDE.md`,
+  `docs/CONSTITUTION.md`, `.claude/harness.json`, `.claude/settings.json`,
+  `.claude/settings.local.json`. Deny always wins (enforced even under
+  bypass); it's a guardrail, not a sandbox.
+- Git hooks (husky): pre-commit runs format/lint/typecheck, a frozen-lockfile
+  install gated on `package.json` changes, gitleaks on staged files, and
+  warn-only readme-coupling and comment-hygiene checks; commit-msg enforces
+  Conventional Commits; pre-push runs the harness integrity check + quality
+  gate.
+- CI hard gates: changed-line coverage (`diff-cover` ≥80%), `build`,
+  changelog-touched, readme-freshness, comment hygiene, harness integrity,
+  lockfile-in-sync, and `security.yml` (gitleaks, `pnpm audit`, CodeQL).
+- RLS isolation: `supabase/tests/rls.test.sql` via `supabase test db`.
+  Manifest: `.claude/harness.json`; project skills live in `.claude/skills/`.
 
 ## Skills Security
 
@@ -225,13 +148,8 @@ entry carries a real sha256 as of the 2026-08-01 husky migration's
 
 ## Project-Specific Notes
 
-- This repo is a fresh harness seeded from the sibling project `paykit`
-  (same templateCentral-adjacent Supabase variant, same shared Supabase
-  project, different schema) — same seeding precedent paykit itself used
-  from qkit.
-- Design: `docs/superpowers/specs/2026-08-21-printkit-v0.1-design.md`. Plan
-  of record (this file's task set): `docs/superpowers/plans/2026-08-21-
-printkit-v0.1-plan1-scaffold-data-model.md`.
+Seeding origin and design/plan-of-record links are at the end of
+`docs/meta/ai-harness-reference.md`.
 
 <!-- [[post-harness]] — reserved for trace capture and meta-harness integration -->
 

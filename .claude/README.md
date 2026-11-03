@@ -31,6 +31,8 @@ recorded `origin_hash`.
 
 `harness.json` records the hash of each hook script; a hook edit is committed together with its new hash.
 
+`AGENTS.md` is slimmed under 200 lines (the first 30 lines are injected at session start and are unchanged); its `harness.json` hash was updated for that edit, and the detail now lives in `docs/`.
+
 ## Parent
 
 [printkit](../README.md)

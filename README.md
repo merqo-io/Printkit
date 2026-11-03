@@ -140,3 +140,5 @@ The Bluetooth bridge provides an optional 40 by 60 mm calibration preview and an
 The sticker designer prototype supports configurable label geometry and a non-printing renderer preview; saved designs now print on live label jobs. Long text fits its box (wrap, shrink, then ellipsis), and a job falls back to the default label if the design cannot render. A vendor can upload one PNG or JPEG logo (up to 512 KB and 1024 by 1024 pixels) into the private `sticker-logos` storage bucket and place it on the sticker; the logo prints as a dithered 1-bit image and is drawn in the designer print preview, and a missing or unreadable logo is skipped without failing the job. A design is scaled to the printer's label size (contain, centered), the designer warns when the sizes differ, and Feie printers keep the standard label.
 
 `printkit-test` is a reserved kit slug: test labels use it as their `source_kit` and never call a kit back, so `create-kit-key` refuses to mint a key with it.
+
+AGENTS.md is kept under 200 lines; file layout, data model and harness detail live in `docs/FILE-LAYOUT.md`, `docs/DATA-MODEL.md` and `docs/meta/`.
