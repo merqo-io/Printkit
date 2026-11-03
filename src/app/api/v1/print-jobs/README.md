@@ -12,9 +12,9 @@ order-placed.
   Zod (`vendor_id` UUID, `payload` object, `source_ref`, an optional
   `location_ref` — the calling kit's own opaque location id, e.g. qkit's
   `booths.id`, used to route the job to a specific paired bridge instead
-  of just the vendor as a whole — and an optional `job_type`, passed
-  through as-is; the DB column still only accepts `'label'`, this just
-  keeps the API from hardcoding one job type ahead of that widening),
+  of just the vendor as a whole — and an optional `job_type`, limited
+  to `label` or `label_batch`; anything else is a 400. The set mirrors the
+  DB check plus the API-only batch mode, and a new job type widens both),
   then delegates to `createPrintJob`
   (`@/lib/print-jobs`). Returns 401 unauthenticated, 400 invalid body, 201
   with the new row's `id` on success, or the `createPrintJob` error's own

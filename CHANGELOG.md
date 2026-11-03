@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Pairing fails closed when the limiter is down; requests with no IP share one `pair:noip` bucket (10/min).
 - New limits (60s window): kit routes 300/min per IP before auth and 600/min per kit after; bridge-agent token routes 240/min per IP before auth. 429 carries `Retry-After: 60`.
 - `source_ref`, `location_ref` and location `label` capped at 128 characters; the agent result body is bounded to 4 KiB and the print-locations body to 16 KiB.
+- `job_type` on `POST /api/v1/print-jobs` is limited to `label` or `label_batch`; other values return 400.
 
 ## [0.8.0] - 2026-11-02
 

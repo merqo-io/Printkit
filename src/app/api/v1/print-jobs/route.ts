@@ -16,9 +16,9 @@ const bodySchema = z
     payload: z.record(z.string(), z.unknown()),
     source_ref: z.string().trim().min(1).max(128),
     location_ref: z.string().trim().max(128).optional(),
-    // DB still only accepts 'label' today — accepted here so the API shape
-    // isn't hardcoded to one job type ahead of the DB constraint widening.
-    job_type: z.string().optional(),
+    // Mirrors the DB check on print_jobs.job_type plus the API-only
+    // label_batch mode; a new job type widens both together.
+    job_type: z.enum(["label", "label_batch"]).optional(),
     labels: labelBatchSchema.optional(),
   })
   .refine(
