@@ -18,7 +18,11 @@ order-placed.
   then delegates to `createPrintJob`
   (`@/lib/print-jobs`). Returns 401 unauthenticated, 400 invalid body, 201
   with the new row's `id` on success, or the `createPrintJob` error's own
-  status (e.g. 409 on a duplicate `source_kit`+`source_ref`). An omitted
+  status (e.g. 409 on a duplicate `source_kit`+`source_ref`, 403
+  `{"error":"labels_not_entitled"}` when the vendor has neither a live
+  paid entitlement nor a running event pass, 503 when that lookup fails).
+  qkit surfaces any non-2xx `error` string the same way, so 403 was chosen
+  over 402 to avoid proxy and CDN special-casing of "payment required". An omitted
   or unresolvable `location_ref` never fails the request — the job is
   still created, just without a `location_id`.
 - `route.test.ts` — auth rejection, body validation, success, and the

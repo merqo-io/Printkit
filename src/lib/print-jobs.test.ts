@@ -38,6 +38,12 @@ vi.mock("@/lib/print-locations", () => ({
   listActiveLocations: (...args: unknown[]) => listActiveLocationsMock(...args),
 }));
 
+const hasLabelAccessMock = vi.fn();
+vi.mock("@/lib/vendor-entitlement", () => ({
+  LABELS_NOT_ENTITLED: "labels_not_entitled",
+  vendorHasLabelAccess: (...args: unknown[]) => hasLabelAccessMock(...args),
+}));
+
 import { createPrintJob, updatePrintJobStatus } from "./print-jobs";
 
 describe("createPrintJob", () => {
@@ -45,6 +51,50 @@ describe("createPrintJob", () => {
     insertMock.mockReset();
     resolveActiveLocationMock.mockReset();
     listActiveLocationsMock.mockReset().mockResolvedValue([]);
+    hasLabelAccessMock.mockReset().mockResolvedValue(true);
+  });
+
+  it("rejects a vendor without label access and writes nothing", async () => {
+    hasLabelAccessMock.mockResolvedValue(false);
+    const result = await createPrintJob({
+      vendorId: "vendor-1",
+      payload: {},
+      sourceKit: "qkit",
+      sourceRef: "order-1",
+    });
+    expect(result).toEqual({
+      ok: false,
+      status: 403,
+      error: "labels_not_entitled",
+    });
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(rpcMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects label batches too when access is denied", async () => {
+    hasLabelAccessMock.mockResolvedValue(false);
+    const result = await createPrintJob({
+      vendorId: "vendor-1",
+      payload: {},
+      sourceKit: "qkit",
+      sourceRef: "order-1",
+      jobType: "label_batch",
+      labels: [{ item_name: "Kopi" }],
+    });
+    expect(result).toMatchObject({ ok: false, status: 403 });
+    expect(rpcMock).not.toHaveBeenCalled();
+  });
+
+  it("fails closed with a 503 when the entitlement lookup errors", async () => {
+    hasLabelAccessMock.mockResolvedValue(null);
+    const result = await createPrintJob({
+      vendorId: "vendor-1",
+      payload: {},
+      sourceKit: "qkit",
+      sourceRef: "order-1",
+    });
+    expect(result).toMatchObject({ ok: false, status: 503 });
+    expect(insertMock).not.toHaveBeenCalled();
   });
 
   it("inserts a queued print_jobs row and returns its id", async () => {

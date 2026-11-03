@@ -65,6 +65,8 @@ check rejects an unknown kind and `ref` rejects 65 characters, and that
 `purge_ops_events()` deletes a 31-day-old row, keeps a 29-day-old row and is
 not executable by `authenticated`.
 
+`vendor-entitlements.test.sql` covers the entitlement cache: RLS own-row read, no client write grant, service-role-only execute on `apply_vendor_entitlement` and `vendor_has_label_access`, stale-push no-op, and the access truth table (no row, live paid, lapsed paid, running and expired event pass).
+
 `cloudprnt-revision.test.sql` covers conditional claim revisions and stale outcomes. `admin-membership-scope.test.sql` checks authenticated users cannot probe another user through the admin-membership helper. These prepared SQL regressions remain unrun while the local database engine is unavailable.
 
 CloudPRNT mutation assertions attach their data-modifying CTE to the top-level SELECT, as PostgreSQL requires. Each assertion retains its exact attempt/location/revision predicates and verifies the number of matched rows.

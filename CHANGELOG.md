@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `POST /api/merqo/entitlement` (bearer `MERQO_PROVISION_SECRET`) receives merqo's per-vendor entitlement into `printkit.vendor_entitlements` (migration 0017).
+
+### Changed
+
+- Label print jobs (`POST /api/v1/print-jobs` and the dashboard test label) now require a live paid entitlement or a running event pass. Kits get 403 `labels_not_entitled`; a failed lookup fails closed (503 on the API). Vendors with no pushed entitlement are blocked until merqo pushes.
+
 ### Security
 
 - Rate limiter picks the client IP from `x-vercel-forwarded-for`, then `x-real-ip`, then the last `x-forwarded-for` hop (the first hop is client-spoofable) and returns null instead of a shared `unknown` bucket.

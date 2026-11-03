@@ -6,6 +6,8 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/connectors/vendor-cloud/drivers", () => ({
   getVendorCloudDriver: () => null,
 }));
+const access = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/vendor-entitlement", () => ({ vendorHasLabelAccess: access }));
 const dispatch = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/job-dispatch", () => ({ dispatchJob: dispatch }));
 
@@ -85,6 +87,7 @@ beforeEach(() => {
   state.inserted = [];
   state.audits = [];
   dispatch.mockResolvedValue(undefined);
+  access.mockResolvedValue(true);
 });
 
 describe("sendTestPrint", () => {
@@ -106,6 +109,24 @@ describe("sendTestPrint", () => {
     expect(state.printerEqs).toContainEqual(["vendor_id", "vendor-a"]);
     expect(state.inserted).toHaveLength(0);
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it("shows a friendly message and queues nothing without label access", async () => {
+    access.mockResolvedValue(false);
+    const result = await sendTestPrint(L);
+    expect(result).toMatchObject({ ok: false });
+    expect(result.ok === false && result.error).toMatch(/paid plan/);
+    expect(state.inserted).toHaveLength(0);
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when the entitlement lookup errors", async () => {
+    access.mockResolvedValue(null);
+    expect(await sendTestPrint(L)).toEqual({
+      ok: false,
+      error: "Could not send the test label.",
+    });
+    expect(state.inserted).toHaveLength(0);
   });
 
   it("queues a test job, dispatches it and audits it", async () => {

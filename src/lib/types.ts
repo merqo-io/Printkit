@@ -378,11 +378,44 @@ export type Database = {
         Update: { count?: number; key?: string; window_start?: string };
         Relationships: [];
       };
+      vendor_entitlements: {
+        Row: {
+          vendor_id: string;
+          tier: "free" | "paid";
+          founder: boolean;
+          stats_window: "24h" | "90d";
+          event_pass_starts_at: string | null;
+          event_pass_ends_at: string | null;
+          valid_until: string | null;
+          issued_at: string;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      apply_vendor_entitlement: {
+        Args: {
+          p_email: string;
+          p_tier: string;
+          p_founder: boolean;
+          p_stats_window: string;
+          p_event_pass_starts_at: string | null;
+          p_event_pass_ends_at: string | null;
+          p_valid_until: string | null;
+          p_issued_at: string;
+        };
+        Returns: string;
+      };
+      vendor_has_label_access: {
+        Args: { p_vendor: string };
+        Returns: boolean;
+      };
       save_sticker_template: {
         Args: { p_location_id: string; p_vendor_id: string; p_design: Json };
         Returns: string;

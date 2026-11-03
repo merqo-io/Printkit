@@ -53,7 +53,8 @@ everything else sits flat here.
   `/legal/accept` otherwise.
 - `kit-auth.ts` — `hashApiKey`/`verifyKitAuth`: bearer-secret verification
   for calling kits, checked on every `/api/v1/*` route before any DB access.
-- `print-jobs.ts` — `createPrintJob(input)`: inserts a queued `print_jobs`
+- `print-jobs.ts` - `createPrintJob(input)`: first checks label access
+  (403 `labels_not_entitled`, 503 on a failed lookup), then inserts a queued `print_jobs`
   row via the service client and returns its `id`. `(source_kit, source_ref)`
   is unique, so a retried call for the same source order returns a clean
   `{ok:false, status:409}` instead of a generic 500. An optional
@@ -137,7 +138,15 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
   failure rate at or above 20%), `new` (no job yet), `quiet` (no job in 30
   days), else `healthy`. A null `summary` omits `incidents`/`recent`.
 - `merqo-auth.ts` — `bearerOk(request)`: constant-time check of merqo's
-  bearer token against `MERQO_METRICS_SECRET`.
+  bearer token against `MERQO_METRICS_SECRET`; `provisionBearerOk(request)`
+  does the same against `MERQO_PROVISION_SECRET` for merqo's state-changing
+  pushes.
+- `merqo-entitlement-contract.ts` - `entitlementPayloadSchema` / `EntitlementPayload`:
+  the Zod wire contract for merqo's entitlement push, identical in every kit.
+- `vendor-entitlement.ts` - `vendorHasLabelAccess(vendorId)`: calls the
+  `vendor_has_label_access` SQL helper (live paid entitlement or running event
+  pass). Returns `null` on a failed lookup so callers fail closed.
+  `LABELS_NOT_ENTITLED` is the stable `labels_not_entitled` error code.
 - `list-all-users.ts` — `listAllUsers(supabase)`: every auth user across
   `listUsers()` pages (1000 per page, 50-page ceiling), for the email lookup.
 - `test-print.ts` - `TEST_PRINT_SOURCE_KIT` / `isTestPrint`: the `source_kit` of dashboard test labels; `notifyKitPrintStatus` returns early for it. `test-print.test.ts` pins the value, which `scripts/create-kit-key-input.mjs` hardcodes as a reserved kit slug.

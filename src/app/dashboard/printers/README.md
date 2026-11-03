@@ -27,7 +27,7 @@ is online or it is not.
   type, model). A 4G printer is first unregistered from the maker's account,
   best effort: a failure is logged and the removal still goes ahead. Device
   credentials cascade; queued jobs stay on the booth for the next printer.
-  `sendTestPrint`: vendor session, Zod-checked booth id, printer looked up by vendor and booth, one test per booth per minute, a `print_jobs` row with `source_kit` `printkit-test` (so no kit callback), dispatched at once for 4G printers, audited as `test_print_sent`.
+  `sendTestPrint`: vendor session, Zod-checked booth id, printer looked up by vendor and booth, label access required (a friendly upgrade message otherwise, failing closed if the lookup errors), one test per booth per minute, a `print_jobs` row with `source_kit` `printkit-test` (so no kit callback), dispatched at once for 4G printers, audited as `test_print_sent`.
   Each row carries the id `booth-<location id>` (`locationRowId`), which the
   status API's `manage_url` names so a calling kit's "manage this booth's
   printer" link lands on the right row, which is outlined while it is the

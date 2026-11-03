@@ -8,6 +8,10 @@ import {
 } from "@/lib/print-locations";
 import type { Json } from "@/lib/types";
 import { labelBatchSchema, type LabelBatch } from "@/lib/label-batch";
+import {
+  LABELS_NOT_ENTITLED,
+  vendorHasLabelAccess,
+} from "@/lib/vendor-entitlement";
 
 export type CreatePrintJobInput = {
   vendorId: string;
@@ -129,6 +133,15 @@ async function createLabelBatch(
 export async function createPrintJob(
   input: CreatePrintJobInput,
 ): Promise<CreatePrintJobResult> {
+  // Every job type the DB accepts is a label, so the gate covers all of them.
+  const access = await vendorHasLabelAccess(input.vendorId);
+  if (access === null) {
+    return { ok: false, status: 503, error: "Could not create print job." };
+  }
+  if (!access) {
+    return { ok: false, status: 403, error: LABELS_NOT_ENTITLED };
+  }
+
   let locationId = input.locationRef
     ? await resolveLocationRef(
         input.sourceKit,

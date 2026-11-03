@@ -100,6 +100,26 @@ describe("POST /api/v1/print-jobs", () => {
     expect(createPrintJobMock).not.toHaveBeenCalled();
   });
 
+  it("returns 403 labels_not_entitled when the vendor has no label access", async () => {
+    verifyKitAuthMock.mockResolvedValue({ kitSlug: "qkit" });
+    createPrintJobMock.mockResolvedValue({
+      ok: false,
+      status: 403,
+      error: "labels_not_entitled",
+    });
+
+    const res = await POST(
+      requestWith({
+        vendor_id: "11111111-1111-1111-8111-111111111111",
+        payload: {},
+        source_ref: "order-uuid-1",
+      }),
+    );
+
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: "labels_not_entitled" });
+  });
+
   it("passes location_ref through to createPrintJob as locationRef", async () => {
     verifyKitAuthMock.mockResolvedValue({ kitSlug: "qkit" });
     createPrintJobMock.mockResolvedValue({ ok: true, id: "job-1" });
