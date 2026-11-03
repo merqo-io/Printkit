@@ -62,4 +62,4 @@ entry carries a real sha256 as of the 2026-08-01 husky migration's
   from qkit.
 - Design: `docs/superpowers/specs/2026-08-21-printkit-v0.1-design.md`. Plan
   of record (this file's task set): `docs/superpowers/plans/2026-08-21-
-  printkit-v0.1-plan1-scaffold-data-model.md`.
+printkit-v0.1-plan1-scaffold-data-model.md`.
