@@ -6,6 +6,12 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/connectors/vendor-cloud/drivers", () => ({
   getVendorCloudDriver: () => null,
 }));
+const access = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/vendor-entitlement", () => ({
+  LABELS_UPGRADE_MESSAGE:
+    "Label printing needs a paid plan or an active event pass.",
+  vendorHasLabelAccess: access,
+}));
 const dispatch = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/job-dispatch", () => ({ dispatchJob: dispatch }));
 
@@ -73,6 +79,7 @@ vi.mock("@/lib/supabase/server", () => ({
     }),
 }));
 
+import { LABELS_UPGRADE_MESSAGE } from "@/lib/vendor-entitlement";
 import { sendTestPrint } from "./actions";
 
 beforeEach(() => {
@@ -85,6 +92,7 @@ beforeEach(() => {
   state.inserted = [];
   state.audits = [];
   dispatch.mockResolvedValue(undefined);
+  access.mockResolvedValue(true);
 });
 
 describe("sendTestPrint", () => {
@@ -106,6 +114,23 @@ describe("sendTestPrint", () => {
     expect(state.printerEqs).toContainEqual(["vendor_id", "vendor-a"]);
     expect(state.inserted).toHaveLength(0);
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it("shows a friendly message and queues nothing without label access", async () => {
+    access.mockResolvedValue(false);
+    const result = await sendTestPrint(L);
+    expect(result).toEqual({ ok: false, error: LABELS_UPGRADE_MESSAGE });
+    expect(state.inserted).toHaveLength(0);
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when the entitlement lookup errors", async () => {
+    access.mockResolvedValue(null);
+    expect(await sendTestPrint(L)).toEqual({
+      ok: false,
+      error: "Could not send the test label.",
+    });
+    expect(state.inserted).toHaveLength(0);
   });
 
   it("queues a test job, dispatches it and audits it", async () => {

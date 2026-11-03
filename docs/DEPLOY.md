@@ -82,6 +82,23 @@ Before merging a PR that adds a file under `supabase/migrations/`:
 3. Merge the PR.
 4. Apply the same file to production the usual way (Supabase SQL Editor).
 
+## Merqo entitlements (label gate)
+
+Label print jobs are blocked for any vendor without a live paid entitlement or
+a running event pass. Until merqo pushes, every vendor has no
+`vendor_entitlements` row, so labels are blocked. Roll out in this order:
+
+1. Apply migration `0017_vendor_entitlements.sql`.
+2. Set `MERQO_PROVISION_SECRET` in Vercel (same value as merqo's
+   `MERQO_PROVISION_SECRET`). Unset, every push gets 401.
+3. Deploy printkit.
+4. In merqo, add the `printkit` products row, then trigger a resync push so
+   existing paying vendors get their row. Check one vendor can print before
+   announcing.
+
+Vendors already printing live lose label access between step 3 and the
+resync in step 4, so run the resync immediately after the deploy.
+
 ## Notes
 
 - The qkit↔printkit cross-kit integration (order-placed job creation,

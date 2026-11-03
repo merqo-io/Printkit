@@ -42,6 +42,8 @@ older than 30 days and runs daily as the `printkit-ops-events-purge` `pg_cron`
 job; scheduling is best-effort, so the migration still applies where
 `pg_cron` is unavailable.
 
+`0017_vendor_entitlements.sql` adds `vendor_entitlements`, the cache of merqo's per-vendor entitlement push (own-row select, no client writes). `apply_vendor_entitlement` upserts by email and applies a push only when its `issued_at` is newer; `vendor_has_label_access` is the single definition of label access (live paid tier or running event pass). Both are `service_role`-only. printkit had no legacy plan columns, so there is no data migration: until merqo pushes, a vendor has no row and no label access.
+
 ## Scoped administration predicates
 
 Migration 0010 limits `is_admin(uuid)` to the signed-in user or trusted service-role administration. Anonymous and foreign-user membership probing is denied; existing self-scoped RLS policies retain their behavior.

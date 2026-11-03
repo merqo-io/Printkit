@@ -8,6 +8,10 @@ import { uuidSchema } from "@/lib/schemas";
 import { dispatchJob } from "@/lib/job-dispatch";
 import { printerState } from "@/lib/printers";
 import { TEST_PRINT_SOURCE_KIT } from "@/lib/test-print";
+import {
+  LABELS_UPGRADE_MESSAGE,
+  vendorHasLabelAccess,
+} from "@/lib/vendor-entitlement";
 
 export type RemovePrinterResult = { ok: true } | { ok: false; error: string };
 
@@ -95,6 +99,15 @@ export type SendTestPrintResult =
 
 const TEST_PRINT_COOLDOWN_MS = 60_000;
 
+// Null means allowed. A failed lookup reads as a generic failure, not a
+// denial, so a vendor with a paid plan is not told to upgrade during an outage.
+async function labelAccessError(vendorId: string): Promise<string | null> {
+  const access = await vendorHasLabelAccess(vendorId);
+  if (access === null) return "Could not send the test label.";
+  if (!access) return LABELS_UPGRADE_MESSAGE;
+  return null;
+}
+
 /**
  * Queues one sample label for a booth's printer. It goes through the same
  * queue as real orders, so a label that prints proves the whole route works.
@@ -125,6 +138,9 @@ export async function sendTestPrint(
   if (!printer) {
     return { ok: false, error: "That booth has no printer to test." };
   }
+
+  const denied = await labelAccessError(user.id);
+  if (denied) return { ok: false, error: denied };
 
   const since = new Date(Date.now() - TEST_PRINT_COOLDOWN_MS).toISOString();
   const { data: recent, error: recentError } = await service
