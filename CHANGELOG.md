@@ -22,6 +22,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Vercel builds from git only for `main` (`vercel.json` `git.deploymentEnabled`), so PR and branch pushes no longer use up the Hobby daily deployment cap. Staging still deploys through the staging-sync deploy hook; ad-hoc previews come from the `vercel` CLI.
+
 ### Fixed
 
 - First-run steps only show done when every earlier step is done, so "Print your first label" is no longer ticked while "Pick your printer" is open.
