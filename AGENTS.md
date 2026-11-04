@@ -1,4 +1,4 @@
-<!-- templateCentral: nextjs@6.0.4 (Supabase variant — shared project, schema per kit) -->
+<!-- templateCentral: nextjs@7.2.2 (Supabase variant — shared project, schema per kit) -->
 
 # AGENTS.md — printkit
 
@@ -32,7 +32,7 @@ not Realtime presence. Design:
 ## Stack
 
 Next.js 16 · App Router · Turbopack · TypeScript strict · Tailwind v4 · shadcn/ui
-(new-york) · Zod · Supabase (`@supabase/ssr`) · Vitest · pnpm 11 · Node ≥24 ·
+(new-york) · Zod · Supabase (`@supabase/ssr`) · Vitest · pnpm 11 · Node ≥24.22.1 ·
 deploy target: Vercel
 
 ## Commands
@@ -102,7 +102,7 @@ no realtime). Use only the stack-agnostic ones here:
 Do **not** run `templatecentral:add (auth)` or `(database)` — they install
 better-auth / Drizzle and will break RLS.
 
-The templateCentral 6.0.4 review (adopted / not-adopted history, 2026-10-12)
+The templateCentral 7.2.2 review (adopted / not-adopted history, 2026-11-04)
 is in `docs/meta/templatecentral-adoption-log.md`.
 
 ## AI Harness
@@ -120,7 +120,8 @@ Enforcement points an agent must obey:
 - PostToolUse: `tsc --noEmit --incremental` and a comment-hygiene scan after
   every Edit/Write (feedback-only, never block).
 - Stop: runs the test suite; exit 2 feeds failures back.
-- SessionStart: re-injects the first 30 lines of this file.
+- SessionStart: prints the always-on invariants only (this file is loaded
+  through the `CLAUDE.md` import).
 - `permissions`: `deny` covers secret reads/edits (`.env.local` and other
   `.env.<env>` variants, `./secrets/**`; `.env.example` is the one whitelisted
   env file) and irreversible ops (`rm -rf`, `git push --force`/`-f`,
@@ -136,7 +137,9 @@ Enforcement points an agent must obey:
   gate.
 - CI hard gates: changed-line coverage (`diff-cover` ≥80%), `build`,
   changelog-touched, readme-freshness, comment hygiene, harness integrity,
-  lockfile-in-sync, and `security.yml` (gitleaks, `pnpm audit`, CodeQL).
+  lockfile-in-sync, and `security.yml` (gitleaks, the fail-closed deps gate `.claude/deps-gate.sh` —
+  `pnpm audit` high/critical, expiring suppressions only in
+  `.claude/dep-audit-allow.txt` — and CodeQL).
 - RLS isolation: `supabase/tests/rls.test.sql` via `supabase test db`.
   Manifest: `.claude/harness.json`; project skills live in `.claude/skills/`.
 

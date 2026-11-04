@@ -1,9 +1,10 @@
 {
-  "templatecentral_version": "6.0.4",
+  "templatecentral_version": "7.2.2",
   "stack": "nextjs",
   "adapted": "Next 16 + Supabase (auth/db) — Supabase variant, based on qkit harness",
   "seeded_at": "2026-07-22",
-  "review_note": "2026-10-12: templateCentral 5.15 to 6.0.4. Ported the harness qkit adopted in its 6.0.1 and 6.0.4 reviews by 3-way merge, keeping this repo's local lines: project-anchored hook commands with timeouts, clean-tree Stop skip, additionalContext typecheck feedback, the Skill matcher, the per-segment block-no-verify parser with cwd-aware branch detection, protect-files path resolution, a verifier that fails on an unreadable manifest, a wider commit-msg gate, fail-closed PR doc gates in CI. Removed post-tool-failure.sh. Not adopted: exec-form hooks, the gitleaks syntax changes, ci-gates.sh, hooks/local, Azure DevOps and OpenCode items. Reasoning is in the AGENTS.md entry of the same date. Hashes below were recomputed from the LF-normalised blobs. Harness built to match the AGENTS.md 'AI Harness' section that had described it since the qkit-seeded bootstrap but was never actually built. Hooks/skills match qkit's simpler pattern; git-hook layer (lefthook) matches loopkit's, since that's this plan's chosen baseline. CI gates (changelog, readme-freshness, coverage) added to match loopkit's real working jobs. Follow-up: added the missing .claude/hooks/* Claude-Code-hook script layer (previously inline `node -e` one-liners embedded in settings.json), and fixed lefthook.yml's format-lint command, which had no exclude list and would have reformatted/drifted those scripts on first commit; version marker bumped 5.7.0 -> 5.11.0 to match sibling repo loopkit's harness architecture, which this change brings paykit's Claude Code hook layer up to.",
+  "reviewed_at": "2026-11-04",
+  "review_note": "2026-11-04: templateCentral 6.0.4 to 7.2.2 by 3-way merge onto this repo's files. Adopted: the 6.0.5 strict && chain fix in block-no-verify.sh (with upstream's test cases in a new block-no-verify.test.sh), session-context.sh no longer printing head -30 AGENTS.md (7.0.0), engines.node >=24.22.1 (7.2.2 eMudhra CA fix), and the 6.1.0/6.1.1 fail-closed deps gate as a standalone .claude/deps-gate.sh with the expiring .claude/dep-audit-allow.txt and its protect-files.sh ask rule, wired into security.yml. Skipped items and reasons are in docs/meta/templatecentral-adoption-log.md. 2026-10-12:templateCentral 5.15 to 6.0.4. Ported the harness qkit adopted in its 6.0.1 and 6.0.4 reviews by 3-way merge, keeping this repo's local lines: project-anchored hook commands with timeouts, clean-tree Stop skip, additionalContext typecheck feedback, the Skill matcher, the per-segment block-no-verify parser with cwd-aware branch detection, protect-files path resolution, a verifier that fails on an unreadable manifest, a wider commit-msg gate, fail-closed PR doc gates in CI. Removed post-tool-failure.sh. Not adopted: exec-form hooks, the gitleaks syntax changes, ci-gates.sh, hooks/local, Azure DevOps and OpenCode items. Reasoning is in the AGENTS.md entry of the same date. Hashes below were recomputed from the LF-normalised blobs. Harness built to match the AGENTS.md 'AI Harness' section that had described it since the qkit-seeded bootstrap but was never actually built. Hooks/skills match qkit's simpler pattern; git-hook layer (lefthook) matches loopkit's, since that's this plan's chosen baseline. CI gates (changelog, readme-freshness, coverage) added to match loopkit's real working jobs. Follow-up: added the missing .claude/hooks/* Claude-Code-hook script layer (previously inline `node -e` one-liners embedded in settings.json), and fixed lefthook.yml's format-lint command, which had no exclude list and would have reformatted/drifted those scripts on first commit; version marker bumped 5.7.0 -> 5.11.0 to match sibling repo loopkit's harness architecture, which this change brings paykit's Claude Code hook layer up to.",
   "adoWiki": false,
   "richReadme": true,
   "seeded_files": {
@@ -110,6 +111,18 @@
     ".claude/regen-harness.sh": {
       "origin_hash": "888ee29fd7a5312d2662abdb447ca94feaed57249287510d8227ec8a6ee186ee",
       "path": ".claude/regen-harness.sh"
+    },
+    ".claude/deps-gate.sh": {
+      "origin_hash": "PLACEHOLDER",
+      "path": ".claude/deps-gate.sh"
+    },
+    ".claude/dep-audit-allow.txt": {
+      "origin_hash": "PLACEHOLDER",
+      "path": ".claude/dep-audit-allow.txt"
+    },
+    ".claude/hooks/block-no-verify.test.sh": {
+      "origin_hash": "PLACEHOLDER",
+      "path": ".claude/hooks/block-no-verify.test.sh"
     }
   }
 }

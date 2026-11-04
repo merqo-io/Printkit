@@ -12,7 +12,10 @@ harness.
 - `block-no-verify.sh` — PreToolUse(Bash): blocks `--no-verify`/`-n` on
   `git commit`, hook-bypass env vars, direct commits to `main`, force-push
   to a protected branch, `git checkout/restore` on guard-layer files, and
-  recursive-force `rm` on source directories; exit 2 blocks.
+  recursive-force `rm` on source directories; exit 2 blocks. A strict `&&`
+  chain (`cd <repo> && git commit`) is judged only by the directories git
+  actually runs in, so it passes from a `main` checkout when the `cd` lands on
+  a feature branch; anything looser keeps the starting directory as a candidate.
 - `post-edit-typecheck.sh` — PostToolUse(Edit|Write), `.ts`/`.tsx` files
   only: runs incremental `tsc --noEmit` and surfaces the last 5 lines;
   feedback-only, never blocks.
@@ -25,7 +28,8 @@ harness.
   secret directories and credentials. Governance and CI/CD writes require
   approval; governance reads are permitted.
 - `session-context.sh` — SessionStart(startup|resume|clear|compact):
-  re-injects the first 30 lines of `AGENTS.md`.
+  re-injects the always-on invariants (`AGENTS.md` is already loaded through
+  the `CLAUDE.md` import).
 - `skill-usage-log.sh` — PostToolUse(`Skill`): appends a
   `timestamp\tskill-name` line to `.claude/skill-usage.log`; always exits 0.
 - `stop-checks.sh` — Stop: runs `pnpm test`; on failure, tails the last 20
