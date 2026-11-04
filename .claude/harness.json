@@ -9,7 +9,7 @@
   "richReadme": true,
   "seeded_files": {
     "AGENTS.md": {
-      "origin_hash": "21a91c6b584abd86fdb648e9ae0b0c0f766b7df5087034f5a80bbad413646a57",
+      "origin_hash": "5f78bfe0f655340fbe08a4870a199e52e3677d0cdea65449586c19f7ffe4d40f",
       "path": "AGENTS.md"
     },
     ".claude/settings.json": {
@@ -17,11 +17,11 @@
       "path": ".claude/settings.json"
     },
     ".claude/hooks/block-no-verify.sh": {
-      "origin_hash": "e780da8322bc56be0eb517637aa4593257ef9b8c02e98e3c4d8c60f689544a1b",
+      "origin_hash": "3adeda695d32b794580c19b7c1309a7b06638d87ca2051e21ee32e4837ad6f6a",
       "path": ".claude/hooks/block-no-verify.sh"
     },
     ".claude/hooks/protect-files.sh": {
-      "origin_hash": "3b828581fc1123e27d325401212f295cfbfc6cde34c7f06e36a2dc3f7955e382",
+      "origin_hash": "a682c2c259a098ec41ff69894def6d3d2246bf8db69b3f233c598f3987c4c75b",
       "path": ".claude/hooks/protect-files.sh"
     },
     ".claude/hooks/user-prompt-guard.cjs": {
@@ -45,7 +45,7 @@
       "path": ".claude/hooks/post-edit-typecheck.sh"
     },
     ".claude/hooks/session-context.sh": {
-      "origin_hash": "a3e8facd103e97b8129f0bbe311403f4431888b115b81741ce298619b3b15db9",
+      "origin_hash": "038362dfce87e6128e5d4e333ae492b794c7af77c24a3df62774172c7f1cd087",
       "path": ".claude/hooks/session-context.sh"
     },
     ".claude/hooks/skill-usage-log.sh": {
@@ -101,7 +101,7 @@
       "path": ".gitleaks.toml"
     },
     ".github/workflows/ci.yml": {
-      "origin_hash": "faf2826b3145250b1f0ced7ff515a8799dcb2251e3fa9bc95e724b7e3ac6d152",
+      "origin_hash": "676f53940f98cb912a25c4dbc015b045f3cf31307d2b6f4fd513104881b35765",
       "path": ".github/workflows/ci.yml"
     },
     ".claude/verify-harness.sh": {
@@ -113,15 +113,15 @@
       "path": ".claude/regen-harness.sh"
     },
     ".claude/deps-gate.sh": {
-      "origin_hash": "PLACEHOLDER",
+      "origin_hash": "ddfd9aa43a84429f576a38c7bda5eb754c95eea186baeb27f28c8b71479bf195",
       "path": ".claude/deps-gate.sh"
     },
     ".claude/dep-audit-allow.txt": {
-      "origin_hash": "PLACEHOLDER",
+      "origin_hash": "1b1aa7ce946db18b417352ed016f5329c70d90b382fc735af395de58143de0b2",
       "path": ".claude/dep-audit-allow.txt"
     },
     ".claude/hooks/block-no-verify.test.sh": {
-      "origin_hash": "PLACEHOLDER",
+      "origin_hash": "31fec18badee31a72ed2e7d743d0a18c8e8d297d3e4c0854f386d5086a80763e",
       "path": ".claude/hooks/block-no-verify.test.sh"
     }
   }
