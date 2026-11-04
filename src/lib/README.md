@@ -24,6 +24,11 @@ everything else sits flat here.
   `GET /api/v1/print-locations/status` as `manage_url` so no calling kit
   builds a printkit path. `locationRowId(id)` is the row's element id,
   shared with the printers page so the link and the row cannot drift.
+- `auth-errors.ts` — maps Supabase auth errors to short plain copy for the
+  login and reset-password screens (`signInErrorMessage`,
+  `resetErrorMessage`, `passwordUpdateErrorMessage`, `oauthErrorMessage`).
+  Unknown errors get a generic fallback so raw provider text never reaches
+  the page.
 - `safe-redirect.ts` — `safeRedirectPath(next, fallback)`: rejects an absolute
   URL, a protocol-relative `//`/`/\` path, or one carrying an embedded control
   character, falling back otherwise. The open-redirect guard for every
