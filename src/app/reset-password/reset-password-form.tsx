@@ -35,7 +35,10 @@ export function ResetPasswordForm({
     if (state !== "ready" || pending) return;
     const parsed = passwordChangeSchema.safeParse({ password, confirm });
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Check your password");
+      setError(
+        parsed.error.issues[0]?.message ??
+          "Could not use that password. Check both fields.",
+      );
       return;
     }
     setError(null);
@@ -52,7 +55,7 @@ export function ResetPasswordForm({
         router.refresh();
         await navigatingAway();
       } catch {
-        toast.error("Could not update your password. Please try again.");
+        toast.error("Could not update your password. Try again in a minute.");
       }
     });
   }
@@ -67,8 +70,8 @@ export function ResetPasswordForm({
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {state === "failed"
-            ? "Check your connection and reload this page, or return to sign in."
-            : "Password reset links can only be used once, and they expire after a short while. Request a fresh one from the sign-in page."}
+            ? "Check your connection and reload this page, or go back to sign in."
+            : "Reset links work once and expire after a short while. Request a new one from the sign-in page."}
         </p>
         <Button
           asChild
@@ -87,7 +90,7 @@ export function ResetPasswordForm({
         Set a new password
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground">
-        Pick something at least 8 characters long.
+        Use at least 8 characters.
       </p>
       <form
         onSubmit={(e) => {
@@ -97,40 +100,38 @@ export function ResetPasswordForm({
         className="mt-6 space-y-5"
       >
         <div className="space-y-2">
-          <Label
-            htmlFor="new-password"
-            className="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
-          >
+          <Label htmlFor="new-password" className="text-sm font-medium">
             New password
           </Label>
           <Input
             id="new-password"
             type="password"
             autoComplete="new-password"
-            placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 rounded-xl"
+            className="h-11 rounded-xl text-base"
           />
         </div>
         <div className="space-y-2">
-          <Label
-            htmlFor="confirm-password"
-            className="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
-          >
+          <Label htmlFor="confirm-password" className="text-sm font-medium">
             Confirm new password
           </Label>
           <Input
             id="confirm-password"
             type="password"
             autoComplete="new-password"
-            placeholder="••••••••"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="h-11 rounded-xl"
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? "reset-password-error" : undefined}
+            className="h-11 rounded-xl text-base"
           />
           {error && (
-            <p role="alert" className="text-sm text-destructive">
+            <p
+              id="reset-password-error"
+              role="alert"
+              className="text-sm text-destructive"
+            >
               {error}
             </p>
           )}

@@ -63,7 +63,7 @@ describe("updatePasswordAction", () => {
     const result = await updatePasswordAction(input);
     expect(result).toEqual({
       success: false,
-      error: "Could not check your reset link. Please try again.",
+      error: "Could not check your reset link. Try again in a minute.",
     });
     expect(updateUser).not.toHaveBeenCalled();
   });
@@ -71,7 +71,7 @@ describe("updatePasswordAction", () => {
   it.each([
     [{ password: "short", confirm: "short" }, /at least 8/],
     [{ password: "long-password", confirm: "different" }, /do not match/],
-    [null, /check your password/i],
+    [null, /could not use that password/i],
   ])("rejects invalid input %j before the auth API", async (bad, message) => {
     const result = await updatePasswordAction(bad);
     expect(result.success).toBe(false);
@@ -81,10 +81,13 @@ describe("updatePasswordAction", () => {
 
   it("keeps the window open for a retry when Supabase rejects the update", async () => {
     updateUser.mockResolvedValue({
-      error: { message: "Password is too weak" },
+      error: { message: "Password is too weak", code: "weak_password" },
     });
     const result = await updatePasswordAction(input);
-    expect(result).toEqual({ success: false, error: "Password is too weak" });
+    expect(result).toEqual({
+      success: false,
+      error: "That password is too easy to guess. Try a longer one.",
+    });
     expect(cookieDelete).not.toHaveBeenCalled();
   });
 
@@ -93,7 +96,7 @@ describe("updatePasswordAction", () => {
     const result = await updatePasswordAction(input);
     expect(result).toEqual({
       success: false,
-      error: "Could not update your password. Please try again.",
+      error: "Could not update your password. Try again in a minute.",
     });
     expect(cookieDelete).not.toHaveBeenCalled();
   });

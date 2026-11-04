@@ -3,6 +3,12 @@
 import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { z } from "zod";
+import {
+  oauthErrorMessage,
+  resetErrorMessage,
+  signInErrorMessage,
+} from "@/lib/auth-errors";
 import { createClient } from "@/lib/supabase/client";
 import { safeRedirectPath } from "@/lib/safe-redirect";
 import { authNextCookie } from "@/lib/auth-return";
@@ -16,7 +22,10 @@ import { GoogleMark } from "@merqo/ui";
 const DEFAULT_RETURN_PATH = "/dashboard";
 
 const OAUTH_ERROR_MESSAGE =
-  "Something went wrong signing in with Google. Please try again.";
+  "Could not sign in with Google. Try again in a minute.";
+
+const emailSchema = z.string().trim().email();
+const EMAIL_ERROR = "Enter a valid email, like you@business.sg.";
 
 export default function LoginPage() {
   return (
@@ -34,6 +43,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(
     searchParams.get("error") === "oauth" ? OAUTH_ERROR_MESSAGE : null,
   );
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   // A URL fragment never reaches the server, but the browser carries it across
@@ -71,21 +81,22 @@ function LoginForm() {
         },
       });
       if (error) {
-        setError(error.message);
+        setError(oauthErrorMessage(error));
         setBusy(false);
       }
     } catch {
-      setError("Could not sign in with Google. Please try again.");
+      setError(OAUTH_ERROR_MESSAGE);
       setBusy(false);
     }
   }
 
   // The callback recognises the reset link's code exchange and opens the form.
   async function sendReset() {
-    if (!email) {
-      toast.error("Enter your email first");
+    if (!emailSchema.safeParse(email).success) {
+      setEmailError(EMAIL_ERROR);
       return;
     }
+    setEmailError(null);
     setBusy(true);
     setError(null);
     try {
@@ -94,12 +105,12 @@ function LoginForm() {
         redirectTo: `${window.location.origin}/auth/callback`,
       });
       if (error) {
-        toast.error(error.message);
+        toast.error(resetErrorMessage(error));
         return;
       }
-      toast.success(`Password reset link sent to ${email}.`);
+      toast.success(`Reset link sent to ${email}. Check your inbox.`);
     } catch {
-      toast.error("Could not send a reset link. Please try again.");
+      toast.error("Could not send a reset link. Try again in a minute.");
     } finally {
       setBusy(false);
     }
@@ -107,8 +118,13 @@ function LoginForm() {
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    setBusy(true);
     setError(null);
+    if (!emailSchema.safeParse(email).success) {
+      setEmailError(EMAIL_ERROR);
+      return;
+    }
+    setEmailError(null);
+    setBusy(true);
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
@@ -116,7 +132,7 @@ function LoginForm() {
         password,
       });
       if (error) {
-        setError(error.message);
+        setError(signInErrorMessage(error));
         setBusy(false);
         return;
       }
@@ -128,7 +144,7 @@ function LoginForm() {
     }
   }
 
-  const submitLabel = busy ? "Please wait…" : "Sign in";
+  const submitLabel = busy ? "Signing in…" : "Sign in";
 
   return (
     <main className="flex min-h-screen items-center justify-center p-5">
@@ -136,17 +152,17 @@ function LoginForm() {
         <div className="mb-8 text-center">
           <Wordmark className="text-3xl" />
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage your printer connection and print jobs.
+            New to printkit? Start in qkit.
           </p>
         </div>
 
         <ElevatedCard>
           <div className="px-7 pt-9 pb-8">
-            <h1 className="font-display text-3xl font-bold tracking-tight">
+            <h1 className="font-display text-3xl font-semibold tracking-tight">
               Welcome back
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Sign in to your printkit dashboard.
+              Sign in to manage your printers and print jobs.
             </p>
 
             <Button
@@ -162,18 +178,15 @@ function LoginForm() {
 
             <div className="my-6 flex items-center gap-3">
               <span className="h-px flex-1 bg-border" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                or with email
+              <span className="text-sm text-muted-foreground">
+                or use email
               </span>
               <span className="h-px flex-1 bg-border" />
             </div>
 
-            <form onSubmit={submit} className="space-y-5">
+            <form onSubmit={submit} noValidate className="space-y-5">
               <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                >
+                <Label htmlFor="email" className="text-sm font-medium">
                   Email
                 </Label>
                 <Input
@@ -182,24 +195,28 @@ function LoginForm() {
                   required
                   autoComplete="email"
                   placeholder="you@business.sg"
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-xl text-base"
                   value={email}
+                  aria-invalid={emailError ? true : undefined}
+                  aria-describedby={emailError ? "email-error" : undefined}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+                {emailError && (
+                  <p id="email-error" className="text-sm text-destructive">
+                    {emailError}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-3">
-                  <Label
-                    htmlFor="password"
-                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                  >
+                  <Label htmlFor="password" className="text-sm font-medium">
                     Password
                   </Label>
                   <button
                     type="button"
                     onClick={sendReset}
                     disabled={busy}
-                    className="text-xs font-semibold text-primary underline-offset-4 hover:underline disabled:opacity-50"
+                    className="text-sm font-medium text-primary underline-offset-4 hover:underline disabled:opacity-50"
                   >
                     Forgot password?
                   </button>
@@ -209,8 +226,7 @@ function LoginForm() {
                   type="password"
                   required
                   autoComplete="current-password"
-                  placeholder="••••••••"
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-xl text-base"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -236,8 +252,7 @@ function LoginForm() {
 
           <div className="border-t" />
           <p className="px-7 py-4 text-center text-sm text-muted-foreground">
-            printkit is the print companion for qkit booths. New vendors start
-            with qkit.
+            printkit is the print companion for qkit booths.
           </p>
         </ElevatedCard>
       </div>

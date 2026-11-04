@@ -16,7 +16,10 @@ folder's job is entirely to collect the vendor's consent and forward it.
   Laid out like the login page: `Wordmark` above an `ElevatedCard`, title in the display face. Tab title "Accept the updated terms".
 - `accept-form.tsx` — `AcceptForm`, a client component wrapping `@merqo/ui`'s
   `TermsAcceptanceCheckbox` (just the agree checkbox — no typed name); the
-  submit button is disabled until it's checked. Posts to `acceptLegalTerms`.
+  "Accept and continue" is disabled until it's checked and posts to
+  `acceptLegalTerms`. A separate "Sign out instead" form posts to
+  `signOutAction` (`@/app/actions/auth`), so a visitor who declines is not
+  stuck on this page.
 - `actions.ts` — `acceptLegalTerms` server action. Re-checks for a signed-in
   user (redirects to `/login` otherwise), reads the vendor's real
   `ip`/`user_agent`, then `POST`s `/api/merqo/legal-accept` on merqo once

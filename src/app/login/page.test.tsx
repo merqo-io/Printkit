@@ -59,7 +59,7 @@ describe("LoginPage", () => {
 
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent(
-      "Something went wrong signing in with Google. Please try again.",
+      "Could not sign in with Google. Try again in a minute.",
     );
   });
 
@@ -85,9 +85,12 @@ describe("LoginPage", () => {
     });
   });
 
-  it("shows the Supabase error and stays on the page when password sign-in is rejected", async () => {
+  it("shows plain copy and stays on the page when password sign-in is rejected", async () => {
     signInWithPasswordMock.mockResolvedValue({
-      error: { message: "Invalid login credentials" },
+      error: {
+        message: "Invalid login credentials",
+        code: "invalid_credentials",
+      },
     });
     const push = vi.fn();
     useRouterMock.mockReturnValue({ push, refresh: vi.fn() });
@@ -99,7 +102,7 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Invalid login credentials",
+      "Email or password is wrong. Try again or reset your password.",
     );
     expect(push).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Sign in" })).toBeEnabled();
@@ -127,20 +130,20 @@ describe("LoginPage", () => {
     });
   });
 
-  it("toasts an error and does not send a reset email when the email field is empty", async () => {
+  it("flags the email inline and does not send a reset email when the email field is empty", async () => {
     const user = userEvent.setup();
     const { default: LoginPage } = await import("./page");
     render(<LoginPage />);
 
     await user.click(screen.getByRole("button", { name: /forgot password/i }));
 
-    expect(toast.error).toHaveBeenCalledWith("Enter your email first");
+    expect(screen.getByText(/Enter a valid email/)).toBeVisible();
     expect(resetPasswordForEmailMock).not.toHaveBeenCalled();
   });
 
-  it("toasts the Supabase error message when resetPasswordForEmail fails", async () => {
+  it("toasts plain copy when resetPasswordForEmail is rate limited", async () => {
     resetPasswordForEmailMock.mockResolvedValue({
-      error: { message: "Too many requests" },
+      error: { message: "Too many requests", status: 429 },
     });
     const user = userEvent.setup();
     const { default: LoginPage } = await import("./page");
@@ -150,7 +153,9 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: /forgot password/i }));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Too many requests");
+      expect(toast.error).toHaveBeenCalledWith(
+        "Too many requests. Wait a few minutes and try again.",
+      );
     });
     expect(toast.success).not.toHaveBeenCalled();
   });
@@ -318,7 +323,7 @@ it("releases reset controls after transport rejection", async () => {
   await user.click(screen.getByRole("button", { name: /forgot password/i }));
   await waitFor(() =>
     expect(toast.error).toHaveBeenCalledWith(
-      "Could not send a reset link. Please try again.",
+      "Could not send a reset link. Try again in a minute.",
     ),
   );
   expect(

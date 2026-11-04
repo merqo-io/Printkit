@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Sign-in, password reset and legal accept use plain sentence-case copy. Supabase auth errors map to short next-step messages (`src/lib/auth-errors.ts`) instead of showing raw text, the login email is validated inline, and the legal accept page gains "Sign out instead".
+
 ### Added
 
 - `POST /api/merqo/entitlement` (bearer `MERQO_PROVISION_SECRET`) receives merqo's per-vendor entitlement into `printkit.vendor_entitlements` (migration 0017).
