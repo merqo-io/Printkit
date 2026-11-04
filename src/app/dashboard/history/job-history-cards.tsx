@@ -32,11 +32,11 @@ export function JobHistoryCards({
                     ? "Test print"
                     : payloadField(job.payload, "customer_name")}
                 </p>
-                {!test && (
-                  <p className="text-muted-foreground font-mono text-sm">
-                    #{payloadField(job.payload, "order_number")}
-                  </p>
-                )}
+                <p className="text-muted-foreground font-mono text-sm">
+                  {test
+                    ? "None"
+                    : `#${payloadField(job.payload, "order_number")}`}
+                </p>
               </div>
               <JobStatusBadge status={job.status} />
             </div>

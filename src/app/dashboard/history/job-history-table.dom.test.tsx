@@ -283,6 +283,7 @@ describe("JobHistoryCards", () => {
       />,
     );
     expect(screen.getByText("Test print")).toBeInTheDocument();
+    expect(screen.getByText("None")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /reprint/i }),
     ).not.toBeInTheDocument();
