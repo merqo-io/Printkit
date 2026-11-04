@@ -19,6 +19,31 @@ it("renders the way back as the shared BackButton", () => {
   ).toBeInTheDocument();
 });
 
+it("renders the eyebrow, description and action alongside a single h1", () => {
+  render(
+    <PageHeader
+      eyebrow="Printers"
+      title="Your printers"
+      description="Everything that prints for you."
+      action={<button type="button">Add printer</button>}
+    />,
+  );
+  expect(screen.getByText("Printers")).toHaveClass("uppercase");
+  expect(
+    screen.getByText("Everything that prints for you."),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("button", { name: "Add printer" }),
+  ).toBeInTheDocument();
+  expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+});
+
+it("omits the eyebrow and action when not given", () => {
+  const { container } = render(<PageHeader title="Overview" />);
+  expect(container.querySelector("p")).toBeNull();
+  expect(screen.queryByRole("button")).not.toBeInTheDocument();
+});
+
 it("leaves the way back out when there is none", () => {
   render(<PageHeader title="Overview" description="What this page is for." />);
   expect(screen.queryByRole("link")).not.toBeInTheDocument();
