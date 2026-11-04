@@ -92,23 +92,25 @@ function LoginForm() {
 
   // The callback recognises the reset link's code exchange and opens the form.
   async function sendReset() {
-    if (!emailSchema.safeParse(email).success) {
+    const parsed = emailSchema.safeParse(email);
+    if (!parsed.success) {
       setEmailError(EMAIL_ERROR);
       return;
     }
+    const cleanEmail = parsed.data;
     setEmailError(null);
     setBusy(true);
     setError(null);
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
         redirectTo: `${window.location.origin}/auth/callback`,
       });
       if (error) {
         toast.error(resetErrorMessage(error));
         return;
       }
-      toast.success(`Reset link sent to ${email}. Check your inbox.`);
+      toast.success(`Reset link sent to ${cleanEmail}. Check your inbox.`);
     } catch {
       toast.error("Could not send a reset link. Try again in a minute.");
     } finally {
@@ -119,7 +121,8 @@ function LoginForm() {
   async function submit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!emailSchema.safeParse(email).success) {
+    const parsed = emailSchema.safeParse(email);
+    if (!parsed.success) {
       setEmailError(EMAIL_ERROR);
       return;
     }
@@ -128,7 +131,7 @@ function LoginForm() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: parsed.data,
         password,
       });
       if (error) {
@@ -199,7 +202,10 @@ function LoginForm() {
                   value={email}
                   aria-invalid={emailError ? true : undefined}
                   aria-describedby={emailError ? "email-error" : undefined}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError(null);
+                  }}
                 />
                 {emailError && (
                   <p id="email-error" className="text-sm text-destructive">
