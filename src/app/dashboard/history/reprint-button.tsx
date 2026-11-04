@@ -36,9 +36,7 @@ export function ReprintButton({
       const result = await reprintJob(jobId);
       if (result.success) {
         toast.success(
-          boothLabel
-            ? `Label sent to print again at ${boothLabel}.`
-            : "Label sent to print again.",
+          boothLabel ? `Reprint queued for ${boothLabel}.` : "Reprint queued.",
         );
       } else toast.error(result.error);
     })

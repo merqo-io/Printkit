@@ -30,6 +30,9 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
   way back, drawn as the shared `BackButton`.
 - `panel.tsx` — `Panel({ as, className, children })`: the bordered container
   dashboard content sits in. Panels are never nested.
+- `segmented-control.tsx` — `SegmentedControl({ label, options })`: an
+  either/or switch of links (`aria-current` on the active one), 44px tall on
+  coarse pointers.
 - `notice.tsx` — `Notice({ tone, title, children })`: a neutral, info or
   warning callout, coloured from the status tokens.
 - `steps.tsx` — `Steps` and `Step({ number, title })`: the numbered sequence

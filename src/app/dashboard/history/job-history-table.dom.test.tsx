@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render as rtlRender,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { JobHistoryTable } from "./job-history-table";
+import { JobHistoryCards } from "./job-history-cards";
 import type { PrintJob } from "@/lib/print-jobs-list";
 
 const assignPrintLocationMock = vi.hoisted(() => vi.fn());
@@ -37,6 +43,14 @@ const UNROUTED_JOB: PrintJob = {
   print_locations: null,
 };
 
+// jsdom applies no stylesheet, so the phone card list and the desktop table
+// are both in the DOM. These tests target the table; cards have their own.
+function render(ui: React.ReactElement) {
+  const result = rtlRender(ui);
+  result.container.querySelector('[data-testid="history-cards"]')?.remove();
+  return result;
+}
+
 describe("JobHistoryTable", () => {
   it("renders a row per job with customer name, order number, and status", () => {
     render(<JobHistoryTable jobs={[JOB]} />);
@@ -55,7 +69,10 @@ describe("JobHistoryTable", () => {
 
   it("shows an empty state when there are no jobs", () => {
     render(<JobHistoryTable jobs={[]} />);
-    expect(screen.getByText(/no print jobs yet/i)).toBeInTheDocument();
+    expect(screen.getByText("No labels yet.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Each qkit order shows up here."),
+    ).toBeInTheDocument();
   });
 
   it("renders a Reprint button for a failed job", () => {
@@ -213,7 +230,74 @@ describe("JobHistoryTable test prints", () => {
       />,
     );
     expect(screen.getByText("Test print")).toBeInTheDocument();
+    expect(screen.getByText("None")).toBeInTheDocument();
     expect(screen.queryByText("Printer A")).toBeNull();
     expect(screen.queryByText("TEST")).toBeNull();
+  });
+
+  it("offers no Reprint for a test print, in the table or the cards", () => {
+    const test = { ...JOB, source_kit: "printkit-test" };
+    rtlRender(<JobHistoryTable jobs={[test]} />);
+    expect(
+      screen.queryByRole("button", { name: /reprint/i }),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("JobHistoryCards", () => {
+  it("renders a card with customer, mono order number, booth, status and time", () => {
+    rtlRender(<JobHistoryCards jobs={[JOB]} locations={[]} />);
+    expect(screen.getByText("Ada")).toBeInTheDocument();
+    expect(screen.getByText("#0007")).toHaveClass("font-mono");
+    expect(screen.getByText("Kopitiam Cart")).toBeInTheDocument();
+    expect(screen.getByText("Printed")).toBeInTheDocument();
+    expect(screen.getByText("22 Aug 2026, 6:00 pm")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /reprint/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a plain failure line and Reprint for a failed label", () => {
+    rtlRender(
+      <JobHistoryCards
+        jobs={[{ ...JOB, status: "failed", failure_reason: "expired" }]}
+        locations={[]}
+      />,
+    );
+    expect(
+      screen.getByText(/did not pick this label up in time/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /reprint/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("hides Reprint for test prints and still-queued labels", () => {
+    rtlRender(
+      <JobHistoryCards
+        jobs={[
+          { ...JOB, id: "a", source_kit: "printkit-test" },
+          { ...JOB, id: "b", status: "queued" },
+        ]}
+        locations={[]}
+      />,
+    );
+    expect(screen.getByText("Test print")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /reprint/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers booth assignment on an unrouted queued label", () => {
+    rtlRender(
+      <JobHistoryCards
+        jobs={[UNROUTED_JOB]}
+        locations={[{ id: "loc-1", label: "Kopitiam Cart" }]}
+      />,
+    );
+    expect(screen.getByText("Needs a booth")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Assign to Kopitiam Cart" }),
+    ).toBeInTheDocument();
   });
 });

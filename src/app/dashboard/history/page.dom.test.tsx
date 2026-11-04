@@ -67,8 +67,8 @@ const validCursor = Buffer.from(
 describe("HistoryPage", () => {
   it("renders every row when the unrouted filter isn't applied", async () => {
     render(await HistoryPage({ searchParams: Promise.resolve({}) }));
-    expect(screen.getByText("Ada")).toBeInTheDocument();
-    expect(screen.getByText("Uma")).toBeInTheDocument();
+    expect(screen.getAllByText("Ada").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Uma").length).toBeGreaterThan(0);
   });
 
   it("renders only unrouted, queued rows when ?unrouted=1 is present", async () => {
@@ -76,7 +76,7 @@ describe("HistoryPage", () => {
       await HistoryPage({ searchParams: Promise.resolve({ unrouted: "1" }) }),
     );
     expect(screen.queryByText("Ada")).not.toBeInTheDocument();
-    expect(screen.getByText("Uma")).toBeInTheDocument();
+    expect(screen.getAllByText("Uma").length).toBeGreaterThan(0);
   });
 });
 
@@ -88,7 +88,7 @@ it("preserves the unrouted filter when browsing older jobs", async () => {
   render(
     await HistoryPage({ searchParams: Promise.resolve({ unrouted: "1" }) }),
   );
-  expect(screen.getByRole("link", { name: "Older jobs" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Older labels" })).toHaveAttribute(
     "href",
     "/dashboard/history?unrouted=1&cursor=next-page",
   );
@@ -100,7 +100,7 @@ it("offers a return to the newest filtered page", async () => {
       searchParams: Promise.resolve({ unrouted: "1", cursor: validCursor }),
     }),
   );
-  expect(screen.getByRole("link", { name: "Newest jobs" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Newest labels" })).toHaveAttribute(
     "href",
     "/dashboard/history?unrouted=1",
   );
@@ -110,16 +110,28 @@ it("offers a return to the newest filtered page", async () => {
   });
 });
 
-it("says when the unrouted filter is on and offers a way out", async () => {
+it("marks Needs a booth current with ?unrouted=1 and links back to all labels", async () => {
   render(
     await HistoryPage({ searchParams: Promise.resolve({ unrouted: "1" }) }),
   );
-  expect(
-    screen.getByText(/showing only jobs that need a booth/i),
-  ).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Show all jobs" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Needs a booth" })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  const all = screen.getByRole("link", { name: "All labels" });
+  expect(all).toHaveAttribute("href", "/dashboard/history");
+  expect(all).not.toHaveAttribute("aria-current");
+});
+
+it("marks All labels current by default and deep-links the booth filter", async () => {
+  render(await HistoryPage({ searchParams: Promise.resolve({}) }));
+  expect(screen.getByRole("link", { name: "All labels" })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  expect(screen.getByRole("link", { name: "Needs a booth" })).toHaveAttribute(
     "href",
-    "/dashboard/history",
+    "/dashboard/history?unrouted=1",
   );
 });
 
@@ -136,8 +148,8 @@ it.each([{}, { unrouted: "1" }])(
       cursor: undefined,
     });
     expect(
-      screen.queryByRole("link", { name: "Newest jobs" }),
+      screen.queryByRole("link", { name: "Newest labels" }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByText("No older jobs.")).not.toBeInTheDocument();
+    expect(screen.queryByText("No older labels.")).not.toBeInTheDocument();
   },
 );

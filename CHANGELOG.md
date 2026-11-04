@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- History shows a card list on phones (table from `sm` up, also on Overview), hides Reprint on test prints, filters with an "All labels / Needs a booth" control (`?unrouted=1` still works), and says "labels" instead of "jobs". Empty placeholders read "None" / "Not given" instead of em dashes.
 - Label print jobs (`POST /api/v1/print-jobs` and the dashboard test label) now require a live paid entitlement or a running event pass. Kits get 403 `labels_not_entitled`; a failed lookup fails closed (503 on the API). Vendors with no pushed entitlement are blocked until merqo pushes.
 
 ### Security

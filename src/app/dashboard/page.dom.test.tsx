@@ -157,7 +157,7 @@ describe("DashboardPage", () => {
 
   it("shows the empty history state when there are no recent jobs", async () => {
     render(await DashboardPage());
-    expect(screen.getByText(/no print jobs yet/i)).toBeInTheDocument();
+    expect(screen.getByText("No labels yet.")).toBeInTheDocument();
   });
 
   it("hides the unrouted-jobs callout when the count is zero", async () => {

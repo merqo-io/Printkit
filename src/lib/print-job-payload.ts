@@ -9,7 +9,7 @@ import type { Json } from "@/lib/types";
 export function payloadField(
   payload: Json,
   key: string,
-  fallback = "—",
+  fallback = "Not given",
 ): string {
   if (typeof payload !== "object" || payload === null || Array.isArray(payload))
     return fallback;
