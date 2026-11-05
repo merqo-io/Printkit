@@ -63,7 +63,9 @@ describe("ReprintButton", () => {
     await waitFor(() => expect(toastSuccess).toHaveBeenCalled());
     expect(reprintJobMock).toHaveBeenCalledTimes(1);
     expect(reprintJobMock).toHaveBeenCalledWith("job-1");
-    expect(toastSuccess.mock.calls[0][0]).toContain("Kopitiam Cart");
+    expect(toastSuccess.mock.calls[0][0]).toBe(
+      "Reprint queued for Kopitiam Cart.",
+    );
   });
 
   it("disables confirm while pending and recovers when the action throws", async () => {

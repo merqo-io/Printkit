@@ -56,8 +56,12 @@ export function AssignLocationControl({
   return (
     <div className="flex items-center gap-2">
       <Select value={selected} onValueChange={setSelected}>
-        <SelectTrigger size="sm" className="w-36">
-          <SelectValue placeholder="Choose booth" />
+        <SelectTrigger
+          size="sm"
+          className="w-36"
+          aria-label="Booth for this label"
+        >
+          <SelectValue placeholder="Choose a booth" />
         </SelectTrigger>
         <SelectContent>
           {locations.map((loc) => (

@@ -3,9 +3,8 @@ import Link from "next/link";
 import { getVendorSession } from "@/lib/vendor-session";
 import { isHistoryCursor, listPrintHistoryPage } from "@/lib/print-history";
 import { listActiveLocations } from "@/lib/print-locations";
-import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
-import { TextLink } from "@/components/text-link";
+import { SegmentedControl } from "@/components/segmented-control";
 import { Button } from "@/components/ui/button";
 import { JobHistoryTable } from "./job-history-table";
 
@@ -37,24 +36,29 @@ export default async function HistoryPage({
   if (nextCursor) next.set("cursor", nextCursor);
 
   let emptyMessage: string | undefined;
-  if (unrouted)
-    emptyMessage = "No jobs are waiting for a booth. Every job has one.";
-  else if (cursor) emptyMessage = "No older jobs.";
+  if (unrouted) emptyMessage = "Every label has a booth.";
+  else if (cursor) emptyMessage = "No older labels.";
 
   return (
     <div className="mx-auto max-w-4xl">
-      <PageHeader
-        title="History"
-        description="Every label job, most recent first."
+      <PageHeader title="History" description="Every label, newest first." />
+      <SegmentedControl
+        label="Filter labels"
+        className="mb-4"
+        options={[
+          {
+            label: "All labels",
+            href: "/dashboard/history",
+            selected: !unrouted,
+          },
+          {
+            label: "Needs a booth",
+            href: "/dashboard/history?unrouted=1",
+            selected: unrouted,
+          },
+        ]}
       />
-      {unrouted && (
-        <Notice tone="info" className="mb-4">
-          <p>
-            Showing only jobs that need a booth assigned.{" "}
-            <TextLink href="/dashboard/history">Show all jobs</TextLink>
-          </p>
-        </Notice>
-      )}
+
       <JobHistoryTable
         jobs={jobs}
         locations={locations}
@@ -62,7 +66,7 @@ export default async function HistoryPage({
       />
       {(cursor || nextCursor) && (
         <nav
-          aria-label="Print history pages"
+          aria-label="Label history pages"
           className="mt-6 flex flex-wrap gap-3"
         >
           {cursor && (
@@ -74,14 +78,14 @@ export default async function HistoryPage({
                     : "/dashboard/history"
                 }
               >
-                Newest jobs
+                Newest labels
               </Link>
             </Button>
           )}
           {nextCursor && (
             <Button asChild variant="outline" size="sm">
               <Link href={"/dashboard/history?" + next.toString()}>
-                Older jobs
+                Older labels
               </Link>
             </Button>
           )}

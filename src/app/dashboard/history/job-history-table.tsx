@@ -1,5 +1,6 @@
 import { DataTable, type DataTableColumn } from "@merqo/ui";
 import { JobStatusBadge } from "../job-status-badge";
+import { JobHistoryCards } from "./job-history-cards";
 import { ReprintButton } from "./reprint-button";
 import { AssignLocationControl } from "./assign-location-control";
 import { failureReasonText } from "./failure-reason-copy";
@@ -11,7 +12,7 @@ import type { PrintJob } from "@/lib/print-jobs-list";
 export function JobHistoryTable({
   jobs,
   locations = [],
-  emptyMessage = "No print jobs yet. They show up here once qkit sends one.",
+  emptyMessage = "Each qkit order shows up here.",
 }: {
   jobs: PrintJob[];
   locations?: { id: string; label: string }[];
@@ -19,9 +20,10 @@ export function JobHistoryTable({
 }) {
   if (jobs.length === 0) {
     return (
-      <p className="text-muted-foreground rounded-xl border border-dashed px-5 py-10 text-center text-sm">
-        {emptyMessage}
-      </p>
+      <div className="rounded-xl border border-dashed px-5 py-10 text-center">
+        <p className="font-display text-2xl">No labels yet.</p>
+        <p className="text-muted-foreground mt-2 text-sm">{emptyMessage}</p>
+      </div>
     );
   }
 
@@ -37,7 +39,7 @@ export function JobHistoryTable({
       header: "Order #",
       cell: (job) =>
         isTestPrint(job.source_kit)
-          ? "—"
+          ? "None"
           : payloadField(job.payload, "order_number"),
     },
     {
@@ -75,7 +77,8 @@ export function JobHistoryTable({
     {
       header: "Action",
       cell: (job) =>
-        job.status === "failed" || job.status === "printed" ? (
+        !isTestPrint(job.source_kit) &&
+        (job.status === "failed" || job.status === "printed") ? (
           <ReprintButton
             jobId={job.id}
             boothLabel={job.print_locations?.label}
@@ -84,6 +87,13 @@ export function JobHistoryTable({
     },
   ];
   return (
-    <DataTable rows={jobs} columns={columns} getRowKey={(job) => job.id} />
+    <>
+      <div className="sm:hidden">
+        <JobHistoryCards jobs={jobs} locations={locations} />
+      </div>
+      <div className="hidden sm:block">
+        <DataTable rows={jobs} columns={columns} getRowKey={(job) => job.id} />
+      </div>
+    </>
   );
 }
