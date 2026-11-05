@@ -30,8 +30,8 @@ export default function RootError({
             Something went wrong
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            We hit a snag loading this page. Try again, or head back home if it
-            keeps happening.
+            We hit a snag loading this page. Try again, or go back to the
+            overview if it keeps happening.
           </p>
           <div className="mt-7 flex flex-col gap-2.5">
             <Button
@@ -46,7 +46,7 @@ export default function RootError({
               variant="outline"
               className="h-11 w-full rounded-xl"
             >
-              <Link href="/">Back to home</Link>
+              <Link href="/dashboard">Back to overview</Link>
             </Button>
           </div>
         </ElevatedCard>

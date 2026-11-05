@@ -31,7 +31,7 @@ describe("RootError", () => {
     );
   });
 
-  it("calls retry(), not reset(), when Try again is clicked, and links back home", async () => {
+  it("calls retry(), not reset(), when Try again is clicked, and links back to the overview", async () => {
     const retry = vi.fn();
     const reset = vi.fn();
     const user = userEvent.setup();
@@ -41,7 +41,7 @@ describe("RootError", () => {
     expect(retry).toHaveBeenCalledTimes(1);
     expect(reset).not.toHaveBeenCalled();
 
-    const homeLink = screen.getByRole("link", { name: /back to home/i });
-    expect(homeLink).toHaveAttribute("href", "/");
+    const homeLink = screen.getByRole("link", { name: /back to overview/i });
+    expect(homeLink).toHaveAttribute("href", "/dashboard");
   });
 });

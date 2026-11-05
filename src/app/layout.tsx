@@ -27,7 +27,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "printkit", template: "%s | printkit" },
+  title: { default: "printkit", template: "printkit | %s" },
   description:
     "The print companion for qkit booths: connect a printer to each booth.",
   robots: { index: false, follow: false },

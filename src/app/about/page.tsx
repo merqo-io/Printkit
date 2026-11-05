@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { AboutMerqo } from "@merqo/ui";
-import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
+import { TextLink } from "@/components/text-link";
 
 export const metadata: Metadata = {
   title: "About",
@@ -16,9 +15,7 @@ export default function AboutPage() {
       <SiteNav />
       <main className="flex-1">
         <AboutMerqo kitName="printkit">
-          <Button asChild size="lg">
-            <Link href="/dashboard/printers">Set up a printer</Link>
-          </Button>
+          <TextLink href="/dashboard/printers">Set up a printer</TextLink>
         </AboutMerqo>
       </main>
       <SiteFooter showSignIn />
