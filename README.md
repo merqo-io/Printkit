@@ -107,6 +107,13 @@ created, within 15 minutes, through a signed recovery-window cookie set by
 `/auth/callback`. Any other signed-in session gets the expired card. See
 `src/app/reset-password/README.md`.
 
+Sign-in, password reset and terms acceptance show plain sentence-case copy.
+Supabase auth errors are mapped to short next-step messages in
+`src/lib/auth-errors.ts` (unknown ones get a generic "Try again in a minute"
+rather than the raw text), the login page checks the email inline before
+calling Supabase, and `/legal/accept` has a "Sign out instead" button so a
+vendor who declines the updated terms is not stuck.
+
 Every Supabase `redirectTo` is the bare `/auth/callback` URL, since the
 shared project honours only an exact allowed Redirect URL. The login page's
 return path travels in the `printkit_auth_next` cookie; see
