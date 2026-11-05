@@ -32,8 +32,11 @@ deliberate.
   for go along as `next`, so the login page can return there after
   sign-in; a bare `/dashboard` is where sign-in lands anyway and adds no
   `next`. Any other query parameter is dropped from the `/login` URL. A URL
-  fragment never reaches the server, so it is not in `next`. Called from
-  `src/proxy.ts`.
+  fragment never reaches the server, so it is not in `next`. A signed-in
+  visitor on `/login` is redirected to the safe `next` (its own query kept)
+  or `/dashboard`, carrying refreshed auth cookies on the redirect. That
+  bounce is skipped when `?error=` is set or the recovery-window cookie
+  exists, since those pages must still show. Called from `src/proxy.ts`.
 
 ## Connectivity
 
