@@ -32,6 +32,9 @@ The authenticated vendor area (`/dashboard/*`).
   only feeds the avatar's initials) carries the visible vendor name — see
   `AccountMenuProps` in `@merqo/ui`. No plan/tier/tour concept exists in
   printkit yet, so those optional shared-component props are omitted.
+  `extraLink` adds a "Bluetooth guide" entry to the avatar menu, pointing at
+  `/guides/bluetooth-printers`. The layout's `<main>` uses qkit's
+  `max-w-7xl px-5 py-7` rhythm.
 - `page.tsx` — the Overview: a "Needs a booth" `Notice` when unrouted jobs exist, the first-run panel until a label has printed, one `PrinterStatusRow` per booth (with a "Design label" link to the designer) in a `Panel`, and the five most recent jobs. `hasPrintedJob` (`@/lib/print-jobs-list`) decides whether the last first-run step is done, so a printed job older than the five shown still counts. Its title (page heading and tab title) matches the nav label.
 - `first-run-panel.tsx` — `FirstRunPanel`: three numbered steps (booth, printer, first label) with done marks; the first open step gets the magenta mark. A step is done only when every earlier step is done too. Renders nothing once all three are done. Step 1 links to qkit only when `NEXT_PUBLIC_QKIT_URL` is an http(s) URL.
 - `auto-refresh.tsx` — `AutoRefresh`: client component that calls `router.refresh()` on window focus / `visibilitychange` and every 30 s, never while the tab is hidden. Reusable on other pages.
