@@ -13,4 +13,4 @@ components instead of changing generated structure.
 
 [Parent components](../README.md)
 
-On touch screens (`pointer-coarse`) `button`, `input` and `select` grow taller (default 44px, `sm` 40px, `lg` 48px) so vendors on an iPad get a full-size tap target; mouse and trackpad keep the compact sizes.
+On touch screens (`pointer-coarse`) `button`, `input` and `select` grow taller (every `button` size, including `xs` and the icon sizes, is at least 44px; `lg` is 48px; `input` and `select` keep their own sizes) so vendors on an iPad get a full-size tap target; mouse and trackpad keep the compact sizes.

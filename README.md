@@ -95,6 +95,11 @@ since none passed kit context. `legal/accept/actions.ts`'s recorded
 Brand theme is "Ink and paper" (black-ink primary on receipt paper, warm-grey
 secondary, process-magenta accent) — see `src/app/globals.css`'s own header comment.
 
+The shared `PageHeader` takes an optional `eyebrow` and `action` (props
+`eyebrow`, `title`, `description`, `action`, `back`), and every `Button` size
+is at least 44px tall on touch screens, so dashboard pages can adopt one
+header and tap targets stay finger-sized. See `src/components/README.md`.
+
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
 Reprint first asks "Print this label again?" so a double tap cannot queue two
