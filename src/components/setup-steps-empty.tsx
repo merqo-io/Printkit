@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 export type SetupStep = { done?: boolean; body: ReactNode };
 
 /**
- * Dashed "nothing here yet" block with numbered steps. Kept local and small
- * so it can be swapped for the merqo-ui empty state without touching callers.
+ * Dashed "nothing here yet" block with numbered steps, so the three places
+ * that tell a vendor how to get printing started look and read the same.
  */
 export function SetupStepsEmpty({
   heading,

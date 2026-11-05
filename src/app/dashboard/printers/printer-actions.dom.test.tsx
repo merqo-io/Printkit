@@ -171,6 +171,9 @@ it("disables the test button and says the printer is offline", () => {
     screen.getByRole("button", { name: "Print test label" }),
   ).toBeDisabled();
   expect(screen.getByText(/printer is offline/i)).toBeVisible();
+  expect(
+    screen.getByRole("button", { name: "Print test label" }),
+  ).toHaveAccessibleDescription(/printer is offline/i);
 });
 
 it("closes the More menu on outside click and on Escape", async () => {
