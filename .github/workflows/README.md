@@ -23,7 +23,7 @@ secret scan, dependency audit).
   via the keyword patterns in `.claude/comment-hygiene-patterns.txt`;
   skippable via `skip-comment-check`).
   Also `e2e` ("e2e (public smoke)": installs Chromium and runs the Playwright specs in `e2e/` against `pnpm dev` with dummy Supabase values).
-- `security.yml` — gitleaks secret scan + `pnpm audit`, triggered on push to
+- `security.yml` — gitleaks secret scan + the fail-closed `.claude/deps-gate.sh` dependency audit, triggered on push to
   `main`, every PR, and a weekly cron.
   The gitleaks job installs the pinned release binary and checks its SHA-256, because gitleaks-action needs a paid license on organization-owned repos. It scans the PR commits, or the pushed range on `main`.
 

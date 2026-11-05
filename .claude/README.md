@@ -8,6 +8,7 @@ and its verifier.
 
 ## Contents
 
+- `deps-gate.sh` + `dep-audit-allow.txt` — the fail-closed dependency-audit gate run by `security.yml`, and its expiring advisory allowlist
 - `harness.json` — harness manifest: templateCentral version/stack/adaptation metadata, plus `seeded_files` — the enforcement-layer file list (path + sha256 `origin_hash`) that `verify-harness.sh` compares against committed HEAD blobs. Of the workflow files, only `ci.yml` is listed, so a change to it needs a human `regen-harness.sh` run while `security.yml` does not.
 - `.harness-base/` — as-seeded mirror of every enforcement-layer file (hooks, `settings.json`, husky, `.gitleaks.toml`, `ci.yml`, the verifier scripts, project skills), used as the 3-way-merge base when a future templateCentral re-sync needs to combine upstream changes with this repo's own edits without clobbering either. Deliberately excludes `AGENTS.md` — it's genuinely customized for this repo's Supabase stack with no legitimate seeded baseline to snapshot.
 - `comment-hygiene-patterns.txt` — the shared change-narration/oversized-comment pattern list read at runtime by `hooks/post-edit-comment-check.sh`, `.husky/lib/comment-hygiene.sh`, and the `comment-hygiene` CI job — one canonical copy instead of three
@@ -31,7 +32,7 @@ recorded `origin_hash`.
 
 `harness.json` records the hash of each hook script; a hook edit is committed together with its new hash.
 
-`AGENTS.md` is slimmed under 200 lines (the first 30 lines are injected at session start and are unchanged); its `harness.json` hash was updated for that edit, and the detail now lives in `docs/`.
+`AGENTS.md` is slimmed under 200 lines (it loads through the `CLAUDE.md` import, not a session-start print); its `harness.json` hash was updated for that edit, and the detail now lives in `docs/`.
 
 ## Parent
 
