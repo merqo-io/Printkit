@@ -113,7 +113,7 @@ everything else sits flat here.
   convention as `listPrintJobs`. `hasPrintedJob(vendorId)`: whether the
   vendor has any `printed` job (one-row query), used by the overview's
   first-run steps; returns `false` on a query error.
-- `print-job-payload.ts` — `payloadField(payload, key, fallback = "—")`:
+- `print-job-payload.ts` — `payloadField(payload, key, fallback = "Not given")`:
   the one place that defensively narrows a string field out of a
   `print_jobs.payload` jsonb value, shared by the history table's display
   columns and the bridge's auto-print label extraction.

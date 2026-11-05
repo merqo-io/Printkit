@@ -55,6 +55,8 @@ The authenticated vendor area (`/dashboard/*`).
   `/dashboard/history?unrouted=1` when the count is above zero, and recent
   print jobs via `JobHistoryTable` (limited to 5 jobs), passing the same
   `listActiveLocations` result down so unrouted rows get an assign control.
+  `JobHistoryTable` renders cards below `sm`, so the dom test's empty-state
+  assertion reads the "No labels yet." headline.
 - `history/` — vendor-facing print job history — see its own README.
 - `bridge/` — Bridge-mode runtime (Web Bluetooth pairing, auto-print,
   presence, wake lock) — see its own README.

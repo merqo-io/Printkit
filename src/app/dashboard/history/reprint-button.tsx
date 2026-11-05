@@ -36,9 +36,7 @@ export function ReprintButton({
       const result = await reprintJob(jobId);
       if (result.success) {
         toast.success(
-          boothLabel
-            ? `Label sent to print again at ${boothLabel}.`
-            : "Label sent to print again.",
+          boothLabel ? `Reprint queued for ${boothLabel}.` : "Reprint queued.",
         );
       } else toast.error(result.error);
     })
@@ -54,7 +52,6 @@ export function ReprintButton({
         size="sm"
         variant="outline"
         onClick={() => setConfirming(true)}
-        className="pointer-coarse:h-10"
       >
         Reprint
       </Button>
@@ -65,13 +62,7 @@ export function ReprintButton({
     <div role="group" aria-label="Confirm reprint" className="space-y-2">
       <p className="text-sm">Print this label again?</p>
       <div className="flex gap-2">
-        <Button
-          ref={confirmRef}
-          size="sm"
-          onClick={confirm}
-          disabled={pending}
-          className="pointer-coarse:h-10"
-        >
+        <Button ref={confirmRef} size="sm" onClick={confirm} disabled={pending}>
           {pending ? "Printing…" : "Yes, print"}
         </Button>
         <Button
@@ -79,7 +70,6 @@ export function ReprintButton({
           variant="outline"
           onClick={() => setConfirming(false)}
           disabled={pending}
-          className="pointer-coarse:h-10"
         >
           Cancel
         </Button>
