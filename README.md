@@ -102,6 +102,11 @@ labels, and a failed job in History explains its `failure_reason` in plain
 words. The printer picker cards show only the essentials, with the rest behind
 a "Details" disclosure.
 
+History (and the Overview's recent list) shows each label as a card on a phone
+and as a table from the `sm` breakpoint up. An "All labels / Needs a booth"
+control filters the list (`?unrouted=1` still deep-links to it), test prints
+have no Reprint, and the copy says "labels" rather than "jobs".
+
 `/reset-password` shows its form only to the session a fresh reset link
 created, within 15 minutes, through a signed recovery-window cookie set by
 `/auth/callback`. Any other signed-in session gets the expired card. See
