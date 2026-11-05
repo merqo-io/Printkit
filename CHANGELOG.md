@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Release flow is now `feat/*` | `fix/*` -> `staging` -> `main`. Vercel's git integration deploys `staging` (`vercel.json` `git.deploymentEnabled`) and CI also runs on pushes to `staging`. `staging-sync` only fast-forwards `staging` after a promotion; the `VERCEL_STAGING_DEPLOY_HOOK` deploy hook is retired.
+
 ### Added
 
 - `POST /api/merqo/entitlement` (bearer `MERQO_PROVISION_SECRET`) receives merqo's per-vendor entitlement into `printkit.vendor_entitlements` (migration 0017).
