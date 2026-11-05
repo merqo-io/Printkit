@@ -32,12 +32,11 @@ schema (it calls `merqo.*` RPCs there), Vercel-deployed from
 
 ## Staging
 
-Only `main` deploys from git (`vercel.json` `git.deploymentEnabled`, using
-`**` because `*` does not match branch names containing `/`), so PRs get no
-automatic preview and the Hobby daily deployment cap is not spent on branch
-pushes. Staging deploys through the `VERCEL_STAGING_DEPLOY_HOOK` call in the
-`staging-sync` workflow, which the setting does not gate. For an ad-hoc preview
-run the `vercel` CLI.
+Only `main` and `staging` deploy from git (`vercel.json` `git.deploymentEnabled`,
+using `**` because `*` does not match branch names containing `/`), so PRs get no
+automatic preview and the Hobby daily deployment cap is not spent on feature
+branch pushes. Staging deploys when a PR merges into `staging`. For an ad-hoc
+preview run the `vercel` CLI.
 
 Vercel `Preview` deployments (the staging branch and CLI previews) use the
 shared staging Supabase project (`merqo-staging`), not production. The `staging` branch, kept on `main` by
@@ -60,9 +59,9 @@ setup, the env model and the rollout checklist live in merqo's
   Preview `PRINTKIT_KIT_SECRET` and `PRINTKIT_CALLBACK_SECRET`.
 
 Vercel Deployment Protection must be off on this project (it still challenges
-a branch-assigned domain), and the sync workflow needs the repo secret
-`VERCEL_STAGING_DEPLOY_HOOK`: Vercel does not git-deploy a commit it already
-built for production, so the workflow calls the deploy hook instead.
+a branch-assigned domain). After a `staging` -> `main` promotion the sync
+workflow only fast-forwards `staging` to `main`; Vercel may skip that build
+because it already built the commit for production.
 
 Load the `printkit` schema on staging with `scripts/staging-migrate.sh`, after
 merqo's and qkit's, not with `supabase db push`: every kit shares one
