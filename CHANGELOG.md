@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- A signed-in visitor who opens `/login` is sent to the dashboard (or a safe `next` path). A failed-callback `?error=` and an open password-reset window still show the form.
+- Public shell: the top bar offers "Sign in" instead of "Dashboard" to visitors, About and the Bluetooth guide use one filled button (sign in) with a text link for printer setup, the 404 and root error pages say "Back to overview" and tab titles read "printkit | Overview".
 - Sign-in, password reset and legal accept use plain sentence-case copy. Supabase auth errors map to short next-step messages (`src/lib/auth-errors.ts`) instead of showing raw text, the login email is validated inline, and the legal accept page gains "Sign out instead".
 - History shows a card list on phones (table from `sm` up, also on Overview), hides Reprint on test prints, filters with an "All labels / Needs a booth" control (`?unrouted=1` still works), and says "labels" instead of "jobs". Empty placeholders read "None" / "Not given" instead of em dashes.
 - Every `Button` size is at least 44px tall on touch screens; `TextLink` gets a clearer focus ring.

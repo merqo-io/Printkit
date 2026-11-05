@@ -2,12 +2,26 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
 import { publicEnv } from "@/lib/env";
+import { RECOVERY_WINDOW_COOKIE } from "@/lib/recovery-window";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 import type { Database } from "@/lib/types";
 
 const DEFAULT_SIGNED_IN_PATH = "/dashboard";
 
 function isProtectedPath(path: string): boolean {
   return path.startsWith("/dashboard");
+}
+
+// A signed-in visitor has no use for the sign-in form, except where the page
+// must still be shown: a failed OAuth callback (`?error=`) explains itself
+// there, and an open password-reset window can lead back to it.
+function bouncesSignedInVisitor(request: NextRequest): boolean {
+  const { pathname, searchParams } = request.nextUrl;
+  return (
+    pathname === "/login" &&
+    !searchParams.has("error") &&
+    !request.cookies.has(RECOVERY_WINDOW_COOKIE)
+  );
 }
 
 function isAuthTokenCookieName(name: string): boolean {
@@ -76,7 +90,9 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  if (!isProtectedPath(request.nextUrl.pathname)) {
+  const bounce = bouncesSignedInVisitor(request);
+
+  if (!isProtectedPath(request.nextUrl.pathname) && !bounce) {
     clearHostOnlyDuplicates(
       request,
       supabaseResponse,
@@ -91,6 +107,30 @@ export async function updateSession(request: NextRequest) {
     user = data.user;
   } catch {
     user = null;
+  }
+
+  if (bounce) {
+    if (!user) {
+      clearHostOnlyDuplicates(
+        request,
+        supabaseResponse,
+        cookiesWrittenBySupabase,
+      );
+      return supabaseResponse;
+    }
+    const url = request.nextUrl.clone();
+    url.pathname = safeRedirectPath(
+      request.nextUrl.searchParams.get("next"),
+      DEFAULT_SIGNED_IN_PATH,
+    );
+    url.search = "";
+    const redirectResponse = NextResponse.redirect(url);
+    clearHostOnlyDuplicates(
+      request,
+      redirectResponse,
+      cookiesWrittenBySupabase,
+    );
+    return redirectResponse;
   }
 
   if (!user) {

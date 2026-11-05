@@ -20,7 +20,7 @@ describe("updateSession", () => {
   });
 
   it("passes through an unprotected path without checking auth", async () => {
-    const request = new NextRequest("https://printkit.merqo.io/login");
+    const request = new NextRequest("https://printkit.merqo.io/about");
 
     const response = await updateSession(request);
 
@@ -93,6 +93,78 @@ describe("updateSession", () => {
   });
 });
 
+describe("updateSession: /login for a signed-in visitor", () => {
+  const signedOut = () =>
+    createServerClient.mockImplementation(() => ({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
+      },
+    }));
+  const go = (path: string, headers?: Record<string, string>) =>
+    updateSession(
+      new NextRequest(`https://printkit.merqo.io${path}`, { headers }),
+    );
+
+  beforeEach(() => {
+    createServerClient.mockImplementation(() => ({ auth: { getUser } }));
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("sends a signed-in visitor to the dashboard", async () => {
+    const response = await go("/login");
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      "https://printkit.merqo.io/dashboard",
+    );
+  });
+
+  it("honours a safe next path", async () => {
+    const response = await go("/login?next=/dashboard/history");
+    expect(response.headers.get("location")).toBe(
+      "https://printkit.merqo.io/dashboard/history",
+    );
+  });
+
+  it.each(["//evil.com", "https://evil.com/x"])(
+    "ignores the unsafe next %s",
+    async (next) => {
+      const response = await go(`/login?next=${encodeURIComponent(next)}`);
+      expect(response.headers.get("location")).toBe(
+        "https://printkit.merqo.io/dashboard",
+      );
+    },
+  );
+
+  it("shows the form to a signed-out visitor", async () => {
+    signedOut();
+    const response = await go("/login");
+    expect(response.status).toBe(200);
+  });
+
+  it("shows the form when getUser throws", async () => {
+    createServerClient.mockImplementation(() => ({
+      auth: { getUser: vi.fn().mockRejectedValue(new Error("down")) },
+    }));
+    const response = await go("/login");
+    expect(response.status).toBe(200);
+  });
+
+  it("keeps the page for a failed sign-in callback", async () => {
+    const response = await go("/login?error=oauth");
+    expect(response.status).toBe(200);
+    expect(getUser).not.toHaveBeenCalled();
+  });
+
+  it("keeps the page while a password-reset window is open", async () => {
+    const response = await go("/login", { cookie: "printkit_recovery=x" });
+    expect(response.status).toBe(200);
+    expect(getUser).not.toHaveBeenCalled();
+  });
+});
+
 describe("updateSession: host-only duplicate auth cookie cleanup", () => {
   const DUPLICATED =
     "sb-project-auth-token=host-only; sb-project-auth-token=domain";
@@ -129,7 +201,7 @@ describe("updateSession: host-only duplicate auth cookie cleanup", () => {
   });
 
   it("clears on a public path too, where no user is resolved", async () => {
-    const response = await updateSession(request("/login", DUPLICATED));
+    const response = await updateSession(request("/about", DUPLICATED));
     expect(cleared(response, "sb-project-auth-token")?.maxAge).toBe(0);
   });
 

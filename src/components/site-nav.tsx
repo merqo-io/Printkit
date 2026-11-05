@@ -7,8 +7,8 @@ import { Wordmark } from "@/components/wordmark";
  * The top bar of printkit's public pages (`/about` and the Bluetooth guide):
  * `@merqo/ui`'s shared `LandingNav` with the printkit wordmark. printkit has
  * no landing page or sign-up of its own (vendors arrive from qkit), so the
- * one primary action is the dashboard, which sends a signed-out visitor to
- * sign in.
+ * one primary action is signing in. A signed-in visitor who clicks it is sent on to the dashboard
+ * by `src/lib/supabase/middleware.ts`; the wordmark leads there too.
  */
 export function SiteNav() {
   return (
@@ -33,7 +33,7 @@ export function SiteNav() {
             <Link href="/about">About</Link>
           </Button>
           <Button asChild className="h-10 rounded-lg px-5 font-semibold">
-            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/login">Sign in</Link>
           </Button>
         </>
       }
