@@ -118,13 +118,18 @@ export async function updateSession(request: NextRequest) {
       );
       return supabaseResponse;
     }
-    const url = request.nextUrl.clone();
-    url.pathname = safeRedirectPath(
+    const target = safeRedirectPath(
       request.nextUrl.searchParams.get("next"),
       DEFAULT_SIGNED_IN_PATH,
     );
-    url.search = "";
-    const redirectResponse = NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(
+      new URL(target, request.nextUrl.origin),
+    );
+    // A token refreshed by getUser above would be lost with the pass-through
+    // response, so it rides along on the redirect.
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie);
+    });
     clearHostOnlyDuplicates(
       request,
       redirectResponse,

@@ -128,6 +128,43 @@ describe("updateSession: /login for a signed-in visitor", () => {
     );
   });
 
+  it("keeps the query of the next path", async () => {
+    const response = await go(
+      `/login?next=${encodeURIComponent("/dashboard/history?page=2&x=1")}`,
+    );
+    expect(response.headers.get("location")).toBe(
+      "https://printkit.merqo.io/dashboard/history?page=2&x=1",
+    );
+  });
+
+  it("keeps a session cookie refreshed during the check", async () => {
+    createServerClient.mockImplementation(
+      (
+        _url: string,
+        _key: string,
+        opts: {
+          cookies: {
+            setAll: (
+              c: { name: string; value: string; options: object }[],
+            ) => void;
+          };
+        },
+      ) => ({
+        auth: {
+          getUser: vi.fn().mockImplementation(async () => {
+            opts.cookies.setAll([
+              { name: "sb-project-auth-token", value: "fresh", options: {} },
+            ]);
+            return { data: { user: { id: "u1" } } };
+          }),
+        },
+      }),
+    );
+    const response = await go("/login");
+    expect(response.status).toBe(307);
+    expect(response.cookies.get("sb-project-auth-token")?.value).toBe("fresh");
+  });
+
   it.each(["//evil.com", "https://evil.com/x"])(
     "ignores the unsafe next %s",
     async (next) => {
