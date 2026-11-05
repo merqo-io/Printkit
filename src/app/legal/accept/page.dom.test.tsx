@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("@/app/actions/auth", () => ({ signOutAction: vi.fn() }));
 import { render, screen } from "@testing-library/react";
 import LegalAcceptPage from "./page";
 

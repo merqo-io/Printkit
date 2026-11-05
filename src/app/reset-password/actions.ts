@@ -2,6 +2,7 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@/lib/supabase/server";
 import { passwordChangeSchema } from "@/lib/password-change";
+import { passwordUpdateErrorMessage } from "@/lib/auth-errors";
 import {
   RECOVERY_WINDOW_COOKIE,
   getRecoveryState,
@@ -21,7 +22,11 @@ export async function updatePasswordAction(
   const parsed = passwordChangeSchema.safeParse(input);
   if (!parsed.success) {
     const issue = parsed.error.issues.find((i) => i.path.length > 0);
-    return { success: false, error: issue?.message ?? "Check your password" };
+    return {
+      success: false,
+      error:
+        issue?.message ?? "Could not use that password. Check both fields.",
+    };
   }
 
   const supabase = await createServerClient();
@@ -29,7 +34,7 @@ export async function updatePasswordAction(
   if (state === "failed")
     return {
       success: false,
-      error: "Could not check your reset link. Please try again.",
+      error: "Could not check your reset link. Try again in a minute.",
     };
   if (state === "expired")
     return {
@@ -42,11 +47,12 @@ export async function updatePasswordAction(
     const { error } = await supabase.auth.updateUser({
       password: parsed.data.password,
     });
-    if (error) return { success: false, error: error.message };
+    if (error)
+      return { success: false, error: passwordUpdateErrorMessage(error) };
   } catch {
     return {
       success: false,
-      error: "Could not update your password. Please try again.",
+      error: "Could not update your password. Try again in a minute.",
     };
   }
 

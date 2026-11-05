@@ -15,11 +15,12 @@ eight-character floor in Zod, checks the recovery window again on the
 server, then calls Supabase `updateUser` with the cookie-bound server
 client. A successful update deletes the cookie, so the same session cannot
 change the password a second time. A Supabase error keeps the window open
-for a retry. A closed window returns `expired`, and the form switches to the
+for a retry; the error shown comes from `passwordUpdateErrorMessage`
+(`@/lib/auth-errors`), never Supabase's raw text. A closed window returns `expired`, and the form switches to the
 expired card. Supabase owns the authoritative password policy. No
 service-role client is used.
 
-Every state renders in the shared `ElevatedCard`, and its labels use the same small uppercase style as the login page.
+Every state renders in the shared `ElevatedCard`, and its labels use the same sentence-case style as the login page.
 
 `page.tsx` sets the tab title "Set a new password", matching the form's heading.
 

@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Sign-in, password reset and legal accept use plain sentence-case copy. Supabase auth errors map to short next-step messages (`src/lib/auth-errors.ts`) instead of showing raw text, the login email is validated inline, and the legal accept page gains "Sign out instead".
 - History shows a card list on phones (table from `sm` up, also on Overview), hides Reprint on test prints, filters with an "All labels / Needs a booth" control (`?unrouted=1` still works), and says "labels" instead of "jobs". Empty placeholders read "None" / "Not given" instead of em dashes.
 - Every `Button` size is at least 44px tall on touch screens; `TextLink` gets a clearer focus ring.
 - Label print jobs (`POST /api/v1/print-jobs` and the dashboard test label) now require a live paid entitlement or a running event pass. Kits get 403 `labels_not_entitled`; a failed lookup fails closed (503 on the API). Vendors with no pushed entitlement are blocked until merqo pushes.

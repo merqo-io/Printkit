@@ -120,7 +120,7 @@ describe("password recovery", () => {
     await enterPasswords();
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith(
-        "Could not update your password. Please try again.",
+        "Could not update your password. Try again in a minute.",
       ),
     );
     expect(

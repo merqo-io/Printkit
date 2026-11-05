@@ -3,7 +3,7 @@
 ## Purpose
 
 The sign-in page (`/login`) — email+password and Google
-OAuth, plus password reset. There is no sign-up: a footer line says printkit is the print companion for qkit booths and new vendors start with qkit. `/reset-password` completes emailed recovery links.
+OAuth, plus password reset. There is no sign-up: the tagline says "New to printkit? Start in qkit." `/reset-password` completes emailed recovery links.
 
 ## Contents
 
@@ -14,10 +14,16 @@ OAuth, plus password reset. There is no sign-up: a footer line says printkit is 
   - Google OAuth via `supabase.auth.signInWithOAuth`, redirecting through
     `/auth/callback`; `queryParams: { hl: "en" }` forces an English consent
     screen regardless of the visitor's browser/account locale.
-  - Email+password sign-in via `supabase.auth.signInWithPassword`.
+  - Email+password sign-in via `supabase.auth.signInWithPassword`. The email
+    is checked with Zod first and a bad one shows an inline error tied to the
+    field with `aria-describedby`. Supabase errors never show raw: they go
+    through `@/lib/auth-errors` (wrong credentials, unconfirmed email, rate
+    limit, network, and a generic "Could not sign in. Try again in a
+    minute."). The button reads "Signing in…" while pending.
   - "Forgot password?" calls
-    `supabase.auth.resetPasswordForEmail`, toasting an error if the email
-    field is empty or the call fails, and a success toast otherwise. The
+    `supabase.auth.resetPasswordForEmail`, showing the inline email error if
+    the field is not a valid email, a mapped error toast if the call fails,
+    and a success toast otherwise. The
     reset link lands on the bare `/auth/callback` URL, which recognises the
     recovery exchange, opens a 15-minute recovery window and forwards to
     `/reset-password`.
