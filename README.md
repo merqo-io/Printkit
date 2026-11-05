@@ -100,6 +100,9 @@ The shared `PageHeader` takes an optional `eyebrow` and `action` (props
 is at least 44px tall on touch screens, so dashboard pages can adopt one
 header and tap targets stay finger-sized. See `src/components/README.md`.
 
+The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard
+`<main>` uses qkit's `px-5 py-7` spacing. See `src/app/dashboard/README.md`.
+
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
 Reprint first asks "Print this label again?" so a double tap cannot queue two

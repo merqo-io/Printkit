@@ -75,6 +75,10 @@ export function DashboardNav({
       }}
       signOutAction={signOut}
       switchKits={getSwitchKits("printkit")}
+      extraLink={{
+        href: "/guides/bluetooth-printers",
+        label: "Bluetooth guide",
+      }}
       getHelp={{
         type: "form",
         onSubmit: async ({ message, category }) => {

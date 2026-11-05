@@ -25,7 +25,7 @@ export default async function DashboardLayout({
           avatarUrl={avatarUrl}
         />
       </div>
-      <main className="mx-auto w-full max-w-7xl flex-1 px-6 pt-8 pb-16">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-7">
         {children}
       </main>
       <div className="contents print:hidden">
