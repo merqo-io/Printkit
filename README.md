@@ -95,6 +95,11 @@ since none passed kit context. `legal/accept/actions.ts`'s recorded
 Brand theme is "Ink and paper" (black-ink primary on receipt paper, warm-grey
 secondary, process-magenta accent) — see `src/app/globals.css`'s own header comment.
 
+The shared `PageHeader` takes an optional `eyebrow` and `action` (props
+`eyebrow`, `title`, `description`, `action`, `back`), and every `Button` size
+is at least 44px tall on touch screens, so dashboard pages can adopt one
+header and tap targets stay finger-sized. See `src/components/README.md`.
+
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
 Reprint first asks "Print this label again?" so a double tap cannot queue two
@@ -131,7 +136,7 @@ Audit progress and validation limits are recorded in
 Device result handlers report persistence failures and recheck delivery state
 in the update. Feie callbacks also bind the update to the signed attempt ID.
 
-The AI harness follows templateCentral 6.0.4: hook commands are anchored on the project directory, and the guard against committing to `main` reads the branch of the directory a command runs in. The dated entry in `AGENTS.md` lists what was adopted.
+The AI harness follows templateCentral 7.2.2: hook commands are anchored on the project directory, and the guard against committing to `main` reads the branch of the directory a command runs in (a strict `&&` chain only by the directories git runs in). The dependency audit is the fail-closed `.claude/deps-gate.sh`, with expiring suppressions only in `.claude/dep-audit-allow.txt`. The dated entry in `AGENTS.md` lists what was adopted.
 
 ## Security headers
 

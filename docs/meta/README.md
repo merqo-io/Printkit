@@ -10,7 +10,7 @@ for the one MVP build; this is the standing backlog going forward).
 - `2026-10-10-component-reuse-spec.md` records component cleanup scope, preserved printer contracts and validation requirements.
 
 - `ai-harness-reference.md` holds the hook-by-hook and CI detail moved out of `AGENTS.md`, plus the project seeding notes.
-- `templatecentral-adoption-log.md` records the templateCentral 6.0.4 adopted and not-adopted history moved out of `AGENTS.md`.
+- `templatecentral-adoption-log.md` records the templateCentral 6.0.4 and 7.2.2 adopted and not-adopted history moved out of `AGENTS.md`.
 
 ## Parent
 
