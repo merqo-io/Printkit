@@ -38,6 +38,13 @@ describe("DashboardLayout", () => {
     expect(screen.getByText("page content")).toBeInTheDocument();
   });
 
+  it("uses the qkit main container rhythm", async () => {
+    render(await DashboardLayout({ children: <p>page content</p> }));
+    const main = screen.getByRole("main");
+    expect(main).toHaveClass("mx-auto", "max-w-7xl", "px-5", "py-7");
+    expect(main).not.toHaveClass("pb-16");
+  });
+
   it("renders the shared family footer with the legal links", async () => {
     render(await DashboardLayout({ children: <p>page content</p> }));
     expect(screen.getByText("© 2026 printkit")).toBeInTheDocument();

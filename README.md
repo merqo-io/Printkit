@@ -53,7 +53,7 @@ Design: `docs/superpowers/specs/2026-08-21-printkit-v0.1-design.md`,
 `docs/superpowers/specs/2026-09-20-printer-connectors-design.md`
 
 Deploy and staging (`printkit-staging.merqo.io`, previews on the shared staging
-Supabase project; only `main` deploys from git, ad-hoc previews use the `vercel` CLI, `scripts/staging-migrate.sh`): `docs/DEPLOY.md`. The
+Supabase project; `main` and `staging` deploy from git, ad-hoc previews use the `vercel` CLI, `scripts/staging-migrate.sh`): `docs/DEPLOY.md`. The
 `staging-sync` workflow pushes the `staging` branch with the `merqo-staging-sync`
 GitHub App token, because a ruleset limits pushes to `staging` to that app.
 
@@ -99,6 +99,9 @@ The shared `PageHeader` takes an optional `eyebrow` and `action` (props
 `eyebrow`, `title`, `description`, `action`, `back`), and every `Button` size
 is at least 44px tall on touch screens, so dashboard pages can adopt one
 header and tap targets stay finger-sized. See `src/components/README.md`.
+
+The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard
+`<main>` uses qkit's `px-5 py-7` spacing. See `src/app/dashboard/README.md`.
 
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
