@@ -3,6 +3,10 @@ import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { PageHeader } from "@/components/page-header";
 import { Panel } from "@/components/panel";
+import {
+  SetupStepsEmpty,
+  boothPrintingSteps,
+} from "@/components/setup-steps-empty";
 import { BridgePanel } from "./bridge-panel";
 import { BridgeLocationGate } from "./bridge-location-gate";
 
@@ -21,10 +25,10 @@ function BridgeBody({
 }) {
   if (locations.length === 0) {
     return (
-      <p className="text-muted-foreground text-sm">
-        No booths have printing enabled yet. Turn it on in qkit&apos;s booth
-        settings.
-      </p>
+      <SetupStepsEmpty
+        heading="No booths have printing turned on yet."
+        steps={boothPrintingSteps(process.env.NEXT_PUBLIC_QKIT_URL)}
+      />
     );
   }
   const resolvedId =
