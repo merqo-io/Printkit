@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Printer copy: "Serial number" and "Key" replace SN and KEY, setup errors say what to do next, booths without a printer read "No printer yet", and the virtual printer is named "Virtual printer" without a brand. New virtual printers get that name; existing rows keep their stored name. Removing a printer opens a modal dialog (Escape or Cancel closes it, focus returns to More) with "Remove printer" and "Removing…". Picker chips are 44px tall on touch screens.
 - Dashboard pages share one header: every page has an eyebrow, and the child pages of Printers link back to it. The per-booth Design label link is gone from the Overview booth list.
 - Release flow is now `feat/*` | `fix/*` -> `staging` -> `main`. Vercel's git integration deploys `staging` (`vercel.json` `git.deploymentEnabled`) and CI also runs on pushes to `staging`. `staging-sync` only fast-forwards `staging` after a promotion; the `VERCEL_STAGING_DEPLOY_HOOK` deploy hook is retired.
 

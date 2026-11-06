@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { InfoButton } from "@/components/info-button";
 import { BLUETOOTH_WARNING } from "@/lib/printer-info-copy";
 import { createBridgePairingCode } from "./actions";
+import { SETUP_FAILED } from "./messages";
 import { Step, Steps, WaitingForPrinter } from "./setup-step";
 
 export function BridgeSetup({
@@ -34,7 +35,7 @@ export function BridgeSetup({
         }
         setCode(result.code);
       } catch {
-        toast.error("Could not complete setup. Please try again.");
+        toast.error(SETUP_FAILED);
       }
     });
   };

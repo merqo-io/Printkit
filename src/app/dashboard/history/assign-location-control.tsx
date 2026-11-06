@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ export function AssignLocationControl({
 }) {
   const { pending, run } = useAsyncAction();
   const [selected, setSelected] = useState("");
+  const selectId = useId();
 
   const assign = (locationId: string) =>
     run(async () => {
@@ -55,12 +56,11 @@ export function AssignLocationControl({
 
   return (
     <div className="flex items-center gap-2">
+      <label htmlFor={selectId} className="sr-only">
+        Booth for this label
+      </label>
       <Select value={selected} onValueChange={setSelected}>
-        <SelectTrigger
-          size="sm"
-          className="w-36"
-          aria-label="Booth for this label"
-        >
+        <SelectTrigger size="sm" className="w-36" id={selectId}>
           <SelectValue placeholder="Choose a booth" />
         </SelectTrigger>
         <SelectContent>

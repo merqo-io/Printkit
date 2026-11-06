@@ -10,7 +10,7 @@ else sits flat here.
 
 - `setup-steps-empty.tsx` — `SetupStepsEmpty({ heading, steps })`: the dashed-border numbered-steps empty state used by the Printers page, bridge page and first-run panel, plus `boothPrintingSteps` (shared copy) and `safeQkitUrl`. Local so it can be swapped for merqo-ui later.
 - `printer-status-row.tsx` — `PrinterStatusRow({ label, printerName, state,
-lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the status sits under the booth name instead of beside it, so a long "Offline since" time wraps inside the card. It renders
+lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the status sits under the booth name instead of beside it, so a long "Offline since" time wraps inside the card. A booth with no printer shows no name line, only the "No printer yet" status. It renders
   what the server already read from `printers.last_seen_at`, the health
   signal every connector shares, so no page needs a live subscription and a
   cloud printer, a 4G printer and a Bluetooth bridge all report the same

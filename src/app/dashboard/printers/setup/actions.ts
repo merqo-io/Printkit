@@ -14,6 +14,7 @@ import { getVendorCloudDriver } from "@/lib/connectors/vendor-cloud/drivers";
 import { createServiceClient } from "@/lib/supabase/server";
 import { publicSiteUrl } from "@/lib/site-url";
 import { z } from "zod";
+import { SETUP_FAILED } from "./messages";
 import {
   catalogIdSchema,
   cloudPrinterCredentialsSchema,
@@ -80,13 +81,18 @@ export async function createPrinterUrl(
   const { locationId, catalogId } = ref.data;
   const { user } = await getVendorSession();
   if (!(await ownedLocation(locationId, user.id))) {
-    return { ok: false, error: "That booth does not belong to your account." };
+    return {
+      ok: false,
+      error:
+        "That booth is not on your account. Choose one from the Printers page.",
+    };
   }
 
   if (getCatalogEntry(catalogId)?.connector !== "cloud_poll") {
     return {
       ok: false,
-      error: "That printer does not use a CloudPRNT address.",
+      error:
+        "That printer does not use an address. Choose its setup from the Printers page.",
     };
   }
   const printer = await printerFor(locationId, catalogId, user.id);
@@ -103,12 +109,12 @@ export async function createPrinterUrl(
   const base = publicSiteUrl();
   if (!base) {
     console.error("printer setup: PRINTKIT_PUBLIC_URL is not set");
-    return { ok: false, error: "Could not create the printer's address." };
+    return { ok: false, error: SETUP_FAILED };
   }
 
   const token = await mintDeviceCredential(printer.id, "cloudprnt_url_token");
   if (!token) {
-    return { ok: false, error: "Could not create the printer's address." };
+    return { ok: false, error: SETUP_FAILED };
   }
   return { ok: true, url: `${base}/api/cloudprnt/${token}` };
 }
@@ -133,13 +139,20 @@ export async function registerBrandCloudPrinter(
   const { locationId, catalogId, sn, key } = ref.data;
   const { user } = await getVendorSession();
   if (!(await ownedLocation(locationId, user.id))) {
-    return { ok: false, error: "That booth does not belong to your account." };
+    return {
+      ok: false,
+      error:
+        "That booth is not on your account. Choose one from the Printers page.",
+    };
   }
 
   const entry = getCatalogEntry(catalogId);
   const driver = entry ? getVendorCloudDriver(entry.driver) : null;
   if (!entry || !driver) {
-    return { ok: false, error: "That printer is not supported yet." };
+    return {
+      ok: false,
+      error: "That printer is not supported yet. Choose another model.",
+    };
   }
 
   const printer = await printerFor(locationId, catalogId, user.id);
@@ -156,7 +169,10 @@ export async function registerBrandCloudPrinter(
     key,
     name: printer.display_name,
   });
-  if (!registered.ok) return { ok: false, error: registered.error };
+  if (!registered.ok) {
+    console.error("registerBrandCloudPrinter: maker refused", registered.error);
+    return { ok: false, error: SETUP_FAILED };
+  }
 
   const service = await createServiceClient();
   const { error } = await service
@@ -166,7 +182,7 @@ export async function registerBrandCloudPrinter(
 
   if (error) {
     console.error("registerBrandCloudPrinter: save failed", error.message);
-    return { ok: false, error: "Could not save the printer." };
+    return { ok: false, error: SETUP_FAILED };
   }
 
   const state = await driver.queryPrinter(registered.deviceRef);
@@ -185,7 +201,11 @@ export async function createBridgePairingCode(
   const locationId = parsedLocation.data;
   const { user } = await getVendorSession();
   if (!(await ownedLocation(locationId, user.id))) {
-    return { ok: false, error: "That booth does not belong to your account." };
+    return {
+      ok: false,
+      error:
+        "That booth is not on your account. Choose one from the Printers page.",
+    };
   }
 
   const printer = await printerFor(locationId, "niimbot-b1", user.id);
@@ -199,7 +219,10 @@ export async function createBridgePairingCode(
 
   const code = await createPairingCode(printer.id);
   if (!code) {
-    return { ok: false, error: "Could not create a pairing code." };
+    return {
+      ok: false,
+      error: "Could not create a pairing code. Try again in a moment.",
+    };
   }
   return { ok: true, code: formatPairingCode(code) };
 }

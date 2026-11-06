@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
-import { getCatalogEntry } from "@/lib/printer-catalog";
+import { catalogName, getCatalogEntry } from "@/lib/printer-catalog";
 import { PageHeader } from "@/components/page-header";
 import { CloudPollSetup, VendorCloudSetup, BridgeSetup } from "./setup-wizard";
 
@@ -30,7 +30,7 @@ export default async function PrinterSetupPage({
       <PageHeader
         eyebrow="Printers"
         back={{ href: "/dashboard/printers", label: "Printers" }}
-        title={`Set up the ${entry.brand} ${entry.model}`}
+        title={`Set up the ${catalogName(entry)}`}
         description={`Labels for ${booth.label}, ${entry.defaultLabelMm.width} mm by ${entry.defaultLabelMm.height} mm.`}
       />
 

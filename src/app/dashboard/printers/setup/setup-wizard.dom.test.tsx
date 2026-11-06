@@ -149,11 +149,11 @@ it.each([
     expect(
       screen.getByRole("button", { name: "Add this printer" }),
     ).toBeDisabled();
-    await user.type(screen.getByLabelText("SN"), " SN ");
-    await user.type(screen.getByLabelText("KEY"), " KEY ");
+    await user.type(screen.getByLabelText("Serial number"), " SN ");
+    await user.type(screen.getByLabelText("Key"), " KEY ");
     await user.click(screen.getByRole("button", { name: "Add this printer" }));
     expect(m.register).toHaveBeenCalledWith("location", id, "SN", "KEY");
-    await waitFor(() => expect(screen.getByLabelText("KEY")).toHaveValue(""));
+    await waitFor(() => expect(screen.getByLabelText("Key")).toHaveValue(""));
     expect(m.success).toHaveBeenCalledWith(
       state === "online"
         ? "Printer added and online"
@@ -167,11 +167,11 @@ it("retains inputs on a rejected registration", async () => {
   render(
     <VendorCloudSetup entry={entry("feie-fp-n20w")} locationId="location" />,
   );
-  await user.type(screen.getByLabelText("SN"), "SN");
-  await user.type(screen.getByLabelText("KEY"), "KEY");
+  await user.type(screen.getByLabelText("Serial number"), "SN");
+  await user.type(screen.getByLabelText("Key"), "KEY");
   await user.click(screen.getByRole("button", { name: "Add this printer" }));
   expect(m.error).toHaveBeenCalledWith("Wrong key");
-  expect(screen.getByLabelText("KEY")).toHaveValue("KEY");
+  expect(screen.getByLabelText("Key")).toHaveValue("KEY");
   expect(screen.getByText("Add the printer above first.")).toBeInTheDocument();
 });
 it("offers an encoded Android bridge link and retries Pi pairing", async () => {
@@ -213,8 +213,8 @@ it.each(["address", "registration", "pairing"] as const)(
           locationId="location"
         />,
       );
-      await user.type(screen.getByLabelText("SN"), "SN");
-      await user.type(screen.getByLabelText("KEY"), "KEY");
+      await user.type(screen.getByLabelText("Serial number"), "SN");
+      await user.type(screen.getByLabelText("Key"), "KEY");
     } else {
       m.pair.mockRejectedValueOnce(new Error("offline"));
       render(<BridgeSetup locationId="location" boothRef="booth" />);
@@ -226,7 +226,7 @@ it.each(["address", "registration", "pairing"] as const)(
     await user.click(screen.getByRole("button", { name: label }));
     await waitFor(() =>
       expect(m.error).toHaveBeenCalledWith(
-        "Could not complete setup. Please try again.",
+        "Could not finish setup. Check the printer and try again.",
       ),
     );
     expect(screen.getByRole("button", { name: label })).toBeEnabled();

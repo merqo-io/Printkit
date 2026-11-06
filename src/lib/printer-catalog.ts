@@ -131,7 +131,7 @@ export const PRINTER_CATALOG: readonly CatalogEntry[] = [
   },
   {
     id: "virtual",
-    brand: "Merqo",
+    brand: "",
     model: "Virtual printer",
     connector: "cloud_poll",
     driver: "star-cloudprnt",
@@ -151,6 +151,14 @@ export const PRINTER_CATALOG: readonly CatalogEntry[] = [
     notes: ["A test printer that prints to a browser page, for development."],
   },
 ];
+
+/**
+ * Brand and model as one name. The virtual printer has no maker, so its brand
+ * is empty and the name is just the model rather than "Merqo Virtual printer".
+ */
+export function catalogName(entry: CatalogEntry): string {
+  return entry.brand ? `${entry.brand} ${entry.model}` : entry.model;
+}
 
 export function getCatalogEntry(id: string): CatalogEntry | null {
   return PRINTER_CATALOG.find((entry) => entry.id === id) ?? null;

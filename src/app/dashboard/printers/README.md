@@ -16,9 +16,9 @@ is online or it is not.
   the shared `last_seen_at` signal), loaded through one vendor-scoped printer summary query, what kind it is in plain words, and the
   one action that makes sense next. A booth with no printer offers only
   "Choose a printer". A booth with a printer shows its main action (Printer
-  address, Edit SN and KEY, or Open bridge mode) and a "More" group with View
+  address, Edit serial and key, or Open bridge mode) and a "More" group with View
   setup steps, Design label, Use a different printer and Remove printer
-  (`printer-actions.tsx`; the confirm panel takes focus, Escape cancels, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
+  (`printer-actions.tsx`; the confirm is a modal alert dialog, Escape or Cancel closes it and focus returns to More, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
   a one-line check for its type (the virtual printer is told to press Start on its page instead of checking WiFi). With no booths the page lists three numbered
   steps, linking to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
 - `test-print-button.tsx` - the "Print test label" button on each printer row and the setup wizard's connected state; takes an `offline` prop (from `last_seen_at` health) that disables it with a plain note; shows sent, queued and error messages inline and disables itself while sending.
@@ -54,8 +54,8 @@ is online or it is not.
   wait that turns into "Connected" when the printer first reports in:
   - Cloud printer: mint this booth's private printer address once, copy it,
     paste it into the printer's own settings page.
-  - 4G printer: insert a SIM or join WiFi, then type the SN and KEY
-    off the device. The KEY is used once to claim the printer and never
+  - 4G printer: insert a SIM or join WiFi, then type the serial number and key
+    off the device. The key is used once to claim the printer and never
     stored.
   - Bluetooth printer: choose Android (continue in Bridge mode) or Raspberry
     Pi (show a single-use pairing code), after a banner that says this is

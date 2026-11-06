@@ -58,7 +58,7 @@ function Chip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "inline-flex h-8 items-center rounded-full border px-3 text-sm transition-colors pointer-coarse:h-10 pointer-coarse:px-4",
+        "inline-flex h-8 items-center rounded-full border px-3 text-sm transition-colors pointer-coarse:h-11 pointer-coarse:px-4",
         "focus-visible:ring-ring/50 outline-none focus-visible:ring-[3px]",
         active
           ? "border-primary bg-primary text-primary-foreground"
@@ -212,9 +212,11 @@ function PrinterCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-muted-foreground text-xs tracking-wide uppercase">
-            {entry.brand}
-          </p>
+          {entry.brand && (
+            <p className="text-muted-foreground text-xs tracking-wide uppercase">
+              {entry.brand}
+            </p>
+          )}
           <h2 className="text-base font-semibold">{entry.model}</h2>
         </div>
         <span className="text-muted-foreground text-sm">
