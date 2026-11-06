@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Dashboard pages share one header: every page has an eyebrow, and the child pages of Printers link back to it. The per-booth Design label link is gone from the Overview booth list.
 - Release flow is now `feat/*` | `fix/*` -> `staging` -> `main`. Vercel's git integration deploys `staging` (`vercel.json` `git.deploymentEnabled`) and CI also runs on pushes to `staging`. `staging-sync` only fast-forwards `staging` after a promotion; the `VERCEL_STAGING_DEPLOY_HOOK` deploy hook is retired.
 
 ### Added
@@ -57,6 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Dashboard pages share one header: every page has an eyebrow, and the child pages of Printers link back to it. The per-booth Design label link is gone from the Overview booth list.
 - Vercel builds from git only for `main` (`vercel.json` `git.deploymentEnabled`), so PR and branch pushes no longer use up the Hobby daily deployment cap. Staging still deploys through the staging-sync deploy hook; ad-hoc previews come from the `vercel` CLI.
 
 ### Fixed

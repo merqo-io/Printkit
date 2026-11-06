@@ -77,3 +77,5 @@ vendor-cloud driver. Links out to `/guides/bluetooth-printers` and
 [dashboard](../README.md)
 
 `designer/` is an unfinished booth-scoped sticker editor candidate; saved templates are not yet used by order printing.
+
+The Printers header carries a "Printers" eyebrow, as do its child pages (designer, new, setup, and bridge).
