@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { sendTestPrint } from "./actions";
 
@@ -14,10 +14,14 @@ type Outcome = { tone: "ok" | "error"; text: string } | null;
 export function TestPrintButton({
   locationId,
   size = "sm",
+  offline = false,
 }: {
   locationId: string;
   size?: "sm" | "default";
+  /** From printers.last_seen_at health, read by the server page. */
+  offline?: boolean;
 }) {
+  const offlineId = useId();
   const [busy, setBusy] = useState(false);
   const [outcome, setOutcome] = useState<Outcome>(null);
 
@@ -49,9 +53,20 @@ export function TestPrintButton({
 
   return (
     <>
-      <Button variant="outline" size={size} onClick={send} disabled={busy}>
+      <Button
+        variant="outline"
+        size={size}
+        onClick={send}
+        disabled={busy || offline}
+        aria-describedby={offline ? offlineId : undefined}
+      >
         {busy ? "Sending…" : "Print test label"}
       </Button>
+      {offline && (
+        <p id={offlineId} className="text-muted-foreground w-full text-sm">
+          The printer is offline. Test printing is off until it is back online.
+        </p>
+      )}
       {outcome && (
         <p
           role={outcome.tone === "error" ? "alert" : "status"}

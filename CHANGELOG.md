@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Printers page: one shared dashed setup-steps empty state, the test print button is disabled with a plain note while the printer is offline, and the More menu closes on outside click and Escape with a 44px touch trigger.
+
 - The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard `<main>` uses the same `px-5 py-7` spacing as qkit.
 
 - `POST /api/merqo/entitlement` (bearer `MERQO_PROVISION_SECRET`) receives merqo's per-vendor entitlement into `printkit.vendor_entitlements` (migration 0017).

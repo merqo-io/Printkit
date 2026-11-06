@@ -46,7 +46,7 @@ describe("BridgePage", () => {
     vi.mocked(listActiveLocations).mockResolvedValue([]);
     render(await BridgePage({ searchParams: Promise.resolve({}) }));
     expect(
-      screen.getByText(/no booths have printing enabled yet/i),
+      screen.getByText(/no booths have printing turned on yet/i),
     ).toBeInTheDocument();
     expect(screen.queryByText(/bridge panel for/)).not.toBeInTheDocument();
   });

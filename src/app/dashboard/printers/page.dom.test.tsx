@@ -62,7 +62,7 @@ it("links to qkit in the empty state only when its address is set", async () => 
   render(await PrintersPage());
   expect(screen.getByRole("link", { name: "qkit" })).toHaveAttribute(
     "href",
-    "https://qkit.test",
+    "https://qkit.test/",
   );
   vi.unstubAllEnvs();
 });
