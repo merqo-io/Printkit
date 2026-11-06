@@ -20,8 +20,17 @@ const PAGES: [string, () => Promise<MetadataModule>, string][] = [
     () => import("./dashboard/printers/setup/page"),
     "Set up a printer",
   ],
+  [
+    "/dashboard/printers/designer",
+    () => import("./dashboard/printers/designer/page"),
+    "Label design",
+  ],
   ["/dashboard/history", () => import("./dashboard/history/page"), "History"],
-  ["/dashboard/bridge", () => import("./dashboard/bridge/page"), "Bridge mode"],
+  [
+    "/dashboard/bridge",
+    () => import("./dashboard/bridge/page"),
+    "Connect a Bluetooth printer",
+  ],
   [
     "/dashboard/dev/virtual-printer",
     () => import("./dashboard/dev/virtual-printer/page"),

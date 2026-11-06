@@ -41,3 +41,5 @@ Wizard regressions cover pending actions, pairing failure and safe retry behavio
 Every setup action parses its booth id, catalog id and cloud-printer credentials with a Zod schema first.
 
 The page header sets the "Printers" eyebrow and links back to Printers.
+
+`bridge-setup.tsx` names the Bluetooth page "Connect a Bluetooth printer" and its switch "Printing", matching the page itself.

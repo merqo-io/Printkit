@@ -5,7 +5,7 @@ Local shadcn primitives used by Printkit: `alert`, `badge`, `button`, `input`,
 unsupported-device message.
 
 Feature components import these directly by name. `select` supports history
-location assignment; `switch` controls bridge mode; printer setup explanations use shared InfoTooltip. Account menus and help drawers use the shared Merqo UI
+location assignment; `switch` controls Bluetooth printing; printer setup explanations use shared InfoTooltip. Account menus and help drawers use the shared Merqo UI
 package rather than unused local copies.
 
 These primitives remain generator-managed. Put product behavior in feature

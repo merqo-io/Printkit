@@ -23,7 +23,7 @@ type Pending = "remove" | "change" | null;
 const PRIMARY: Record<string, string> = {
   cloud_poll: "Printer address",
   vendor_cloud: "Edit serial and key",
-  bridge: "Open bridge mode",
+  bridge: "Connect a Bluetooth printer",
 };
 
 /**

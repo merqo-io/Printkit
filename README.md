@@ -4,7 +4,7 @@ Hardware print connector for Merqo vendors. Prints a label for every
 order, through one of three connectors (`src/lib/connectors/`):
 `cloud_poll` for printers that fetch their own jobs (Star CloudPRNT),
 `vendor_cloud` for printers reached through their maker's cloud (Feie 4G),
-and `bridge` for Bluetooth printers (NIIMBOT B1) through Bridge mode in
+and `bridge` for Bluetooth printers (NIIMBOT B1) through the Connect a Bluetooth printer page in
 Chrome on an Android phone, a Windows laptop or a Mac, or the Raspberry Pi
 agent in `bridge-agent/`. An iPad cannot drive a Bluetooth printer at all
 (no Web Bluetooth, WebUSB or Web Serial on iOS), verified on a B1 on
