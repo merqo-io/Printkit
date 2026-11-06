@@ -23,8 +23,8 @@ const PAGES: [string, () => Promise<MetadataModule>, string][] = [
   ["/dashboard/history", () => import("./dashboard/history/page"), "History"],
   ["/dashboard/bridge", () => import("./dashboard/bridge/page"), "Bridge mode"],
   [
-    "/dashboard/dev/virtual-printer",
-    () => import("./dashboard/dev/virtual-printer/page"),
+    "/dashboard/printers/virtual",
+    () => import("./dashboard/printers/virtual/page"),
     "Virtual printer",
   ],
   [

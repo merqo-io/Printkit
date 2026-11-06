@@ -28,7 +28,7 @@ it("gives the virtual printer its own steps without CloudPRNT or WiFi copy", asy
   render(<CloudPollSetup entry={entry("virtual")} locationId="location" />);
   expect(
     screen.getByRole("link", { name: "Open the virtual printer." }),
-  ).toHaveAttribute("href", "/dashboard/dev/virtual-printer");
+  ).toHaveAttribute("href", "/dashboard/printers/virtual");
   expect(screen.getByText(/Start virtual printer/)).toBeVisible();
   expect(screen.queryByText(/CloudPRNT/)).toBeNull();
   expect(screen.queryByText(/WiFi/)).toBeNull();

@@ -1,16 +1,18 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
 
 const reprintJobMock = vi.fn();
 const toastSuccess = vi.fn();
+const toastError = vi.fn();
 vi.mock("./actions", () => ({
   reprintJob: (...args: unknown[]) => reprintJobMock(...args),
 }));
 vi.mock("sonner", () => ({
   toast: {
     success: (...args: unknown[]) => toastSuccess(...args),
-    error: vi.fn(),
+    error: (...args: unknown[]) => toastError(...args),
   },
 }));
 
@@ -19,6 +21,7 @@ import { ReprintButton } from "./reprint-button";
 beforeEach(() => {
   reprintJobMock.mockReset().mockResolvedValue({ success: true });
   toastSuccess.mockReset();
+  toastError.mockReset();
 });
 
 describe("ReprintButton", () => {
@@ -66,6 +69,22 @@ describe("ReprintButton", () => {
     expect(toastSuccess.mock.calls[0][0]).toBe(
       "Reprint queued for Kopitiam Cart.",
     );
+  });
+
+  it("shows the upgrade message with a link when labels are blocked", async () => {
+    reprintJobMock.mockResolvedValueOnce({
+      success: false,
+      error: "Needs a plan. Upgrade in your Merqo account to print labels.",
+      upgradeUrl: "https://www.merqo.io/dashboard",
+    });
+    render(<ReprintButton jobId="job-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Reprint" }));
+    fireEvent.click(screen.getByRole("button", { name: "Yes, print" }));
+    await waitFor(() => expect(toastError).toHaveBeenCalledTimes(1));
+    render(<div>{toastError.mock.calls[0][0] as ReactNode}</div>);
+    expect(
+      screen.getByRole("link", { name: "Upgrade in your Merqo account" }),
+    ).toHaveAttribute("href", "https://www.merqo.io/dashboard");
   });
 
   it("disables confirm while pending and recovers when the action throws", async () => {

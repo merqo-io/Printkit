@@ -2,9 +2,14 @@
 
 import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { LabelsUpgradeMessage } from "@/components/labels-upgrade-message";
 import { sendTestPrint } from "./actions";
 
-type Outcome = { tone: "ok" | "error"; text: string } | null;
+type Outcome = {
+  tone: "ok" | "error";
+  text: string;
+  upgradeUrl?: string;
+} | null;
 
 /**
  * Sends one sample label to a booth's printer. Shared by the Printers page
@@ -39,7 +44,11 @@ export function TestPrintButton({
                 ? "Test label queued. It will print when the printer is back online."
                 : "Test label sent. It should print in a few seconds.",
             }
-          : { tone: "error", text: result.error },
+          : {
+              tone: "error",
+              text: result.error,
+              upgradeUrl: result.upgradeUrl,
+            },
       );
     } catch {
       setOutcome({
@@ -76,7 +85,14 @@ export function TestPrintButton({
               : "text-success-text w-full text-sm"
           }
         >
-          {outcome.text}
+          {outcome.upgradeUrl ? (
+            <LabelsUpgradeMessage
+              message={outcome.text}
+              upgradeUrl={outcome.upgradeUrl}
+            />
+          ) : (
+            outcome.text
+          )}
         </p>
       )}
     </>

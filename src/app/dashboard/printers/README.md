@@ -79,3 +79,5 @@ vendor-cloud driver. Links out to `/guides/bluetooth-printers` and
 `designer/` is an unfinished booth-scoped sticker editor candidate; saved templates are not yet used by order printing.
 
 The Printers header carries a "Printers" eyebrow, as do its child pages (designer, new, setup, and bridge).
+
+When label access is denied, `sendTestPrint` also returns `upgradeUrl` (the Merqo dashboard) and `TestPrintButton` renders the message with a real upgrade link. The `error` text is unchanged.

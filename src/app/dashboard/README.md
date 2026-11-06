@@ -63,9 +63,9 @@ The authenticated vendor area (`/dashboard/*`).
 - `history/` — vendor-facing print job history — see its own README.
 - `bridge/` — Bridge-mode runtime (Web Bluetooth pairing, auto-print,
   presence, wake lock) — see its own README.
-- `dev/virtual-printer/` — a printer made of HTML that speaks the real
+- `printers/virtual/` — a printer made of HTML that speaks the real
   CloudPRNT exchange against the real endpoint, so the print path can be
-  tested without hardware. Unlinked from the nav and 404 in production —
+  tested without hardware. Reached from the cloud-poll setup steps, not the nav, and 404 in production —
   see its own README.
 
 ## Connectivity

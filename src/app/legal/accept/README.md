@@ -41,3 +41,5 @@ folder's job is entirely to collect the vendor's consent and forward it.
 Regression fixtures restore environment and transport mocks between tests so missing-configuration and failure cases cannot leak state into later cases.
 
 The `next` form field is length-checked by Zod before `safeRedirectPath` runs.
+
+The Merqo base URL comes from the shared `merqoBaseUrl()` in `src/lib/merqo-url.ts`.
