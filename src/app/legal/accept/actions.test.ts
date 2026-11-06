@@ -117,6 +117,27 @@ describe("acceptLegalTerms", () => {
     );
   });
 
+  it.each([
+    ["throws", () => upsertMock.mockRejectedValue(new Error("db down"))],
+    [
+      "resolves with an error",
+      () => upsertMock.mockResolvedValue({ error: { message: "x" } }),
+    ],
+  ])("still redirects when the cache write %s", async (_label, arrange) => {
+    getUserMock.mockResolvedValue({
+      data: { user: { id: "u1", email: "vendor@business.sg" } },
+    });
+    global.fetch = okFetch() as never;
+    arrange();
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await acceptLegalTerms(formData("/dashboard"));
+
+    expect(errSpy).toHaveBeenCalled();
+    expect(redirectMock).toHaveBeenCalledWith("/dashboard");
+    errSpy.mockRestore();
+  });
+
   it("redirects to /dashboard when no next param is given", async () => {
     getUserMock.mockResolvedValue({
       data: { user: { id: "u1", email: "vendor@business.sg" } },

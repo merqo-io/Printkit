@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 
 - The print-status callback only sends its bearer secret to an `https:` `callback_url` with no embedded credentials; any other stored address is skipped and logged without the secret.
+- The print-status callback refuses redirects, so the secret never follows one to an unvetted address.
+- Accepting the terms no longer fails when the local acceptance cache write fails; it is logged and ignored.
 - A failed write to the legal acceptance cache is logged and ignored, so a vendor who has accepted the current terms is no longer sent to `/legal/accept` when that write fails.
 
 ### Changed

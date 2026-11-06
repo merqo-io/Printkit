@@ -229,8 +229,33 @@ describe("callback URL guard", () => {
   });
 
   it("does not send the secret to an unparseable URL", async () => {
-    const { fetchMock } = await run("not a url");
+    const { fetchMock, logged } = await run("not a url");
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(logged).not.toContain("not a url");
+    expect(logged).not.toContain("s3cret");
+  });
+
+  it("refuses redirects so the secret stays with the vetted URL", async () => {
+    const { fetchMock } = await run("https://qkit.test/cb");
+    expect(fetchMock.mock.calls[0][1].redirect).toBe("error");
+  });
+
+  it("resolves when fetch rejects with an error quoting the URL", async () => {
+    maybeSingleMock.mockResolvedValue({
+      data: { callback_url: "https://qkit.test/cb", callback_secret: "s3cret" },
+      error: null,
+    });
+    global.fetch = vi
+      .fn()
+      .mockRejectedValue(
+        new Error("fetch failed for https://qkit.test/cb"),
+      ) as unknown as typeof fetch;
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(
+      notifyKitPrintStatus("qkit", "order-1", "printed", ATTEMPT_AT),
+    ).resolves.toBeUndefined();
+    expect(JSON.stringify(errSpy.mock.calls)).not.toContain("s3cret");
+    errSpy.mockRestore();
   });
 
   it("sends to an https URL", async () => {

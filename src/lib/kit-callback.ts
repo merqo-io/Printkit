@@ -70,6 +70,8 @@ export async function notifyKitPrintStatus(
     const res = await fetch(target, {
       method: "POST",
       cache: "no-store",
+      // A redirect would carry the secret to a URL the guard never vetted.
+      redirect: "error",
       signal: controller.signal,
       headers: {
         Authorization: `Bearer ${data.callback_secret}`,
