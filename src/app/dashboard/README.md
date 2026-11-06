@@ -84,3 +84,5 @@ see `bridge/README.md` for what reads it.
 [app](../README.md)
 
 Overview and printers pages share `listLocationPrinterSummaries`, which batches the verified vendor's active-booth printer summaries instead of one query per booth.
+
+The Overview header carries a "Your booths" eyebrow. Its booth list shows each printer's status only; the per-booth "Design label" link was removed (the designer is reached from Printers).

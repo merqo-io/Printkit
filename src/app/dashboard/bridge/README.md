@@ -50,3 +50,5 @@ callback. Refresh already-open bridges after this protocol deployment.
 The page's tab title is "Bridge mode", matching its heading.
 
 A separate 40 by 60 mm calibration preview can be opened without printing; its button prints one sample only after an explicit click.
+
+The page header sets the "Printers" eyebrow and links back to Printers.
