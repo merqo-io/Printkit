@@ -32,7 +32,7 @@ export function PrinterStatusRow(props: PrinterStatusRowProps) {
       <div className="min-w-0">
         <p className="font-medium">{props.label}</p>
         <p className="text-muted-foreground text-sm">
-          {props.printerName ?? "No printer set up"}
+          {props.printerName ?? "No printer yet"}
         </p>
       </div>
       <div className="flex items-start gap-2 sm:shrink-0 sm:items-center">

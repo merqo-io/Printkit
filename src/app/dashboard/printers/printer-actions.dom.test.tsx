@@ -39,16 +39,21 @@ const props = {
 beforeEach(() => vi.resetAllMocks());
 afterEach(cleanup);
 
-it("asks before removing and says what happens to waiting orders", async () => {
+it("opens a modal dialog that says what happens, then cancels", async () => {
   const user = userEvent.setup();
   render(<PrinterActions {...props} />);
-  await user.click(screen.getByRole("button", { name: "Remove printer" }));
-  const dialog = screen.getByRole("alertdialog");
-  expect(dialog).toHaveTextContent(/unpaired/);
-  expect(dialog).toHaveTextContent(/30 minutes/);
-  expect(m.remove).not.toHaveBeenCalled();
-  await user.click(screen.getByRole("button", { name: "Keep it" }));
   expect(screen.queryByRole("alertdialog")).toBeNull();
+  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  const dialog = await screen.findByRole("alertdialog");
+  expect(dialog).toHaveTextContent("This printer will stop receiving orders.");
+  expect(dialog).toHaveTextContent(/30 minutes/);
+  expect(
+    within(dialog).getByRole("button", { name: "Remove printer" }),
+  ).toBeVisible();
+  expect(m.remove).not.toHaveBeenCalled();
+  await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+  await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
+  expect(m.remove).not.toHaveBeenCalled();
 });
 
 it("removes the printer and refreshes the list", async () => {
@@ -57,7 +62,7 @@ it("removes the printer and refreshes the list", async () => {
   render(<PrinterActions {...props} />);
   await user.click(screen.getByRole("button", { name: "Remove printer" }));
   await user.click(
-    within(screen.getByRole("alertdialog")).getByRole("button", {
+    within(await screen.findByRole("alertdialog")).getByRole("button", {
       name: "Remove printer",
     }),
   );
@@ -82,28 +87,44 @@ it("sends the vendor to the picker after changing printer", async () => {
   );
 });
 
-it("moves focus to the heading, describes the consequences and closes the menu", async () => {
+it("moves focus into the dialog and closes the menu", async () => {
   const user = userEvent.setup();
   const { container } = render(<PrinterActions {...props} />);
   const menu = container.querySelector("details") as HTMLDetailsElement;
   menu.open = true;
   await user.click(screen.getByRole("button", { name: "Remove printer" }));
-  const dialog = screen.getByRole("alertdialog");
+  const dialog = await screen.findByRole("alertdialog");
   expect(menu.open).toBe(false);
-  expect(screen.getByText(/Remove the printer from Stall/)).toHaveFocus();
-  const described = dialog.getAttribute("aria-describedby") ?? "";
-  expect(document.getElementById(described)).toHaveTextContent(/30 minutes/);
-  expect(dialog).toHaveTextContent(/no printer until you set up a new one/);
+  expect(dialog).toContainElement(document.activeElement as HTMLElement);
+  expect(dialog).toHaveAccessibleName(/Remove the printer from Stall/);
 });
 
 it("cancels on Escape and returns focus to the More trigger", async () => {
   const user = userEvent.setup();
   render(<PrinterActions {...props} />);
   await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  await screen.findByRole("alertdialog");
   await user.keyboard("{Escape}");
-  expect(screen.queryByRole("alertdialog")).toBeNull();
-  expect(screen.getByText("More")).toHaveFocus();
+  await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
+  await waitFor(() => expect(screen.getByText("More")).toHaveFocus());
   expect(m.remove).not.toHaveBeenCalled();
+});
+
+it("shows Removing… while the removal is pending", async () => {
+  const user = userEvent.setup();
+  m.remove.mockReturnValue(new Promise(() => {}));
+  render(<PrinterActions {...props} />);
+  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  await user.click(
+    within(await screen.findByRole("alertdialog")).getByRole("button", {
+      name: "Remove printer",
+    }),
+  );
+  expect(
+    within(await screen.findByRole("alertdialog")).getByRole("button", {
+      name: "Removing…",
+    }),
+  ).toBeDisabled();
 });
 
 it("keeps the printer and shows the error when removal fails", async () => {
@@ -112,7 +133,7 @@ it("keeps the printer and shows the error when removal fails", async () => {
   render(<PrinterActions {...props} />);
   await user.click(screen.getByRole("button", { name: "Remove printer" }));
   await user.click(
-    within(screen.getByRole("alertdialog")).getByRole("button", {
+    within(await screen.findByRole("alertdialog")).getByRole("button", {
       name: "Remove printer",
     }),
   );
