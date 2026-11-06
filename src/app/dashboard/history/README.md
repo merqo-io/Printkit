@@ -29,6 +29,6 @@ The page's tab title is "History", matching its heading.
 
 Batch labels appear as individual jobs, so a missing or failed label can be inspected and reprinted separately.
 
-The History header carries a "Label history" eyebrow.
+The History header (the shared `@merqo/ui` `PageHeader`) carries a "Label history" eyebrow.
 
 When label access is denied, `reprintJob` also returns `upgradeUrl` (the Merqo dashboard) and `ReprintButton` shows the message in the toast with a real upgrade link. The `error` text is unchanged.

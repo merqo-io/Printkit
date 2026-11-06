@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
-import { PageHeader } from "@/components/page-header";
+import { PageHeader } from "@merqo/ui";
+import { PrintersBackLink } from "@/components/printers-back-link";
 import { TextLink } from "@/components/text-link";
 import { PrinterPicker } from "./printer-picker";
 
@@ -29,9 +30,10 @@ export default async function NewPrinterPage({
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
+        responsive
         eyebrow="Printers"
         title="Choose a printer"
-        back={{ href: "/dashboard/printers", label: "Printers" }}
+        back={<PrintersBackLink />}
         description={
           booth
             ? `Which printer will print labels at ${booth.label}?`

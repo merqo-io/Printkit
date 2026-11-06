@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getVendorSession } from "@/lib/vendor-session";
 import { isHistoryCursor, listPrintHistoryPage } from "@/lib/print-history";
 import { listActiveLocations } from "@/lib/print-locations";
-import { PageHeader } from "@/components/page-header";
+import { PageHeader } from "@merqo/ui";
 import { SegmentedControl } from "@/components/segmented-control";
 import { Button } from "@/components/ui/button";
 import { JobHistoryTable } from "./job-history-table";
@@ -42,6 +42,7 @@ export default async function HistoryPage({
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
+        responsive
         eyebrow="Label history"
         title="History"
         description="Every label, newest first."

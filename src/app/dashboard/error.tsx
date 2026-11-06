@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { PageHeader } from "@/components/page-header";
+import { PageHeader } from "@merqo/ui";
 import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 
@@ -21,7 +21,7 @@ export default function DashboardError({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <PageHeader title="Something went wrong" />
+      <PageHeader title="Something went wrong" responsive />
       <Panel>
         <p className="text-muted-foreground text-sm">
           We hit a snag loading this page. Try again, or head back to the

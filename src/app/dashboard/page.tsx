@@ -6,7 +6,7 @@ import {
   hasPrintedJob,
 } from "@/lib/print-jobs-list";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
-import { PageHeader } from "@/components/page-header";
+import { PageHeader } from "@merqo/ui";
 import { Panel } from "@/components/panel";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { TextLink } from "@/components/text-link";
@@ -40,6 +40,7 @@ export default async function DashboardPage() {
     <div className="mx-auto max-w-4xl">
       <AutoRefresh />
       <PageHeader
+        responsive
         eyebrow="Your booths"
         title="Overview"
         description="Whether each booth's printer is online, and the latest labels from qkit orders."

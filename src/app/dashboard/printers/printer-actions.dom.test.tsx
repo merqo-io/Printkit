@@ -137,7 +137,8 @@ it("keeps the printer and shows the error when removal fails", async () => {
       name: "Remove printer",
     }),
   );
-  await waitFor(() => expect(m.error).toHaveBeenCalledWith("Nope"));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Nope");
+  expect(screen.getByRole("alertdialog")).toBeVisible();
   expect(m.push).not.toHaveBeenCalled();
   expect(m.refresh).not.toHaveBeenCalled();
 });

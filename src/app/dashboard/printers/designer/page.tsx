@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PageHeader } from "@/components/page-header";
+import { PageHeader } from "@merqo/ui";
+import { PrintersBackLink } from "@/components/printers-back-link";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { getPrinterByLocation } from "@/lib/printers";
@@ -50,9 +51,10 @@ export default async function DesignerPage({
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
+        responsive
         eyebrow="Printers"
         title="Label design"
-        back={{ href: "/dashboard/printers", label: "Printers" }}
+        back={<PrintersBackLink />}
         description={`Design a label for ${location.label}.`}
       />
       <StickerDesigner

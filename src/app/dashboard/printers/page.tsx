@@ -4,7 +4,7 @@ import { getVendorSession } from "@/lib/vendor-session";
 import { listLocationPrinterSummaries } from "@/lib/location-printer-summaries";
 import { getCatalogEntry } from "@/lib/printer-catalog";
 import { locationRowId } from "@/lib/manage-url";
-import { PageHeader } from "@/components/page-header";
+import { PageHeader } from "@merqo/ui";
 import { Panel } from "@/components/panel";
 import {
   SetupStepsEmpty,
@@ -53,6 +53,7 @@ export default async function PrintersPage() {
     <div className="mx-auto max-w-4xl">
       <AutoRefresh />
       <PageHeader
+        responsive
         eyebrow="Printers"
         title="Printers"
         description="One printer per booth. New orders print by themselves once a booth has a printer that is online."

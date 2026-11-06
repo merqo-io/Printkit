@@ -13,7 +13,7 @@ when `VERCEL_ENV === "production"`.
 
 ## Contents
 
-- `page.tsx` — server page. Blocks production, renders the shared `PageHeader` (eyebrow "Printers", back link to Printers), loads the vendor's active
+- `page.tsx` — server page. Blocks production, renders the shared `@merqo/ui` `PageHeader` (eyebrow "Printers", back link to Printers), loads the vendor's active
   locations, and explains what the page is. Shows a hint instead of the
   panel when the vendor has no printing-enabled booth. Tab title "Virtual printer".
 - `actions.ts` — `startVirtualPrinter(locationId)`. Blocks production,

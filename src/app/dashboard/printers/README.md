@@ -18,7 +18,7 @@ is online or it is not.
   "Choose a printer". A booth with a printer shows its main action (Printer
   address, Edit serial and key, or Connect a Bluetooth printer) and a "More" group with View
   setup steps, Design label, Use a different printer and Remove printer
-  (`printer-actions.tsx`; the confirm is a modal alert dialog, Escape or Cancel closes it and focus returns to More, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
+  (`printer-actions.tsx`; the confirm is the shared `ConfirmDialog`, Escape or Cancel closes it and focus returns to More, and a failed removal shows its message in the dialog, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
   a one-line check for its type (the virtual printer is told to press Start on its page instead of checking WiFi). With no booths the page lists three numbered
   steps, linking to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
 - `test-print-button.tsx` - the "Print test label" button on each printer row and the setup wizard's connected state; takes an `offline` prop (from `last_seen_at` health) that disables it with a plain note; shows sent, queued and error messages inline and disables itself while sending.
