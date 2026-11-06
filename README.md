@@ -108,7 +108,9 @@ one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
 Reprint first asks "Print this label again?" so a double tap cannot queue two
 labels, and a failed job in History explains its `failure_reason` in plain
 words. The printer picker cards show only the essentials, with the rest behind
-a "Details" disclosure.
+a "Details" disclosure. Removing a printer asks for confirmation in a modal
+dialog, and a failed setup shows one plain message while the cause goes to the
+server log.
 
 History (and the Overview's recent list) shows each label as a card on a phone
 and as a table from the `sm` breakpoint up. An "All labels / Needs a booth"
