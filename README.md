@@ -21,6 +21,8 @@ no public marketing site or pricing; `/` redirects straight to
 limited to `label` or `label_batch` (anything else returns 400). The outbound
 print-status callback is kit-agnostic too — configured per calling kit in
 `kit_api_keys` (`callback_url`/`callback_secret`), not hardcoded to qkit.
+The secret is only sent to an `https:` URL without embedded credentials;
+anything else is skipped and logged.
 Its body names the job `source_ref`, with `order_id` kept beside it until
 every calling kit reads the new name. `GET /api/v1/print-locations/status`
 also returns `manage_url`, the printkit page for that location, so a calling

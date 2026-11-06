@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- The print-status callback only sends its bearer secret to an `https:` `callback_url` with no embedded credentials; any other stored address is skipped and logged without the secret.
+- A failed write to the legal acceptance cache is logged and ignored, so a vendor who has accepted the current terms is no longer sent to `/legal/accept` when that write fails.
+
 ### Changed
 
 - `@merqo/ui` moves to 0.42.1. Dashboard pages use its shared `PageHeader` (the local copy is gone; a small `PrintersBackLink` fills its back slot) and the remove-printer confirm uses its `ConfirmDialog`: a failed removal now shows its message inside the dialog, which stays open for a retry, instead of a toast. The page title is slightly tighter and the description is no longer capped at a reading width. The link-based `SegmentedControl` and the printer picker chips stay local.
