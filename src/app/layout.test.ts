@@ -12,7 +12,7 @@ describe("root layout metadata", () => {
   it("titles every page through a lowercase printkit template", () => {
     expect(metadata.title).toEqual({
       default: "printkit",
-      template: "%s | printkit",
+      template: "printkit | %s",
     });
   });
 

@@ -9,9 +9,9 @@ it("frames the guide with the shared nav, footer and back-to-top button", () => 
   expect(
     screen.getByRole("heading", { level: 1, name: "Bluetooth printers" }),
   ).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute(
     "href",
-    "/dashboard",
+    "/login",
   );
   expect(
     screen.getByRole("button", { name: "Back to top", hidden: true }),

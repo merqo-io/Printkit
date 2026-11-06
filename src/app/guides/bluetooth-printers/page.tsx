@@ -3,6 +3,7 @@ import { BackToTop } from "@merqo/ui";
 import { Notice } from "@/components/notice";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
+import { TextLink } from "@/components/text-link";
 import { BLUETOOTH_WARNING } from "@/lib/printer-info-copy";
 
 export const metadata: Metadata = {
@@ -265,7 +266,8 @@ export default function BluetoothPrintersGuide() {
         </Section>
 
         <p className="text-muted-foreground mt-12 text-sm">
-          Still stuck? Ask us from the help menu inside printkit.
+          Still stuck? Ask us from the help menu inside printkit, or{" "}
+          <TextLink href="/dashboard/printers">set up a printer</TextLink>.
         </p>
       </main>
       <SiteFooter showSignIn />
