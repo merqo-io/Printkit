@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertDialog } from "radix-ui";
+import { ConfirmDialog } from "@merqo/ui";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { removePrinter } from "./actions";
@@ -33,7 +33,6 @@ const PRIMARY: Record<string, string> = {
 export function PrinterActions(props: PrinterActionsProps) {
   const router = useRouter();
   const [pending, setPending] = useState<Pending>(null);
-  const [busy, setBusy] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDetailsElement>(null);
   const triggerRef = useRef<HTMLElement>(null);
@@ -71,32 +70,33 @@ export function PrinterActions(props: PrinterActionsProps) {
     setPending(kind);
   };
 
-  const cancel = () => {
-    setPending(null);
-    triggerRef.current?.focus();
-  };
+  const cancel = () => setPending(null);
 
+  // Focus returns to "More" once the dialog has closed; doing it earlier is
+  // undone by the dialog's focus trap.
+  const wasPending = useRef(false);
+  useEffect(() => {
+    if (wasPending.current && pending === null) triggerRef.current?.focus();
+    wasPending.current = pending !== null;
+  }, [pending]);
+
+  // Throwing keeps the shared dialog open with the message, so a failed
+  // removal can be retried without reopening it.
   const confirm = async () => {
-    if (!pending || busy) return;
+    if (!pending) return;
     const next = pending;
-    setBusy(true);
+    let result;
     try {
-      const result = await removePrinter(props.locationId);
-      if (!result.ok) {
-        toast.error(result.error);
-        return;
-      }
-      if (next === "change") {
-        router.push(`/dashboard/printers/new?location=${location}`);
-      } else {
-        toast.success("Printer removed");
-        setPending(null);
-        router.refresh();
-      }
+      result = await removePrinter(props.locationId);
     } catch {
-      toast.error("Could not remove the printer. Please try again.");
-    } finally {
-      setBusy(false);
+      throw new Error("Could not remove the printer. Please try again.");
+    }
+    if (!result.ok) throw new Error(result.error);
+    if (next === "change") {
+      router.push(`/dashboard/printers/new?location=${location}`);
+    } else {
+      toast.success("Printer removed");
+      router.refresh();
     }
   };
 
@@ -151,50 +151,22 @@ export function PrinterActions(props: PrinterActionsProps) {
         </div>
       </details>
 
-      <AlertDialog.Root
+      <ConfirmDialog
         open={pending !== null}
         onOpenChange={(open) => {
-          if (!open && !busy) cancel();
+          if (!open) cancel();
         }}
-      >
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-          <AlertDialog.Content
-            // The trigger lives in a menu that has just closed, so focus is
-            // sent back to "More" by hand.
-            onCloseAutoFocus={(event) => {
-              event.preventDefault();
-              triggerRef.current?.focus();
-            }}
-            className="bg-background fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 space-y-3 rounded-md border p-5 shadow-lg"
-          >
-            <AlertDialog.Title className="font-medium">
-              {pending === "change"
-                ? `Use a different printer for ${props.boothLabel}?`
-                : `Remove the printer from ${props.boothLabel}?`}
-            </AlertDialog.Title>
-            <AlertDialog.Description className="text-muted-foreground text-sm">
-              This printer will stop receiving orders. Orders still queued wait
-              up to 30 minutes for a new printer.
-            </AlertDialog.Description>
-            <div className="flex flex-wrap justify-end gap-2">
-              <AlertDialog.Cancel asChild>
-                <Button variant="outline" size="sm" disabled={busy}>
-                  Cancel
-                </Button>
-              </AlertDialog.Cancel>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={confirm}
-                disabled={busy}
-              >
-                {busy ? "Removing…" : confirmLabel}
-              </Button>
-            </div>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+        title={
+          pending === "change"
+            ? `Use a different printer for ${props.boothLabel}?`
+            : `Remove the printer from ${props.boothLabel}?`
+        }
+        description="This printer will stop receiving orders. Orders still queued wait up to 30 minutes for a new printer."
+        confirmLabel={confirmLabel}
+        pendingLabel="Removing…"
+        variant="destructive"
+        onConfirm={confirm}
+      />
     </div>
   );
 }

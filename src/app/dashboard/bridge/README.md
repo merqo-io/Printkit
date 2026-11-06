@@ -51,4 +51,4 @@ The page's tab title is "Connect a Bluetooth printer", matching its heading. The
 
 A separate 40 by 60 mm calibration preview can be opened without printing; its button prints one sample only after an explicit click.
 
-The page header sets the "Printers" eyebrow and links back to Printers.
+The page header (the shared `@merqo/ui` `PageHeader`) sets the "Printers" eyebrow and links back to Printers.

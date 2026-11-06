@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
-import { PageHeader } from "@/components/page-header";
+import { PageHeader } from "@merqo/ui";
+import { PrintersBackLink } from "@/components/printers-back-link";
 import { Panel } from "@/components/panel";
 import {
   SetupStepsEmpty,
@@ -57,9 +58,10 @@ export default async function BridgePage({
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader
+        responsive
         eyebrow="Printers"
         title="Connect a Bluetooth printer"
-        back={{ href: "/dashboard/printers", label: "Printers" }}
+        back={<PrintersBackLink />}
         description="On the phone or tablet next to your printer, turn on printing below, then pair the printer. Keep this page open while you sell."
       />
       <Panel>

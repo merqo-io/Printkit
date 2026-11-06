@@ -20,9 +20,6 @@ vi.mock("./setup-wizard", () => ({
   VendorCloudSetup: () => null,
   BridgeSetup: () => null,
 }));
-vi.mock("@/components/page-header", () => ({
-  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
-}));
 
 import PrinterSetupPage from "./page";
 

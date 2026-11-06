@@ -18,9 +18,6 @@ vi.mock("@/lib/print-locations", () => ({
   listActiveLocations: mocks.locations,
 }));
 vi.mock("@/lib/printers", () => ({ getPrinterByLocation: async () => null }));
-vi.mock("@/components/page-header", () => ({
-  PageHeader: () => <h1>Label design</h1>,
-}));
 vi.mock("./sticker-designer", () => ({
   StickerDesigner: ({
     locationId,
