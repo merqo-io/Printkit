@@ -11,7 +11,7 @@ import { BridgePanel } from "./bridge-panel";
 import { BridgeLocationGate } from "./bridge-location-gate";
 
 export const metadata: Metadata = {
-  title: "Bridge mode",
+  title: "Connect a Bluetooth printer",
 };
 
 function BridgeBody({
@@ -58,9 +58,9 @@ export default async function BridgePage({
     <div className="mx-auto max-w-2xl">
       <PageHeader
         eyebrow="Printers"
-        title="Bridge mode"
+        title="Connect a Bluetooth printer"
         back={{ href: "/dashboard/printers", label: "Printers" }}
-        description="Turn on Bridge mode on the device next to your printer, then pair it. Keep this page open while you sell."
+        description="On the phone or tablet next to your printer, turn on printing below, then pair the printer. Keep this page open while you sell."
       />
       <Panel>
         <BridgeBody

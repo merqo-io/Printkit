@@ -34,7 +34,7 @@ for this project.
 - `icon.tsx` — `Icon` route handler; renders `brandIcon(32)` as a 32×32 PNG favicon (paper "P" on ink with a magenta dot).
 - `layout.tsx` — `RootLayout`. Loads `Fraunces`/`Inter`/`JetBrains_Mono` via `next/font/google`, sets `metadata` (title template `printkit | %s`, default `printkit`, noindex/nofollow robots), wraps children in `next-themes`' `ThemeProvider` (`attribute="class"`, system default), then `TooltipProvider` + `Toaster`.
 - `login/` — sign-in page (no sign-up; new vendors start with qkit), including the "Forgot password?" flow — see its own README.
-- `page-titles.test.ts` — checks every page exports its own `metadata.title`, matching its heading, including the two `dev/ui-states/` previews.
+- `page-titles.test.ts` — checks every page exports its own `metadata.title`, matching its heading, including the two `dev/ui-states/` previews. The label design page ("Label design") and the Bluetooth printer page ("Connect a Bluetooth printer") are covered there too.
 - `page.tsx` — `Home`. Redirects to `/dashboard` (which `src/proxy.ts` bounces on to `/login` if unauthenticated) — printkit has no cold-acquisition funnel, so `/` is not a marketing landing page (see the design spec's "Internal Merqo product" section).
 
 ## Connectivity

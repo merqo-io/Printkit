@@ -114,7 +114,7 @@ export default function BluetoothPrintersGuide() {
                 Open printkit in Chrome on that phone and sign in.
               </p>,
               <p key="4" className="text-sm">
-                Go to Printers, open your booth, and turn <b>Bridge mode</b> on.
+                Go to Printers, open your booth, and turn <b>Printing</b> on.
               </p>,
               <p key="5" className="text-sm">
                 Tap <b>Pair printer</b> and choose your printer from the list
@@ -226,7 +226,8 @@ export default function BluetoothPrintersGuide() {
               <dd className="text-muted-foreground mt-1 text-sm">
                 Check the Printers page. If the booth shows offline, the helper
                 device has gone to sleep or lost the printer. On a phone, reopen
-                Bridge mode. On a Pi, run the status command above.
+                the Connect a Bluetooth printer page. On a Pi, run the status
+                command above.
               </dd>
             </div>
             <div>

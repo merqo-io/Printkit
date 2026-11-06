@@ -85,7 +85,7 @@ export function BridgeSetup({
         {helper === "android" && (
           <Step number={2} title="Set that device up next to the printer">
             <p className="text-muted-foreground text-sm">
-              Open printkit on it in Chrome, turn Bridge mode on and pair the
+              Open printkit on it in Chrome, turn Printing on and pair the
               printer. Keep the screen on and Battery Saver off. A Windows
               laptop or a Mac works here too. An iPad does not: Apple does not
               let websites use Bluetooth.
@@ -94,7 +94,7 @@ export function BridgeSetup({
               <Link
                 href={`/dashboard/bridge?booth=${encodeURIComponent(boothRef)}`}
               >
-                Open bridge mode
+                Connect a Bluetooth printer
               </Link>
             </Button>
           </Step>

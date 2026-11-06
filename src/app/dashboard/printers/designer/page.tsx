@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { getVendorSession } from "@/lib/vendor-session";
@@ -7,6 +8,10 @@ import { getCatalogEntry } from "@/lib/printer-catalog";
 import { stickerTemplateSchema } from "@/lib/sticker-template";
 import { StickerDesigner } from "./sticker-designer";
 import { signLogoUrls } from "./logo-urls";
+
+export const metadata: Metadata = {
+  title: "Label design",
+};
 
 export default async function DesignerPage({
   searchParams,
@@ -46,7 +51,7 @@ export default async function DesignerPage({
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
         eyebrow="Printers"
-        title="Sticker designer"
+        title="Label design"
         back={{ href: "/dashboard/printers", label: "Printers" }}
         description={`Design a label for ${location.label}.`}
       />

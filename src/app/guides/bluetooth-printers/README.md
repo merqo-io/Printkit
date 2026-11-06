@@ -20,3 +20,5 @@ least recommended way to print, then gives complete steps.
 ## Parent
 
 [guides](../README.md)
+
+The guide names the on/off switch on the Connect a Bluetooth printer page "Printing", matching the page.

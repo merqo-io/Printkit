@@ -184,7 +184,7 @@ it("offers an encoded Android bridge link and retries Pi pairing", async () => {
     screen.getByRole("button", { name: "Android phone or laptop" }),
   );
   expect(
-    screen.getByRole("link", { name: "Open bridge mode" }),
+    screen.getByRole("link", { name: "Connect a Bluetooth printer" }),
   ).toHaveAttribute("href", "/dashboard/bridge?booth=booth%20%26%20one");
   await user.click(screen.getByRole("button", { name: "Raspberry Pi" }));
   await user.click(screen.getByRole("button", { name: "Show a pairing code" }));
