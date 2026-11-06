@@ -33,6 +33,21 @@ describe("AssignLocationControl", () => {
     );
   });
 
+  it("labels the booth select for assistive tech", () => {
+    render(
+      <AssignLocationControl
+        jobId="job-1"
+        locations={[
+          { id: "loc-1", label: "Kopitiam Cart" },
+          { id: "loc-2", label: "Ice Cream Cart" },
+        ]}
+      />,
+    );
+    expect(screen.getByLabelText("Booth for this label")).toBe(
+      screen.getByRole("combobox"),
+    );
+  });
+
   it("keeps the confirm button disabled until a booth is picked, for 2+ locations", () => {
     render(
       <AssignLocationControl

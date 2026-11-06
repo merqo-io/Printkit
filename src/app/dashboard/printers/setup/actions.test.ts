@@ -216,7 +216,8 @@ describe("registerBrandCloudPrinter", () => {
     expect(result).toEqual({ ok: true, state: "online" });
   });
 
-  it("passes the maker's refusal through and saves nothing", async () => {
+  it("hides the maker's refusal, logs it and saves nothing", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
     registerPrinterMock.mockResolvedValue({
       ok: false,
       error: "The printer rejected that KEY.",
@@ -231,8 +232,12 @@ describe("registerBrandCloudPrinter", () => {
 
     expect(result).toEqual({
       ok: false,
-      error: "The printer rejected that KEY.",
+      error: "Could not finish setup. Check the printer and try again.",
     });
+    expect(logged).toHaveBeenCalledWith(
+      expect.any(String),
+      "The printer rejected that KEY.",
+    );
     expect(updateMock).not.toHaveBeenCalled();
   });
 

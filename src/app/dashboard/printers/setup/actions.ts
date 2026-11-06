@@ -169,7 +169,10 @@ export async function registerBrandCloudPrinter(
     key,
     name: printer.display_name,
   });
-  if (!registered.ok) return { ok: false, error: registered.error };
+  if (!registered.ok) {
+    console.error("registerBrandCloudPrinter: maker refused", registered.error);
+    return { ok: false, error: SETUP_FAILED };
+  }
 
   const service = await createServiceClient();
   const { error } = await service
