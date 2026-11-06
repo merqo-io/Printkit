@@ -119,7 +119,11 @@ describe("sendTestPrint", () => {
   it("shows a friendly message and queues nothing without label access", async () => {
     access.mockResolvedValue(false);
     const result = await sendTestPrint(L);
-    expect(result).toEqual({ ok: false, error: LABELS_UPGRADE_MESSAGE });
+    expect(result).toEqual({
+      ok: false,
+      error: LABELS_UPGRADE_MESSAGE,
+      upgradeUrl: expect.stringMatching(/^https?:\/\/.+\/dashboard$/),
+    });
     expect(state.inserted).toHaveLength(0);
     expect(dispatch).not.toHaveBeenCalled();
   });

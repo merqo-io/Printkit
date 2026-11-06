@@ -65,7 +65,7 @@ export function CloudPollSetup({
       <Steps>
         <Step number={1} title="Open the virtual printer page">
           <p className="text-muted-foreground text-sm">
-            <TextLink href="/dashboard/dev/virtual-printer">
+            <TextLink href="/dashboard/printers/virtual">
               Open the virtual printer.
             </TextLink>
           </p>

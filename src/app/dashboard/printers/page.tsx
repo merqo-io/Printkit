@@ -29,7 +29,7 @@ const CONNECTOR_LABEL: Record<string, string> = {
 const OFFLINE_HINT: Record<string, string> = {
   cloud_poll: "Check it is on and connected to WiFi.",
   vendor_cloud: "Check it is on and has signal.",
-  bridge: "Open bridge mode on the helper device.",
+  bridge: "Open the Bluetooth printer page on the helper device.",
 };
 
 // The virtual printer shares the cloud_poll connector but runs in a browser

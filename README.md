@@ -4,7 +4,7 @@ Hardware print connector for Merqo vendors. Prints a label for every
 order, through one of three connectors (`src/lib/connectors/`):
 `cloud_poll` for printers that fetch their own jobs (Star CloudPRNT),
 `vendor_cloud` for printers reached through their maker's cloud (Feie 4G),
-and `bridge` for Bluetooth printers (NIIMBOT B1) through Bridge mode in
+and `bridge` for Bluetooth printers (NIIMBOT B1) through the Connect a Bluetooth printer page in
 Chrome on an Android phone, a Windows laptop or a Mac, or the Raspberry Pi
 agent in `bridge-agent/`. An iPad cannot drive a Bluetooth printer at all
 (no Web Bluetooth, WebUSB or Web Serial on iOS), verified on a B1 on
@@ -167,3 +167,5 @@ The sticker designer prototype supports configurable label geometry and a non-pr
 `printkit-test` is a reserved kit slug: test labels use it as their `source_kit` and never call a kit back, so `create-kit-key` refuses to mint a key with it.
 
 AGENTS.md is kept under 200 lines; file layout, data model and harness detail live in `docs/FILE-LAYOUT.md`, `docs/DATA-MODEL.md` and `docs/meta/`.
+
+`next.config.ts` also redirects the old `/dashboard/dev/virtual-printer` path permanently to `/dashboard/printers/virtual`, keeping the query string.

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 // eslint-disable-next-line no-restricted-imports -- RLS has no client policy for this write; the caller is verified first
 import { createServerClient, createServiceClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@/lib/safe-redirect";
+import { merqoBaseUrl } from "@/lib/merqo-url";
 import { getLegalDocSource, LEGAL_VERSIONS } from "@merqo/ui/legal";
 import { z } from "zod";
 
@@ -13,10 +14,6 @@ const DOC_TYPES = ["terms", "privacy"] as const;
 
 function sha256(input: string): string {
   return createHash("sha256").update(input).digest("hex");
-}
-
-function merqoBaseUrl(): string {
-  return process.env.MERQO_BASE_URL ?? "https://www.merqo.io";
 }
 
 function clientIp(hdrs: Headers): string {

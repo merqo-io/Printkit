@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { LabelsUpgradeMessage } from "@/components/labels-upgrade-message";
 import { reprintJob } from "./actions";
 
 /**
@@ -37,6 +38,13 @@ export function ReprintButton({
       if (result.success) {
         toast.success(
           boothLabel ? `Reprint queued for ${boothLabel}.` : "Reprint queued.",
+        );
+      } else if ("upgradeUrl" in result) {
+        toast.error(
+          <LabelsUpgradeMessage
+            message={result.error}
+            upgradeUrl={result.upgradeUrl}
+          />,
         );
       } else toast.error(result.error);
     })

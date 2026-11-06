@@ -288,9 +288,9 @@ export function BridgePanel({
         <Switch
           checked={enabled}
           onCheckedChange={handleToggle}
-          aria-label="Bridge mode"
+          aria-label="Printing"
         />
-        <span className="text-sm font-medium">Bridge mode</span>
+        <span className="text-sm font-medium">Printing</span>
       </div>
 
       {enabled && pairState === "unpaired" && (

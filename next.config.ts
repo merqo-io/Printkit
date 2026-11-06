@@ -26,6 +26,18 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // The virtual printer moved under Printers. Redirects keep the query string
+  // (for example ?location=) unless the destination sets its own.
+  async redirects() {
+    return [
+      {
+        source: "/dashboard/dev/virtual-printer",
+        destination: "/dashboard/printers/virtual",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     const isProd = process.env.NODE_ENV === "production";
 

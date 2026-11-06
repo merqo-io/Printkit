@@ -1,4 +1,4 @@
-# Sticker designer
+# Label design
 
 The authenticated, booth-scoped editor supports sticker dimensions, field positioning, typography, and a thermal-rendered sample preview. Vendors can save versioned designs after the owner applies the migration. The save action checks ownership, geometry, printer width, and sample overflow.
 
@@ -11,3 +11,4 @@ A vendor can upload one PNG or JPEG logo (512 KB and 1024 by 1024 pixels at most
 Logos are drawn into the print preview and live labels as dithered 1-bit images. The preview only loads logos from the signed-in vendor's own folder.
 
 The page header sets the "Printers" eyebrow and links back to Printers.
+The designer page carries the tab title "Label design", matching its heading.

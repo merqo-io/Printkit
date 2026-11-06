@@ -19,7 +19,7 @@ vi.mock("@/lib/print-locations", () => ({
 }));
 vi.mock("@/lib/printers", () => ({ getPrinterByLocation: async () => null }));
 vi.mock("@/components/page-header", () => ({
-  PageHeader: () => <h1>Sticker designer</h1>,
+  PageHeader: () => <h1>Label design</h1>,
 }));
 vi.mock("./sticker-designer", () => ({
   StickerDesigner: ({

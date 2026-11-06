@@ -16,7 +16,7 @@ is online or it is not.
   the shared `last_seen_at` signal), loaded through one vendor-scoped printer summary query, what kind it is in plain words, and the
   one action that makes sense next. A booth with no printer offers only
   "Choose a printer". A booth with a printer shows its main action (Printer
-  address, Edit serial and key, or Open bridge mode) and a "More" group with View
+  address, Edit serial and key, or Connect a Bluetooth printer) and a "More" group with View
   setup steps, Design label, Use a different printer and Remove printer
   (`printer-actions.tsx`; the confirm is a modal alert dialog, Escape or Cancel closes it and focus returns to More, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
   a one-line check for its type (the virtual printer is told to press Start on its page instead of checking WiFi). With no booths the page lists three numbered
@@ -57,7 +57,7 @@ is online or it is not.
   - 4G printer: insert a SIM or join WiFi, then type the serial number and key
     off the device. The key is used once to claim the printer and never
     stored.
-  - Bluetooth printer: choose Android (continue in Bridge mode) or Raspberry
+  - Bluetooth printer: choose Android (continue on the Connect a Bluetooth printer page) or Raspberry
     Pi (show a single-use pairing code), after a banner that says this is
     not recommended.
 
@@ -79,3 +79,5 @@ vendor-cloud driver. Links out to `/guides/bluetooth-printers` and
 `designer/` is an unfinished booth-scoped sticker editor candidate; saved templates are not yet used by order printing.
 
 The Printers header carries a "Printers" eyebrow, as do its child pages (designer, new, setup, and bridge).
+
+When label access is denied, `sendTestPrint` also returns `upgradeUrl` (the Merqo dashboard) and `TestPrintButton` renders the message with a real upgrade link. The `error` text is unchanged.
