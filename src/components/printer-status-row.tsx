@@ -31,9 +31,9 @@ export function PrinterStatusRow(props: PrinterStatusRowProps) {
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       <div className="min-w-0">
         <p className="font-medium">{props.label}</p>
-        <p className="text-muted-foreground text-sm">
-          {props.printerName ?? "No printer yet"}
-        </p>
+        {props.printerName ? (
+          <p className="text-muted-foreground text-sm">{props.printerName}</p>
+        ) : null}
       </div>
       <div className="flex items-start gap-2 sm:shrink-0 sm:items-center">
         <span
