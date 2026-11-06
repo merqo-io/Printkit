@@ -19,7 +19,7 @@ vi.mock("@merqo/ui", () => ({
 
 import { SiteNav } from "./site-nav";
 
-it("puts the printkit wordmark, About and the dashboard in the shared nav", () => {
+it("puts the printkit wordmark, About and sign in in the shared nav", () => {
   render(<SiteNav />);
   expect(screen.getByRole("link", { name: "printkit home" })).toHaveAttribute(
     "href",
@@ -29,8 +29,8 @@ it("puts the printkit wordmark, About and the dashboard in the shared nav", () =
     "href",
     "/about",
   );
-  expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute(
     "href",
-    "/dashboard",
+    "/login",
   );
 });

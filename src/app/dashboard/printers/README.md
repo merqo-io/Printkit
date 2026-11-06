@@ -21,7 +21,7 @@ is online or it is not.
   (`printer-actions.tsx`; the confirm panel takes focus, Escape cancels, and "Make a new address" in cloud setup asks the same way). An offline printer also shows
   a one-line check for its type (the virtual printer is told to press Start on its page instead of checking WiFi). With no booths the page lists three numbered
   steps, linking to qkit when `NEXT_PUBLIC_QKIT_URL` is set.
-- `test-print-button.tsx` - the "Print test label" button on each printer row and the setup wizard's connected state; shows sent, offline and error messages inline and disables itself while sending.
+- `test-print-button.tsx` - the "Print test label" button on each printer row and the setup wizard's connected state; takes an `offline` prop (from `last_seen_at` health) that disables it with a plain note; shows sent, queued and error messages inline and disables itself while sending.
 - `actions.ts` — `removePrinter`: vendor session, Zod-checked booth id, delete
   scoped to the vendor, `admin_audit` entry `printer_removed` (detail: booth,
   type, model). A 4G printer is first unregistered from the maker's account,

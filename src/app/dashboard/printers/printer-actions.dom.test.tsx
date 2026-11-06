@@ -164,3 +164,32 @@ it("shows the refusal or a failure of the test label", async () => {
     ),
   );
 });
+
+it("disables the test button and says the printer is offline", () => {
+  render(<PrinterActions {...props} offline />);
+  expect(
+    screen.getByRole("button", { name: "Print test label" }),
+  ).toBeDisabled();
+  expect(screen.getByText(/printer is offline/i)).toBeVisible();
+  expect(
+    screen.getByRole("button", { name: "Print test label" }),
+  ).toHaveAccessibleDescription(/printer is offline/i);
+});
+
+it("closes the More menu on outside click and on Escape", async () => {
+  const user = userEvent.setup();
+  const { container } = render(<PrinterActions {...props} />);
+  const details = container.querySelector("details") as HTMLDetailsElement;
+  const summary = screen.getByText("More");
+
+  await user.click(summary);
+  await waitFor(() => expect(details.open).toBe(true));
+  await user.click(document.body);
+  await waitFor(() => expect(details.open).toBe(false));
+
+  await user.click(summary);
+  await waitFor(() => expect(details.open).toBe(true));
+  await user.keyboard("{Escape}");
+  await waitFor(() => expect(details.open).toBe(false));
+  expect(summary).toHaveFocus();
+});

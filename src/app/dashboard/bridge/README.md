@@ -9,7 +9,7 @@ UX. This is the only part of printkit that ever touches
 
 ## Contents
 
-- **`page.tsx`** — Server component: calls `getVendorSession`, server-fetches the vendor's `listActiveLocations`, and resolves which `BridgePanel` to render — a `?booth=<id>` search param (matched against a location's `source_ref`, e.g. qkit's own booth id — deep-linked from qkit's booth settings "Choose the printer for this booth" link) skips straight to that location's panel; otherwise auto-selects when there's exactly one location, shows a message pointing to qkit's booth settings when there are none, and renders `BridgeLocationGate` to let the vendor pick when there are 2+.
+- **`page.tsx`** — Server component: calls `getVendorSession`, server-fetches the vendor's `listActiveLocations`, and resolves which `BridgePanel` to render — a `?booth=<id>` search param (matched against a location's `source_ref`, e.g. qkit's own booth id — deep-linked from qkit's booth settings "Choose the printer for this booth" link) skips straight to that location's panel; otherwise auto-selects when there's exactly one location, shows the shared setup-steps empty state when there are none, and renders `BridgeLocationGate` to let the vendor pick when there are 2+.
 - **`bridge-location-gate.tsx`** — Client component holding the picked-location state between `page.tsx`'s server-fetched location list and `BridgePanel`: renders `LocationPicker` until a booth is chosen, then renders `BridgePanel` with the resolved `locationId`.
 - **`location-picker.tsx`** — Presentational `LocationPicker({locations, onSelect})`: one button per active location, calling `onSelect(id)` on click.
 - **`page.tsx` layout** — `PageHeader` ("Bridge mode", back to Printers) over a `Panel` holding the body.

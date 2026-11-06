@@ -6,6 +6,10 @@ import { getCatalogEntry } from "@/lib/printer-catalog";
 import { locationRowId } from "@/lib/manage-url";
 import { PageHeader } from "@/components/page-header";
 import { Panel } from "@/components/panel";
+import {
+  SetupStepsEmpty,
+  boothPrintingSteps,
+} from "@/components/setup-steps-empty";
 import { PrinterStatusRow } from "@/components/printer-status-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,24 +58,10 @@ export default async function PrintersPage() {
       />
 
       {rows.length === 0 ? (
-        <Panel>
-          <p className="font-medium">No booths have printing turned on yet.</p>
-          <ol className="text-muted-foreground mt-2 list-decimal space-y-1 pl-5 text-sm">
-            <li>
-              In{" "}
-              {qkitUrl ? (
-                <a href={qkitUrl} className="text-foreground underline">
-                  qkit
-                </a>
-              ) : (
-                "qkit"
-              )}
-              , turn on printing for your booth.
-            </li>
-            <li>Pick your printer here.</li>
-            <li>Print a test label.</li>
-          </ol>
-        </Panel>
+        <SetupStepsEmpty
+          heading="No booths have printing turned on yet."
+          steps={boothPrintingSteps(qkitUrl ?? undefined)}
+        />
       ) : (
         <ul className="space-y-3">
           {rows.map(({ location, printer, state }) => (
@@ -120,6 +110,7 @@ export default async function PrintersPage() {
                       boothLabel={location.label}
                       catalogId={printer.catalog_id}
                       connector={printer.connector}
+                      offline={state === "offline"}
                     />
                   </>
                 ) : (

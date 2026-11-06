@@ -8,6 +8,7 @@ else sits flat here.
 
 ## Contents
 
+- `setup-steps-empty.tsx` — `SetupStepsEmpty({ heading, steps })`: the dashed-border numbered-steps empty state used by the Printers page, bridge page and first-run panel, plus `boothPrintingSteps` (shared copy) and `safeQkitUrl`. Local so it can be swapped for merqo-ui later.
 - `printer-status-row.tsx` — `PrinterStatusRow({ label, printerName, state,
 lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the status sits under the booth name instead of beside it, so a long "Offline since" time wraps inside the card. It renders
   what the server already read from `printers.last_seen_at`, the health
@@ -24,7 +25,7 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
   shared raised-card container (rounded, bordered, soft shadow) used by the
   login page and the root error boundary, matching every other kit's
   login page.
-- `site-nav.tsx` — `SiteNav()`: `@merqo/ui`'s `LandingNav` with the printkit wordmark, About and a Dashboard button, the top bar of the public pages (`/about`, the Bluetooth guide).
+- `site-nav.tsx` — `SiteNav()`: `@merqo/ui`'s `LandingNav` with the printkit wordmark (to `/dashboard`), About and a "Sign in" button (to `/login`), the top bar of the public pages (`/about`, the Bluetooth guide).
 - `page-header.tsx` — `PageHeader({ eyebrow, title, description, action, back })`:
   the top of every dashboard page, with an optional uppercase eyebrow, the
   title in the display face, a muted description, an optional action slot

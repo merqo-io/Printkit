@@ -20,7 +20,7 @@ export default function NotFound() {
             no longer exists.
           </p>
           <Button asChild className="mt-7 h-11 w-full rounded-xl">
-            <Link href="/dashboard/printers">Go to printers</Link>
+            <Link href="/dashboard">Back to overview</Link>
           </Button>
         </ElevatedCard>
       </div>
