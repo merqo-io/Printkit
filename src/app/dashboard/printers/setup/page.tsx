@@ -28,6 +28,7 @@ export default async function PrinterSetupPage({
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader
+        eyebrow="Printers"
         back={{ href: "/dashboard/printers", label: "Printers" }}
         title={`Set up the ${entry.brand} ${entry.model}`}
         description={`Labels for ${booth.label}, ${entry.defaultLabelMm.width} mm by ${entry.defaultLabelMm.height} mm.`}

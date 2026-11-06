@@ -40,6 +40,7 @@ export default async function DashboardPage() {
     <div className="mx-auto max-w-4xl">
       <AutoRefresh />
       <PageHeader
+        eyebrow="Your booths"
         title="Overview"
         description="Whether each booth's printer is online, and the latest labels from qkit orders."
       />
@@ -71,12 +72,6 @@ export default async function DashboardPage() {
                     state={state}
                     lastSeenAt={printer?.last_seen_at ?? null}
                   />
-                  <TextLink
-                    href={`/dashboard/printers/designer?location=${encodeURIComponent(loc.id)}`}
-                    className="shrink-0 text-sm"
-                  >
-                    Design label
-                  </TextLink>
                 </div>
               ))}
             </Panel>

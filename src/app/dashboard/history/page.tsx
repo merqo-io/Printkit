@@ -41,7 +41,11 @@ export default async function HistoryPage({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <PageHeader title="History" description="Every label, newest first." />
+      <PageHeader
+        eyebrow="Label history"
+        title="History"
+        description="Every label, newest first."
+      />
       <SegmentedControl
         label="Filter labels"
         className="mb-4"

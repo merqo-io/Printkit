@@ -57,6 +57,7 @@ export default async function BridgePage({
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader
+        eyebrow="Printers"
         title="Bridge mode"
         back={{ href: "/dashboard/printers", label: "Printers" }}
         description="Turn on Bridge mode on the device next to your printer, then pair it. Keep this page open while you sell."
