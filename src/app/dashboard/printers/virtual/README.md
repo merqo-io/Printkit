@@ -1,4 +1,4 @@
-# virtual-printer
+# virtual
 
 ## Purpose
 
@@ -8,12 +8,12 @@ same CloudPRNT exchange a real Star printer does, against the same
 queued, claimed, rendered, confirmed, status reported back to the calling
 kit) can be proven before any hardware is bought.
 
-It is not linked from the dashboard navigation, and the page returns 404
+It is not in the dashboard navigation (the cloud-poll setup steps link to it), and the page returns 404
 when `VERCEL_ENV === "production"`.
 
 ## Contents
 
-- `page.tsx` — server page. Blocks production, loads the vendor's active
+- `page.tsx` — server page. Blocks production, renders the shared `PageHeader` (eyebrow "Printers", back link to Printers), loads the vendor's active
   locations, and explains what the page is. Shows a hint instead of the
   panel when the vendor has no printing-enabled booth. Tab title "Virtual printer".
 - `actions.ts` — `startVirtualPrinter(locationId)`. Blocks production,
@@ -36,7 +36,7 @@ on `@/lib/printers` (printer creation) and `@/lib/device-credentials`
 
 ## Parent
 
-[dashboard](../../README.md)
+[printers](../README.md)
 
 Preview history keeps only the most recent twenty labels. Discarded previews
 and all previews on unmount release their object URLs. A download finishing
@@ -44,3 +44,5 @@ after unmount creates no preview and sends no success acknowledgement. Start
 failures reset the busy state and show a retry message.
 
 `startVirtualPrinter` parses the booth id as a UUID first.
+
+The page moved here from `/dashboard/dev/virtual-printer`; `next.config.ts` redirects the old path permanently (query string kept).

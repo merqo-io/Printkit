@@ -69,3 +69,5 @@ marketing footer. No `admin/` directory exists yet.
 Request boundaries use bounded body parsing before privileged work. Pending form states and bridge wake-lock cleanup are covered by component regressions.
 
 `robots.ts` disallows crawling in every environment and the root `metadata.robots` is noindex/nofollow, so printkit is never indexed. The login layout forces per-request rendering so the nonce CSP reaches its scripts.
+
+`page-titles.test.ts` lists the virtual printer page at `/dashboard/printers/virtual`.

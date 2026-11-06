@@ -10,6 +10,7 @@ import {
 // eslint-disable-next-line no-restricted-imports -- RLS has no client policy for this write; the caller is verified first
 import { createServiceClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/action-result";
+import { merqoUpgradeUrl } from "@/lib/merqo-url";
 import { z } from "zod";
 import { uuidSchema } from "@/lib/schemas";
 
@@ -18,7 +19,10 @@ import { uuidSchema } from "@/lib/schemas";
  * be requeued; comparing status and attempt prevents stale concurrent reprints.
  * Audit failure must not disguise a successful requeue as a failed request.
  */
-export async function reprintJob(input: string): Promise<ActionResult> {
+export type ReprintResult =
+  ActionResult | { success: false; error: string; upgradeUrl: string };
+
+export async function reprintJob(input: string): Promise<ReprintResult> {
   const parsedId = uuidSchema.safeParse(input);
   if (!parsedId.success) return { success: false, error: "Unknown job" };
   const jobId = parsedId.data;
@@ -45,7 +49,13 @@ export async function reprintJob(input: string): Promise<ActionResult> {
   if (access === null) {
     return { success: false, error: "Could not reprint the job" };
   }
-  if (!access) return { success: false, error: LABELS_UPGRADE_MESSAGE };
+  if (!access) {
+    return {
+      success: false,
+      error: LABELS_UPGRADE_MESSAGE,
+      upgradeUrl: merqoUpgradeUrl(),
+    };
+  }
 
   const result = await updatePrintJobStatus(jobId, "queued", undefined, {
     expectedStatus: job.status,

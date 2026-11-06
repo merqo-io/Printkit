@@ -7,6 +7,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { uuidSchema } from "@/lib/schemas";
 import { dispatchJob } from "@/lib/job-dispatch";
 import { printerState } from "@/lib/printers";
+import { merqoUpgradeUrl } from "@/lib/merqo-url";
 import { TEST_PRINT_SOURCE_KIT } from "@/lib/test-print";
 import {
   LABELS_UPGRADE_MESSAGE,
@@ -95,16 +96,27 @@ export async function removePrinter(
 }
 
 export type SendTestPrintResult =
-  { ok: true; offline: boolean } | { ok: false; error: string };
+  | { ok: true; offline: boolean }
+  | { ok: false; error: string; upgradeUrl?: string };
 
 const TEST_PRINT_COOLDOWN_MS = 60_000;
 
 // Null means allowed. A failed lookup reads as a generic failure, not a
 // denial, so a vendor with a paid plan is not told to upgrade during an outage.
-async function labelAccessError(vendorId: string): Promise<string | null> {
+async function labelAccessError(
+  vendorId: string,
+): Promise<{ ok: false; error: string; upgradeUrl?: string } | null> {
   const access = await vendorHasLabelAccess(vendorId);
-  if (access === null) return "Could not send the test label.";
-  if (!access) return LABELS_UPGRADE_MESSAGE;
+  if (access === null) {
+    return { ok: false, error: "Could not send the test label." };
+  }
+  if (!access) {
+    return {
+      ok: false,
+      error: LABELS_UPGRADE_MESSAGE,
+      upgradeUrl: merqoUpgradeUrl(),
+    };
+  }
   return null;
 }
 
@@ -140,7 +152,7 @@ export async function sendTestPrint(
   }
 
   const denied = await labelAccessError(user.id);
-  if (denied) return { ok: false, error: denied };
+  if (denied) return denied;
 
   const since = new Date(Date.now() - TEST_PRINT_COOLDOWN_MS).toISOString();
   const { data: recent, error: recentError } = await service

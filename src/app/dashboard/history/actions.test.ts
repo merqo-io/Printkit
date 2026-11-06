@@ -110,7 +110,11 @@ describe("reprintJob", () => {
 
     const result = await reprintJob("11111111-1111-4111-8111-111111111111");
 
-    expect(result).toEqual({ success: false, error: "upgrade message" });
+    expect(result).toEqual({
+      success: false,
+      error: "upgrade message",
+      upgradeUrl: expect.stringMatching(/^https?:\/\/.+\/dashboard$/),
+    });
     expect(updatePrintJobStatusMock).not.toHaveBeenCalled();
     expect(dispatchJobMock).not.toHaveBeenCalled();
   });

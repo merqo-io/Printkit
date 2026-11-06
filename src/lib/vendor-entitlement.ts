@@ -1,8 +1,8 @@
 import { createServiceClient } from "@/lib/supabase/server";
+import { LABELS_UPGRADE_LINK_TEXT } from "@/lib/labels-upgrade";
 
 /** Dashboard copy shown when a vendor without label access tries to print. */
-export const LABELS_UPGRADE_MESSAGE =
-  "Label printing needs a paid plan or an active event pass. Upgrade in your Merqo account to print labels.";
+export const LABELS_UPGRADE_MESSAGE = `Label printing needs a paid plan or an active event pass. ${LABELS_UPGRADE_LINK_TEXT} to print labels.`;
 
 /** Stable error code qkit and the dashboard branch on when labels are blocked. */
 export const LABELS_NOT_ENTITLED = "labels_not_entitled";

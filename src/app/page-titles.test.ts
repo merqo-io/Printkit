@@ -32,8 +32,8 @@ const PAGES: [string, () => Promise<MetadataModule>, string][] = [
     "Connect a Bluetooth printer",
   ],
   [
-    "/dashboard/dev/virtual-printer",
-    () => import("./dashboard/dev/virtual-printer/page"),
+    "/dashboard/printers/virtual",
+    () => import("./dashboard/printers/virtual/page"),
     "Virtual printer",
   ],
   [

@@ -167,3 +167,5 @@ The sticker designer prototype supports configurable label geometry and a non-pr
 `printkit-test` is a reserved kit slug: test labels use it as their `source_kit` and never call a kit back, so `create-kit-key` refuses to mint a key with it.
 
 AGENTS.md is kept under 200 lines; file layout, data model and harness detail live in `docs/FILE-LAYOUT.md`, `docs/DATA-MODEL.md` and `docs/meta/`.
+
+`next.config.ts` also redirects the old `/dashboard/dev/virtual-printer` path permanently to `/dashboard/printers/virtual`, keeping the query string.

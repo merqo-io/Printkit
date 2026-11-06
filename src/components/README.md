@@ -61,3 +61,5 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
 ## Parent
 
 [printkit](../../README.md)
+
+- `labels-upgrade-message.tsx` - `LabelsUpgradeMessage`: the labels-blocked message with "Upgrade in your Merqo account" rendered as a `TextLink` to the Merqo dashboard (same tab).
