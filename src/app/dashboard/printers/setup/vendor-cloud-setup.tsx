@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { CatalogEntry } from "@/lib/printer-catalog";
 import { registerBrandCloudPrinter } from "./actions";
+import { SETUP_FAILED } from "./messages";
 import { Step, Steps, WaitingForPrinter } from "./setup-step";
 
 export function VendorCloudSetup({
@@ -45,7 +46,7 @@ export function VendorCloudSetup({
             : "Printer added. It will show as online once it is switched on.",
         );
       } catch {
-        toast.error("Could not complete setup. Please try again.");
+        toast.error(SETUP_FAILED);
       }
     });
   };

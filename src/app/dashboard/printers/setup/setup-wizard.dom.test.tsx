@@ -226,7 +226,7 @@ it.each(["address", "registration", "pairing"] as const)(
     await user.click(screen.getByRole("button", { name: label }));
     await waitFor(() =>
       expect(m.error).toHaveBeenCalledWith(
-        "Could not complete setup. Please try again.",
+        "Could not finish setup. Check the printer and try again.",
       ),
     );
     expect(screen.getByRole("button", { name: label })).toBeEnabled();

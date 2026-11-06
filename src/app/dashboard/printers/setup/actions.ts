@@ -14,6 +14,7 @@ import { getVendorCloudDriver } from "@/lib/connectors/vendor-cloud/drivers";
 import { createServiceClient } from "@/lib/supabase/server";
 import { publicSiteUrl } from "@/lib/site-url";
 import { z } from "zod";
+import { SETUP_FAILED } from "./messages";
 import {
   catalogIdSchema,
   cloudPrinterCredentialsSchema,
@@ -21,7 +22,6 @@ import {
 } from "@/lib/schemas";
 
 const INVALID_INPUT = "Check the details and try again.";
-const SETUP_FAILED = "Could not finish setup. Check the printer and try again.";
 
 const refSchema = z.object({
   locationId: uuidSchema,
