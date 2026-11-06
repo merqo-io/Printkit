@@ -40,7 +40,7 @@ Wizard regressions cover pending actions, pairing failure and safe retry behavio
 
 Every setup action parses its booth id, catalog id and cloud-printer credentials with a Zod schema first.
 
-The page header sets the "Printers" eyebrow and links back to Printers.
+The page header (the shared `@merqo/ui` `PageHeader`) sets the "Printers" eyebrow and links back to Printers.
 
 The virtual printer step links to `/dashboard/printers/virtual`.
 

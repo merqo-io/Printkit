@@ -26,11 +26,9 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
   login page and the root error boundary, matching every other kit's
   login page.
 - `site-nav.tsx` — `SiteNav()`: `@merqo/ui`'s `LandingNav` with the printkit wordmark (to `/dashboard`), About and a "Sign in" button (to `/login`), the top bar of the public pages (`/about`, the Bluetooth guide).
-- `page-header.tsx` — `PageHeader({ eyebrow, title, description, action, back })`:
-  the top of every dashboard page, with an optional uppercase eyebrow, the
-  title in the display face, a muted description, an optional action slot
-  (stacks under the title on phones, sits right on `sm`+) and an optional way
-  back, drawn as the shared `BackButton`. One `h1` only.
+- `printers-back-link.tsx` — `PrintersBackLink()`: the `back` slot content for
+  the shared `@merqo/ui` `PageHeader` on every child page of Printers, a
+  `BackButton` to `/dashboard/printers`.
 - `panel.tsx` — `Panel({ as, className, children })`: the bordered container
   dashboard content sits in. Panels are never nested.
 - `segmented-control.tsx` — `SegmentedControl({ label, options })`: an

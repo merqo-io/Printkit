@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { getVendorSession } from "@/lib/vendor-session";
 import { listActiveLocations } from "@/lib/print-locations";
 import { catalogName, getCatalogEntry } from "@/lib/printer-catalog";
-import { PageHeader } from "@/components/page-header";
+import { PageHeader } from "@merqo/ui";
+import { PrintersBackLink } from "@/components/printers-back-link";
 import { CloudPollSetup, VendorCloudSetup, BridgeSetup } from "./setup-wizard";
 
 export const metadata: Metadata = {
@@ -28,8 +29,9 @@ export default async function PrinterSetupPage({
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader
+        responsive
         eyebrow="Printers"
-        back={{ href: "/dashboard/printers", label: "Printers" }}
+        back={<PrintersBackLink />}
         title={`Set up the ${catalogName(entry)}`}
         description={`Labels for ${booth.label}, ${entry.defaultLabelMm.width} mm by ${entry.defaultLabelMm.height} mm.`}
       />
