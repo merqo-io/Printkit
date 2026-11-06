@@ -43,3 +43,5 @@ Every setup action parses its booth id, catalog id and cloud-printer credentials
 The page header sets the "Printers" eyebrow and links back to Printers.
 
 The virtual printer step links to `/dashboard/printers/virtual`.
+
+`bridge-setup.tsx` names the Bluetooth page "Connect a Bluetooth printer" and its switch "Printing", matching the page itself.

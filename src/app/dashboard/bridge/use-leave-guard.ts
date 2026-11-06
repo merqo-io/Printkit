@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 export const LEAVE_BRIDGE_MESSAGE =
-  "Leave Bridge mode? This device stops printing orders until you come back and pair the printer again.";
+  "Leave this page? This device stops printing orders until you come back and pair the printer again.";
 
 /** A same-origin link click that would move this tab to another page. */
 function leavingLink(event: MouseEvent): boolean {

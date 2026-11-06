@@ -40,7 +40,7 @@ it("shows setup links and live status from the scoped summaries", async () => {
     screen.getByRole("link", { name: "Choose a printer" }),
   ).toHaveAttribute("href", "/dashboard/printers/new?location=a");
   expect(
-    screen.getByRole("link", { name: "Open bridge mode" }),
+    screen.getByRole("link", { name: "Connect a Bluetooth printer" }),
   ).toHaveAttribute("href", "/dashboard/bridge?booth=booth-b");
   expect(screen.getByText("Printer B")).toBeInTheDocument();
   expect(screen.getByText("Offline")).toBeInTheDocument();
@@ -79,7 +79,7 @@ const row = (connector: string, catalog: string, state: string) => ({
 it.each([
   ["cloud_poll", "star-mc-label2", "Printer address", "setup?location"],
   ["vendor_cloud", "feie-fp-n20w", "Edit serial and key", "setup?location"],
-  ["bridge", "niimbot-b1", "Open bridge mode", "/dashboard/bridge"],
+  ["bridge", "niimbot-b1", "Connect a Bluetooth printer", "/dashboard/bridge"],
 ])("shows the %s primary action", async (connector, catalog, label, href) => {
   summaries.mockResolvedValue([row(connector, catalog, "online")]);
   render(await PrintersPage());
