@@ -45,6 +45,7 @@ export default async function DesignerPage({
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
+        eyebrow="Printers"
         title="Sticker designer"
         back={{ href: "/dashboard/printers", label: "Printers" }}
         description={`Design a label for ${location.label}.`}

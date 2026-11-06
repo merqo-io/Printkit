@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AlertDialog } from "radix-ui";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { removePrinter } from "./actions";
@@ -21,7 +22,7 @@ type Pending = "remove" | "change" | null;
 
 const PRIMARY: Record<string, string> = {
   cloud_poll: "Printer address",
-  vendor_cloud: "Edit SN and KEY",
+  vendor_cloud: "Edit serial and key",
   bridge: "Open bridge mode",
 };
 
@@ -36,10 +37,7 @@ export function PrinterActions(props: PrinterActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDetailsElement>(null);
   const triggerRef = useRef<HTMLElement>(null);
-  const headingRef = useRef<HTMLParagraphElement>(null);
   const location = encodeURIComponent(props.locationId);
-  const headingId = `confirm-${props.locationId}`;
-  const detailsId = `confirm-details-${props.locationId}`;
   const setupHref = `/dashboard/printers/setup?location=${location}&model=${encodeURIComponent(props.catalogId)}`;
   const primaryHref =
     props.connector === "bridge"
@@ -67,10 +65,6 @@ export function PrinterActions(props: PrinterActionsProps) {
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [menuOpen]);
-
-  useEffect(() => {
-    if (pending) headingRef.current?.focus();
-  }, [pending]);
 
   const ask = (kind: Exclude<Pending, null>) => {
     setMenuOpen(false);
@@ -157,67 +151,50 @@ export function PrinterActions(props: PrinterActionsProps) {
         </div>
       </details>
 
-      {pending && (
-        <div
-          role="alertdialog"
-          aria-labelledby={headingId}
-          aria-describedby={detailsId}
-          onKeyDown={(event) => {
-            if (event.key === "Escape" && !busy) cancel();
-          }}
-          className="bg-muted/50 mt-2 w-full space-y-3 rounded-md border p-4"
-        >
-          <p
-            id={headingId}
-            ref={headingRef}
-            tabIndex={-1}
-            className="font-medium outline-none"
+      <AlertDialog.Root
+        open={pending !== null}
+        onOpenChange={(open) => {
+          if (!open && !busy) cancel();
+        }}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
+          <AlertDialog.Content
+            // The trigger lives in a menu that has just closed, so focus is
+            // sent back to "More" by hand.
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              triggerRef.current?.focus();
+            }}
+            className="bg-background fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 space-y-3 rounded-md border p-5 shadow-lg"
           >
-            {pending === "change"
-              ? `Use a different printer for ${props.boothLabel}?`
-              : `Remove the printer from ${props.boothLabel}?`}
-          </p>
-          <ul
-            id={detailsId}
-            className="text-muted-foreground list-disc space-y-1 pl-5 text-sm"
-          >
-            <li>
-              This printer is unpaired and its address or login stops working.
-            </li>
-            <li>
-              {props.boothLabel} will have no printer until you set up a new
-              one.
-            </li>
-            <li>
-              Orders still waiting stay queued for a new printer, but only for
-              30 minutes after the order. An order already sent to this printer
-              that has not printed may fail. Failed orders can be reprinted from
-              History.
-            </li>
-            {pending === "change" && (
-              <li>You will pick the new printer next.</li>
-            )}
-          </ul>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={confirm}
-              disabled={busy}
-            >
-              {busy ? "Working…" : confirmLabel}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={cancel}
-              disabled={busy}
-            >
-              Keep it
-            </Button>
-          </div>
-        </div>
-      )}
+            <AlertDialog.Title className="font-medium">
+              {pending === "change"
+                ? `Use a different printer for ${props.boothLabel}?`
+                : `Remove the printer from ${props.boothLabel}?`}
+            </AlertDialog.Title>
+            <AlertDialog.Description className="text-muted-foreground text-sm">
+              This printer will stop receiving orders. Orders still queued wait
+              up to 30 minutes for a new printer.
+            </AlertDialog.Description>
+            <div className="flex flex-wrap justify-end gap-2">
+              <AlertDialog.Cancel asChild>
+                <Button variant="outline" size="sm" disabled={busy}>
+                  Cancel
+                </Button>
+              </AlertDialog.Cancel>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={confirm}
+                disabled={busy}
+              >
+                {busy ? "Removing…" : confirmLabel}
+              </Button>
+            </div>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </div>
   );
 }

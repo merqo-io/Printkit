@@ -78,7 +78,7 @@ const row = (connector: string, catalog: string, state: string) => ({
 });
 it.each([
   ["cloud_poll", "star-mc-label2", "Printer address", "setup?location"],
-  ["vendor_cloud", "feie-fp-n20w", "Edit SN and KEY", "setup?location"],
+  ["vendor_cloud", "feie-fp-n20w", "Edit serial and key", "setup?location"],
   ["bridge", "niimbot-b1", "Open bridge mode", "/dashboard/bridge"],
 ])("shows the %s primary action", async (connector, catalog, label, href) => {
   summaries.mockResolvedValue([row(connector, catalog, "online")]);

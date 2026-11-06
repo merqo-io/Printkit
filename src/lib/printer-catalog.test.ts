@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   PRINTER_CATALOG,
+  catalogName,
   compareRecommended,
   getCatalogEntry,
   isRecommended,
@@ -110,5 +111,15 @@ describe("printer catalog", () => {
     expect(PRINTER_CATALOG.every((entry) => !entry.hardwareVerified)).toBe(
       true,
     );
+  });
+});
+
+describe("catalogName", () => {
+  it("joins brand and model", () => {
+    expect(catalogName(entryOf("niimbot-b1"))).toMatch(/^NIIMBOT /);
+  });
+
+  it("names the virtual printer without a brand", () => {
+    expect(catalogName(entryOf("virtual"))).toBe("Virtual printer");
   });
 });

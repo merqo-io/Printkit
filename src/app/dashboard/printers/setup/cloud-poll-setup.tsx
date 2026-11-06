@@ -5,8 +5,9 @@ import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { TextLink } from "@/components/text-link";
-import type { CatalogEntry } from "@/lib/printer-catalog";
+import { catalogName, type CatalogEntry } from "@/lib/printer-catalog";
 import { createPrinterUrl } from "./actions";
+import { SETUP_FAILED } from "./messages";
 import { Step, Steps, WaitingForPrinter } from "./setup-step";
 
 export function CloudPollSetup({
@@ -52,7 +53,7 @@ export function CloudPollSetup({
         restoreFocus.current = true;
         setConfirming(false);
       } catch {
-        toast.error("Could not complete setup. Please try again.");
+        toast.error(SETUP_FAILED);
       }
     });
   };
@@ -172,7 +173,7 @@ export function CloudPollSetup({
 
       <Step
         number={2}
-        title={`Open the ${entry.brand} printer's own settings page`}
+        title={`Open the ${catalogName(entry)}'s own settings page`}
       >
         <p className="text-muted-foreground text-sm">
           Put the printer on the same WiFi as your iPad, then open its settings

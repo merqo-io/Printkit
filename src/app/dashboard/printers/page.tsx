@@ -53,6 +53,7 @@ export default async function PrintersPage() {
     <div className="mx-auto max-w-4xl">
       <AutoRefresh />
       <PageHeader
+        eyebrow="Printers"
         title="Printers"
         description="One printer per booth. New orders print by themselves once a booth has a printer that is online."
       />

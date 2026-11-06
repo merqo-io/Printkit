@@ -21,9 +21,11 @@ The printer picker: choose a model for a booth from the catalog.
   last. The recommended card gets a stronger border.
   Above the filters it shows `PRINTER_CHOICE_ADVICE` and a "Read why" link
   to the Bluetooth guide.
-  Cards are `Panel`s. Sort stays a native `<select>` on purpose, so iPadOS opens its own touch picker; it is styled to match the shared select. Filter chips grow to 40px on touch screens. The iPad badge sits in an `inline-flex` group with its `InfoButton`, so the two wrap as one.
+  Cards are `Panel`s. Sort stays a native `<select>` on purpose, so iPadOS opens its own touch picker; it is styled to match the shared select. Filter chips grow to 44px on touch screens. The iPad badge sits in an `inline-flex` group with its `InfoButton`, so the two wrap as one.
 - `printer-picker.dom.test.tsx` — filtering, sorting, the opening advice,
   the Bluetooth warning, and each badge sharing a group with its `InfoButton`.
+
+The page header sets the "Printers" eyebrow and links back to Printers.
 
 ## Parent
 

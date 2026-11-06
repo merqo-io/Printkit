@@ -1,5 +1,5 @@
 import { createServiceClient } from "@/lib/supabase/server";
-import { getCatalogEntry } from "@/lib/printer-catalog";
+import { catalogName, getCatalogEntry } from "@/lib/printer-catalog";
 import { JOB_EXPIRY_MS } from "@/lib/job-expiry";
 import type { Database } from "@/lib/types";
 import { PRINTER_COLUMNS } from "@/lib/columns";
@@ -101,7 +101,7 @@ export async function createPrinter(input: {
       catalog_id: entry.id,
       connector: entry.connector,
       driver: entry.driver,
-      display_name: input.displayName ?? `${entry.brand} ${entry.model}`,
+      display_name: input.displayName ?? catalogName(entry),
       label_width_mm: entry.defaultLabelMm.width,
       label_height_mm: entry.defaultLabelMm.height,
     })

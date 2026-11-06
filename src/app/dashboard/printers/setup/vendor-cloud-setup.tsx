@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { CatalogEntry } from "@/lib/printer-catalog";
 import { registerBrandCloudPrinter } from "./actions";
+import { SETUP_FAILED } from "./messages";
 import { Step, Steps, WaitingForPrinter } from "./setup-step";
 
 export function VendorCloudSetup({
@@ -45,7 +46,7 @@ export function VendorCloudSetup({
             : "Printer added. It will show as online once it is switched on.",
         );
       } catch {
-        toast.error("Could not complete setup. Please try again.");
+        toast.error(SETUP_FAILED);
       }
     });
   };
@@ -60,10 +61,13 @@ export function VendorCloudSetup({
         </p>
       </Step>
 
-      <Step number={2} title="Type the SN and KEY printed on the printer">
+      <Step
+        number={2}
+        title="Type the serial number and key printed on the printer"
+      >
         <form onSubmit={onSubmit} className="max-w-sm space-y-3">
           <div className="space-y-1">
-            <Label htmlFor="sn">SN</Label>
+            <Label htmlFor="sn">Serial number</Label>
             <Input
               id="sn"
               value={sn}
@@ -73,17 +77,17 @@ export function VendorCloudSetup({
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="key">KEY</Label>
+            <Label htmlFor="key">Key</Label>
             <Input
               id="key"
               value={key}
               onChange={(event) => setKey(event.target.value)}
-              placeholder="Next to the SN"
+              placeholder="Next to the serial number"
               autoComplete="off"
             />
           </div>
           <p className="text-muted-foreground text-xs">
-            We use the KEY once to claim the printer and never store it.
+            We use the key once to claim the printer and never store it.
           </p>
           <Button type="submit" disabled={busy || !sn || !key}>
             {busy ? "Adding…" : "Add this printer"}

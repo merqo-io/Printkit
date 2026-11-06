@@ -180,7 +180,7 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
 - `niimbot-print.ts` — `connectPrinter`/`printLabel`/`disconnectPrinter`/`onPrinterDisconnect`, a thin wrapper around `@mmote/niimbluelib`'s `NiimbotBluetoothClient`/`ImageEncoder`. A B1 on real hardware prints the label and then never sends the "page done"/"job done" packets, so an acknowledgement timeout _after_ the page was sent counts as printed (reprinting a label that already came out is the worse failure); every other error still fails the job. `printLabel`'s optional `model` param (defaults to `niimbot-model.ts`'s `DEFAULT_NIIMBOT_MODEL`) looks up that model's `printDirection` instead of hardcoding the B1's `"top"` inline (the label bitmap itself now arrives from the server, so nothing about label size lives on the device). `niimbot-print.test.ts` mocks the `NiimbotBluetoothClient` constructor with a `function` expression (not an arrow) so `vitest` 4 can call it with `new`. `onPrinterDisconnect(client, onDrop)` subscribes to the client's `disconnect` event (printer switched off, out of range, or taken by another device) and returns the unsubscribe function.
 - `niimbot-model.ts` — `NIIMBOT_MODELS`/`DEFAULT_NIIMBOT_MODEL`: per-model print config, one entry (`B1`) today — `niimbluelib` itself already supports other NIIMBOT models, so adding a second one here is a config entry, not a code change in `niimbot-print.ts`.
 - `printer-catalog.ts` — `PRINTER_CATALOG`/`getCatalogEntry`/`listCatalog`/
-  `worksWithIpadAlone`/`recommendationTier`/`isRecommended`/`compareRecommended`.
+  `catalogName` (brand and model, or just the model when the brand is empty, as for the virtual printer)/`worksWithIpadAlone`/`recommendationTier`/`isRecommended`/`compareRecommended`.
   Recommendation follows what the vendor lives with, not the connector:
   tier 1 works with an iPad alone and costs nothing after purchase (any WiFi
   printer, Star or Feie WiFi), tier 2 works alone but has a running cost
@@ -213,7 +213,8 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
   `touchPrinterSeen`/`printerState`: reads of the `printers` table plus the
   one health signal every connector shares (`last_seen_at`, online inside
   60s, written at most once per 20s so a printer polling every few seconds
-  does not write a row per request).
+  does not write a row per request). New rows get `display_name` from
+  `catalogName(entry)`; existing rows keep their stored name.
 - `job-dispatch.ts` — `claimJob`/`sweepLocation`/`dispatchJob`: the job
   lifecycle beyond creation. `claimJob` wraps the `claim_job` SQL function,
   the only path from `queued` to `sent`. `sweepLocation` is the lazy,
