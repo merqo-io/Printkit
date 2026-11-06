@@ -144,15 +144,13 @@ describe("DashboardPage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("links each booth to its label designer", async () => {
+  it("shows the eyebrow and no per-booth Design label link", async () => {
     vi.mocked(listLocationPrinterSummaries).mockResolvedValue([
       booth("online"),
     ]);
     render(await DashboardPage());
-    expect(screen.getByRole("link", { name: "Design label" })).toHaveAttribute(
-      "href",
-      "/dashboard/printers/designer?location=loc-1",
-    );
+    expect(screen.getByText("Your booths")).toBeInTheDocument();
+    expect(screen.queryByText("Design label")).toBeNull();
   });
 
   it("shows the empty history state when there are no recent jobs", async () => {

@@ -29,6 +29,7 @@ export default async function NewPrinterPage({
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
+        eyebrow="Printers"
         title="Choose a printer"
         back={{ href: "/dashboard/printers", label: "Printers" }}
         description={

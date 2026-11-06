@@ -25,6 +25,8 @@ The printer picker: choose a model for a booth from the catalog.
 - `printer-picker.dom.test.tsx` — filtering, sorting, the opening advice,
   the Bluetooth warning, and each badge sharing a group with its `InfoButton`.
 
+The page header sets the "Printers" eyebrow and links back to Printers.
+
 ## Parent
 
 [printers](../README.md)

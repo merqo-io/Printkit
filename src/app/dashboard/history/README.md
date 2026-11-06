@@ -28,3 +28,5 @@ The page's tab title is "History", matching its heading.
 `reprintJob` and `assignPrintLocation` parse their job and booth ids as UUIDs before any session or database call.
 
 Batch labels appear as individual jobs, so a missing or failed label can be inspected and reprinted separately.
+
+The History header carries a "Label history" eyebrow.
