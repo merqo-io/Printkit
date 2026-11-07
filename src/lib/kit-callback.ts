@@ -7,6 +7,19 @@ import { isTestPrint } from "@/lib/test-print";
 // one hardcoded kit's env vars. Fire-and-forget: never throws, and a kit
 // with no callback configured is skipped silently, not an error.
 
+// The secret travels in a header, so anything but https would expose it. An
+// address with credentials in it is refused too: fetch rejects one with an
+// error that quotes the whole URL.
+function httpsUrl(value: string): URL | null {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.username || url.password) return null;
+    return url;
+  } catch {
+    return null;
+  }
+}
+
 export async function notifyKitPrintStatus(
   kitSlug: string,
   sourceRef: string,
@@ -46,9 +59,19 @@ export async function notifyKitPrintStatus(
       return;
     }
 
-    const res = await fetch(data.callback_url, {
+    const target = httpsUrl(data.callback_url);
+    if (!target) {
+      console.error(
+        `notifyKitPrintStatus: ${kitSlug} callback_url is not a plain https address, skipped`,
+      );
+      return;
+    }
+
+    const res = await fetch(target, {
       method: "POST",
       cache: "no-store",
+      // A redirect would carry the secret to a URL the guard never vetted.
+      redirect: "error",
       signal: controller.signal,
       headers: {
         Authorization: `Bearer ${data.callback_secret}`,

@@ -90,6 +90,46 @@ describe("checkLegalAcceptance", () => {
     );
   });
 
+  it("still returns true when the cache upsert throws", async () => {
+    const upsert = vi.fn().mockRejectedValue(new Error("db down"));
+    const { client } = clientWith({ cached: null, upsert });
+    vi.mocked(createServiceClient).mockResolvedValue(client as never);
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        terms: LEGAL_VERSIONS.terms,
+        privacy: LEGAL_VERSIONS.privacy,
+      }),
+    }) as never;
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(checkLegalAcceptance("vendor@example.com")).resolves.toBe(
+      true,
+    );
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  it("still returns true when the cache upsert resolves with an error", async () => {
+    const upsert = vi.fn().mockResolvedValue({ error: { message: "x" } });
+    const { client } = clientWith({ cached: null, upsert });
+    vi.mocked(createServiceClient).mockResolvedValue(client as never);
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        terms: LEGAL_VERSIONS.terms,
+        privacy: LEGAL_VERSIONS.privacy,
+      }),
+    }) as never;
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(checkLegalAcceptance("vendor@example.com")).resolves.toBe(
+      true,
+    );
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
   it("re-checks and caches when the cached row is older than the TTL", async () => {
     const stale = new Date(Date.now() - 10 * 60 * 1000).toISOString();
     const { client, upsert } = clientWith({
