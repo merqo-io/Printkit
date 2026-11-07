@@ -27,6 +27,8 @@ The page's tab title is "History", matching its heading.
 
 `reprintJob` and `assignPrintLocation` parse their job and booth ids as UUIDs before any session or database call.
 
+`reprintJob` refuses a job whose payload is `{}` (cleared by the 90-day retention purge) with a "no longer be reprinted" error rather than printing a blank label.
+
 Batch labels appear as individual jobs, so a missing or failed label can be inspected and reprinted separately.
 
 The History header (the shared `@merqo/ui` `PageHeader`) carries a "Label history" eyebrow.

@@ -31,7 +31,7 @@ export async function reprintJob(input: string): Promise<ReprintResult> {
 
   const { data: job } = await supabase
     .from("print_jobs")
-    .select("status, sent_at, requeued_at")
+    .select("status, sent_at, requeued_at, payload")
     .eq("id", jobId)
     .eq("vendor_id", user.id)
     .maybeSingle();
@@ -41,6 +41,21 @@ export async function reprintJob(input: string): Promise<ReprintResult> {
     return {
       success: false,
       error: "Only a failed or already-printed job can be reprinted",
+    };
+  }
+
+  // The retention purge empties the payload after 90 days; requeueing would
+  // print a blank label.
+  const payload = job.payload;
+  if (
+    payload !== null &&
+    typeof payload === "object" &&
+    !Array.isArray(payload) &&
+    Object.keys(payload).length === 0
+  ) {
+    return {
+      success: false,
+      error: "This label is older than 90 days and can no longer be reprinted",
     };
   }
 
