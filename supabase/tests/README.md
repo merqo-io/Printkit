@@ -72,3 +72,5 @@ not executable by `authenticated`.
 CloudPRNT mutation assertions attach their data-modifying CTE to the top-level SELECT, as PostgreSQL requires. Each assertion retains its exact attempt/location/revision predicates and verifies the number of matched rows.
 
 `sticker-templates.test.sql` checks booth ownership, service-only writes, version retention and vendor isolation for the template migration. It also proves the `sticker-logos` bucket is private and that a vendor reads only their own folder and cannot insert, update (including renaming into another folder) or delete any object, even in their own folder, with anonymous users denied.
+
+`retention-purges.test.sql` covers `purge_retention()`: printed jobs older than 90 days are cleared while 89-day and recent jobs keep their payload, never-printed jobs follow `created_at`, a batch is cleared only when all its jobs are (labels keep their count), expired pairing codes go while live ones stay, a second run is a no-op, and `anon`/`authenticated` cannot execute it. Unrun locally while the database engine is unavailable; the CI `db` job runs it.
