@@ -1,5 +1,5 @@
 begin;
-select plan(18);
+select plan(16);
 
 insert into auth.users (id, email) values
   ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'retention@test.dev');
