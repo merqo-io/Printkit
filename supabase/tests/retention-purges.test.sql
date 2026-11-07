@@ -24,10 +24,10 @@ insert into printkit.print_batches (id, vendor_id, source_kit, source_ref, paylo
   ('a0000000-0000-4000-8000-00000000000a', 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-old', '{"name":"a"}', '[{"i":1},{"i":2}]'),
   ('b0000000-0000-4000-8000-00000000000b', 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-mixed', '{"name":"b"}', '[{"i":1},{"i":2}]');
 insert into printkit.print_jobs (vendor_id, source_kit, source_ref, payload, status, created_at, printed_at, batch_id) values
-  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-old',   '{"i":1}', 'printed', now() - interval '100 days', now() - interval '95 days', 'a0000000-0000-4000-8000-00000000000a'),
-  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-old',   '{"i":2}', 'printed', now() - interval '100 days', now() - interval '95 days', 'a0000000-0000-4000-8000-00000000000a'),
-  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-mixed', '{"i":1}', 'printed', now() - interval '100 days', now() - interval '95 days', 'b0000000-0000-4000-8000-00000000000b'),
-  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-mixed', '{"i":2}', 'printed', now() - interval '10 days',  now() - interval '9 days',  'b0000000-0000-4000-8000-00000000000b');
+  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-old-1', '{"i":1}', 'printed', now() - interval '100 days', now() - interval '95 days', 'a0000000-0000-4000-8000-00000000000a'),
+  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-old-2', '{"i":2}', 'printed', now() - interval '100 days', now() - interval '95 days', 'a0000000-0000-4000-8000-00000000000a'),
+  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-mixed-1', '{"i":1}', 'printed', now() - interval '100 days', now() - interval '95 days', 'b0000000-0000-4000-8000-00000000000b'),
+  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-mixed-2', '{"i":2}', 'printed', now() - interval '10 days',  now() - interval '9 days',  'b0000000-0000-4000-8000-00000000000b');
 
 select ok(
   not has_function_privilege('authenticated', 'printkit.purge_retention()', 'execute'),
