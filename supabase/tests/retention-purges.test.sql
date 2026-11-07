@@ -1,5 +1,5 @@
 begin;
-select plan(16);
+select plan(19);
 
 insert into auth.users (id, email) values
   ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'retention@test.dev');
@@ -18,7 +18,9 @@ insert into printkit.print_jobs (vendor_id, source_kit, source_ref, payload, sta
   ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'printed-89d',  '{"name":"a"}', 'printed', now() - interval '100 days', now() - interval '89 days'),
   ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'printed-new',  '{"name":"a"}', 'printed', now() - interval '1 day',    now()),
   ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'failed-91d',   '{"name":"a"}', 'failed',  now() - interval '91 days',  null),
-  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'queued-10d',   '{"name":"a"}', 'queued',  now() - interval '10 days',  null);
+  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'queued-10d',   '{"name":"a"}', 'queued',  now() - interval '10 days',  null),
+  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'queued-91d',   '{"name":"a"}', 'queued',  now() - interval '91 days',  null),
+  ('dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'sent-91d',     '{"name":"a"}', 'sent',    now() - interval '91 days',  null);
 
 insert into printkit.print_batches (id, vendor_id, source_kit, source_ref, payload, labels) values
   ('a0000000-0000-4000-8000-00000000000a', 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', 'qkit', 'batch-old', '{"name":"a"}', '[{"i":1},{"i":2}]'),
@@ -68,6 +70,21 @@ select results_eq(
   $$ select payload from printkit.print_jobs where source_ref = 'queued-10d' $$,
   $$ values ('{"name":"a"}'::jsonb) $$,
   'never-printed job younger than 90 days keeps its payload'
+);
+select results_eq(
+  $$ select status, payload from printkit.print_jobs where source_ref = 'queued-10d' $$,
+  $$ values ('queued', '{"name":"a"}'::jsonb) $$,
+  'recent queued job keeps its status and payload'
+);
+select results_eq(
+  $$ select status, payload from printkit.print_jobs where source_ref = 'queued-91d' $$,
+  $$ values ('failed', '{}'::jsonb) $$,
+  'queued job created 91 days ago is failed and cleared'
+);
+select results_eq(
+  $$ select status, payload from printkit.print_jobs where source_ref = 'sent-91d' $$,
+  $$ values ('failed', '{}'::jsonb) $$,
+  'sent job created 91 days ago is failed and cleared'
 );
 select results_eq(
   $$ select count(*) from printkit.print_jobs where source_ref in ('printed-91d', 'failed-91d') $$,

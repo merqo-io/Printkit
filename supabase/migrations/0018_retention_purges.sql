@@ -17,6 +17,15 @@
 -- no created_at and a batch must never lose labels that a job still prints
 -- from. Its labels array keeps its length so the 1-100 length check holds.
 --
+-- A queued or sent job older than 90 days is first marked failed
+-- (failure_reason 'expired'): a label that old is useless, and clearing its
+-- payload mid-flight would let it print blank. Only terminal jobs (printed or
+-- failed) are then cleared. This is a plain database update: it makes no
+-- callback to the originating kit.
+--
+-- A batch with zero jobs is cleared immediately; that is harmless because
+-- create_label_batch always inserts the batch and its jobs together.
+--
 -- Ingest retry: create_label_batch compares the stored batch payload with the
 -- retried one for an existing (source_kit, source_ref). Once a batch is
 -- cleared a retry no longer matches and is rejected as a payload mismatch.
@@ -36,8 +45,15 @@ set search_path = ''
 as $$
 begin
   update printkit.print_jobs
+     set status = 'failed',
+         failure_reason = 'expired'
+   where status in ('queued', 'sent')
+     and created_at < now() - interval '90 days';
+
+  update printkit.print_jobs
      set payload = '{}'::jsonb
    where payload <> '{}'::jsonb
+     and status in ('printed', 'failed')
      and coalesce(printed_at, created_at) < now() - interval '90 days';
 
   -- Rewriting labels as '{}' objects keeps its array length, so a second run
