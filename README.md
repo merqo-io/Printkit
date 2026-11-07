@@ -66,6 +66,9 @@ is a dry run; add `--apply` to delete and `--grace-hours N` to change the
 Migration `0015_fk_indexes.sql` indexes the foreign keys the Supabase advisor
 flagged; it is safe to re-run.
 
+Migration `0018_retention_purges.sql` schedules a daily purge that clears label
+payloads 90 days after printing and deletes expired bridge pairing codes.
+
 `next` is pinned to `16.3.8` and `vitest` to `4.1.11` (see `CHANGELOG.md`
 for the security context). The Vercel build does not use
 `output: "standalone"`; that config was dropped.
