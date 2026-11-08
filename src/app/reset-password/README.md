@@ -28,3 +28,5 @@ Tests: `page.dom.test.tsx` (a plain session is refused, a recovery session
 gets the form), `actions.test.ts` (window checks, validation, the cookie
 cleared only after a successful update) and `reset-password-form.dom.test.tsx`
 (form states and submit handling).
+
+The reset-password form takes `Button`, `Input`, `Label` and `cn` from `@merqo/ui/primitives`.

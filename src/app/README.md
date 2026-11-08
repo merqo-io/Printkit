@@ -71,3 +71,5 @@ Request boundaries use bounded body parsing before privileged work. Pending form
 `robots.ts` disallows crawling in every environment and the root `metadata.robots` is noindex/nofollow, so printkit is never indexed. The login layout forces per-request rendering so the nonce CSP reaches its scripts.
 
 `page-titles.test.ts` lists the virtual printer page at `/dashboard/printers/virtual`.
+
+Pages here import the shadcn primitives (`Button`, `Input`, `Label`, `Select`, `Badge`, `Switch`, `Tooltip`) and `cn` from `@merqo/ui/primitives`, not from local copies.
