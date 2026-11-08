@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { TextLink } from "@/components/text-link";
 import { catalogName, type CatalogEntry } from "@/lib/printer-catalog";
 import { createPrinterUrl } from "./actions";

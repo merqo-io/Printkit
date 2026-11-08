@@ -5,7 +5,7 @@ import { isHistoryCursor, listPrintHistoryPage } from "@/lib/print-history";
 import { listActiveLocations } from "@/lib/print-locations";
 import { PageHeader } from "@merqo/ui";
 import { SegmentedControl } from "@/components/segmented-control";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { JobHistoryTable } from "./job-history-table";
 
 export const metadata: Metadata = {

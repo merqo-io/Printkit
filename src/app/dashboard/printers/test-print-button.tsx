@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { LabelsUpgradeMessage } from "@/components/labels-upgrade-message";
 import { sendTestPrint } from "./actions";
 

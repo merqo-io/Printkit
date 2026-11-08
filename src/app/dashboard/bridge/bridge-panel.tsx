@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
+import { Switch } from "@merqo/ui/primitives";
+import { Button } from "@merqo/ui/primitives";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { isBridgeModeEnabled, setBridgeModeEnabled } from "@/lib/bridge-mode";
 import {

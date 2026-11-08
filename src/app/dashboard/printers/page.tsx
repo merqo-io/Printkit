@@ -11,8 +11,8 @@ import {
   boothPrintingSteps,
 } from "@/components/setup-steps-empty";
 import { PrinterStatusRow } from "@/components/printer-status-row";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@merqo/ui/primitives";
+import { Button } from "@merqo/ui/primitives";
 import { AutoRefresh } from "../auto-refresh";
 import { PrinterActions } from "./printer-actions";
 

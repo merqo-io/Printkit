@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { ElevatedCard } from "@/components/elevated-card";
 import { Wordmark } from "@/components/wordmark";
 

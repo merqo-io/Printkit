@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "@merqo/ui";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { removePrinter } from "./actions";
 import { TestPrintButton } from "./test-print-button";
 

@@ -3,14 +3,14 @@
 import { useId, useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@merqo/ui/primitives";
 import { assignPrintLocation } from "./actions";
 
 /**
