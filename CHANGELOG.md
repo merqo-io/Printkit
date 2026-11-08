@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Re-pin `@merqo/ui` to v0.44.0 (commit `250a4edd5399809b3c182cd381ba310d12dec5a7`) with matching build permission. The new legal text (`LEGAL_VERSIONS` 2026-11-08) makes vendors re-accept the terms at their next visit.
 - `@merqo/ui` moves to 0.42.1. Dashboard pages use its shared `PageHeader` (the local copy is gone; a small `PrintersBackLink` fills its back slot) and the remove-printer confirm uses its `ConfirmDialog`: a failed removal now shows its message inside the dialog, which stays open for a retry, instead of a toast. The page title is slightly tighter and the description is no longer capped at a reading width. The link-based `SegmentedControl` and the printer picker chips stay local.
 - The virtual printer page moved from `/dashboard/dev/virtual-printer` to `/dashboard/printers/virtual` (the old path redirects permanently, query string kept) and uses the shared page header. When label printing is blocked, the test print and reprint messages now link "Upgrade in your Merqo account" to the Merqo dashboard; API and kit responses keep the plain message and error code. The Merqo base URL lives in one helper (`src/lib/merqo-url.ts`).
 - The label designer is now called "Label design" and the Bluetooth page "Connect a Bluetooth printer" (was "Sticker designer" and "Bridge mode"). The on/off switch there reads "Printing", and the printer links, setup steps, leave warning and Bluetooth guide use the same names. Wording only; nothing works differently.
