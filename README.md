@@ -21,6 +21,8 @@ no public marketing site or pricing; `/` redirects straight to
 limited to `label` or `label_batch` (anything else returns 400). The outbound
 print-status callback is kit-agnostic too — configured per calling kit in
 `kit_api_keys` (`callback_url`/`callback_secret`), not hardcoded to qkit.
+The secret is only sent to an `https:` URL without embedded credentials;
+anything else is skipped and logged.
 Its body names the job `source_ref`, with `order_id` kept beside it until
 every calling kit reads the new name. `GET /api/v1/print-locations/status`
 also returns `manage_url`, the printkit page for that location, so a calling
@@ -64,6 +66,9 @@ is a dry run; add `--apply` to delete and `--grace-hours N` to change the
 Migration `0015_fk_indexes.sql` indexes the foreign keys the Supabase advisor
 flagged; it is safe to re-run.
 
+Migration `0018_retention_purges.sql` schedules a daily purge that clears label
+payloads 90 days after printing and deletes expired bridge pairing codes.
+
 `next` is pinned to `16.3.8` and `vitest` to `4.1.11` (see `CHANGELOG.md`
 for the security context). The Vercel build does not use
 `output: "standalone"`; that config was dropped.
@@ -98,8 +103,8 @@ secondary, process-magenta accent) — see `src/app/globals.css`'s own header co
 The shared `@merqo/ui` `PageHeader` (props `eyebrow`, `title`, `description`,
 `action`, `back`, `responsive`) opens every dashboard page, and every `Button`
 size is at least 44px tall on touch screens, so tap targets stay
-finger-sized. The pinned `@merqo/ui` is 0.42.1; the remove-printer confirm uses
-its `ConfirmDialog`. See `src/components/README.md`.
+finger-sized. The pinned `@merqo/ui` is 0.44.0 (its legal text makes vendors re-accept the terms); the
+remove-printer confirm uses its `ConfirmDialog`. See `src/components/README.md`.
 
 The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard
 `<main>` uses qkit's `px-5 py-7` spacing. See `src/app/dashboard/README.md`.

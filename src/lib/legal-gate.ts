@@ -56,11 +56,20 @@ export async function checkLegalAcceptance(email: string): Promise<boolean> {
     return false;
   }
 
-  await supabase.from("legal_check_state").upsert({
-    email: normalized,
-    checked_at: new Date().toISOString(),
-    is_current: isCurrent,
-  });
+  // The cache only saves a round trip, so a failed write must not gate a
+  // vendor whose acceptance was just confirmed current.
+  try {
+    const { error } = await supabase.from("legal_check_state").upsert({
+      email: normalized,
+      checked_at: new Date().toISOString(),
+      is_current: isCurrent,
+    });
+    if (error) {
+      console.error("checkLegalAcceptance: cache write failed", error.message);
+    }
+  } catch (err) {
+    console.error("checkLegalAcceptance: cache write failed", err);
+  }
 
   return isCurrent;
 }

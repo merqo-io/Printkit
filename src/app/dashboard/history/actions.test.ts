@@ -119,6 +119,21 @@ describe("reprintJob", () => {
     expect(dispatchJobMock).not.toHaveBeenCalled();
   });
 
+  it("refuses to reprint a label whose payload was cleared by the retention purge", async () => {
+    maybeSingleMock.mockResolvedValue({
+      data: { status: "printed", payload: {} },
+    });
+
+    const result = await reprintJob("11111111-1111-4111-8111-111111111111");
+
+    expect(result).toEqual({
+      success: false,
+      error: "This label is older than 90 days and can no longer be reprinted",
+    });
+    expect(updatePrintJobStatusMock).not.toHaveBeenCalled();
+    expect(dispatchJobMock).not.toHaveBeenCalled();
+  });
+
   it("fails closed with a generic error when the entitlement lookup errors", async () => {
     hasAccessMock.mockResolvedValue(null);
     maybeSingleMock.mockResolvedValue({ data: { status: "failed" } });

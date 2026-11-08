@@ -53,7 +53,9 @@ everything else sits flat here.
   table (migration `0007`) for 5 minutes to keep the call off every gated
   render. Fails closed (returns `false`/redirects to `/legal/accept`) on a
   missing secret, an unreachable merqo, a non-2xx response, or a malformed
-  body. `requireCurrentLegalAcceptance` is a no-op when `email` is falsy (the
+  body. A failed cache write is logged and ignored, so it never gates a
+  vendor whose acceptance was just confirmed current.
+  `requireCurrentLegalAcceptance` is a no-op when `email` is falsy (the
   caller already handled the no-session case) and redirects a stale vendor to
   `/legal/accept` otherwise.
 - `kit-auth.ts` — `hashApiKey`/`verifyKitAuth`: bearer-secret verification
@@ -164,6 +166,8 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
   qkit via env vars, and no-ops silently if either is unset (not every
   calling kit needs a callback). Never throws; every failure (lookup error,
   missing config, network error, non-2xx) is swallowed after a log line.
+  The secret is sent only to an `https:` URL with no embedded credentials;
+  any other stored address is skipped and logged.
   The body names the job `source_ref`; `order_id` carries the same value
   for a receiver that still reads that name.
 - `vendor-session.ts` — `getVendorSession()`: shared dashboard auth guard
