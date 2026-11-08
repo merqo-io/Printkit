@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ComponentProps } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@merqo/ui/primitives";
 
 /**
  * The one inline link style: accent colour, an offset underline that firms up

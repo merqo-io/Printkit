@@ -1,10 +1,3 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
 /**
  * Formats a `timestamptz` column (e.g. `created_at`) for display, pinned to
  * the `en-SG` locale and the `Asia/Singapore` timezone so the date and time

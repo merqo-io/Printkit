@@ -272,3 +272,5 @@ The B1 calibration sample uses the shared label renderer at 40 mm across by 60 m
 
 - `merqo-url.ts` - `merqoBaseUrl()` (`MERQO_BASE_URL`, default `https://www.merqo.io`), shared by the legal gate and the accept action, and `merqoUpgradeUrl()` (`<base>/dashboard`, where the kit cards hold the Upgrade button).
 - `labels-upgrade.ts` - client-safe `LABELS_UPGRADE_LINK_TEXT`, the phrase `LABELS_UPGRADE_MESSAGE` is built from and the dashboard turns into a link. `legal-gate.ts` imports `merqoBaseUrl` from `merqo-url.ts`.
+
+`utils.ts` no longer exports `cn`; it moved to `@merqo/ui/primitives`. `formatDateTime` stays here.

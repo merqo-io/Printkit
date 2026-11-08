@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Bluetooth, ChevronDown, Signal, Wifi } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@merqo/ui/primitives";
+import { Button } from "@merqo/ui/primitives";
 import { InfoButton } from "@/components/info-button";
 import { Panel } from "@/components/panel";
 import { TextLink } from "@/components/text-link";
@@ -16,7 +16,7 @@ import {
   type CatalogEntry,
 } from "@/lib/printer-catalog";
 import { PRINTER_CHOICE_ADVICE } from "@/lib/printer-info-copy";
-import { cn } from "@/lib/utils";
+import { cn } from "@merqo/ui/primitives";
 
 type Connection = "4g" | "wifi" | "bluetooth";
 type Sort = "recommended" | "setup" | "price";

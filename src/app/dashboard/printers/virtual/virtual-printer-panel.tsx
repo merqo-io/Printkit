@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@merqo/ui/primitives";
 import { startVirtualPrinter } from "./actions";
 
 const POLL_INTERVAL_MS = 3000;

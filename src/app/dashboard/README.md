@@ -86,3 +86,5 @@ see `bridge/README.md` for what reads it.
 Overview and printers pages share `listLocationPrinterSummaries`, which batches the verified vendor's active-booth printer summaries instead of one query per booth.
 
 The Overview header (the shared `@merqo/ui` `PageHeader`) carries a "Your booths" eyebrow. Its booth list shows each printer's status only; the per-booth "Design label" link was removed (the designer is reached from Printers).
+
+Dashboard pages import their shadcn primitives and `cn` from `@merqo/ui/primitives`.

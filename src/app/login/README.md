@@ -72,3 +72,5 @@ into.
 Unexpected OAuth or password request failures restore the controls and retain credentials for retry. Successful navigation retains the pending state while leaving the page.
 
 `layout.tsx` also forces per-request rendering so the nonce CSP from `proxy.ts` reaches this page's scripts.
+
+The login page takes its primitives and `cn` from `@merqo/ui/primitives`.

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- The local shadcn copies of `badge`, `button`, `input`, `label`, `select`, `switch` and `tooltip`, and `cn`, are replaced by `@merqo/ui/primitives`; only `alert` stays local. A touch-size test of the shared `Button` replaces `button.dom.test.tsx`. The assign-location `SelectTrigger size="sm"` is now 44px on touch screens (was 40px).
+
 ### Security
 
 - Label-job payloads are cleared 90 days after printing (after creation for a job never printed), as the privacy notice states, by a daily `printkit-retention-purge` job (migration 0018). Job rows stay for history and metrics.

@@ -61,3 +61,5 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
 [printkit](../../README.md)
 
 - `labels-upgrade-message.tsx` - `LabelsUpgradeMessage`: the labels-blocked message with "Upgrade in your Merqo account" rendered as a `TextLink` to the Merqo dashboard (same tab).
+
+Shared components import shadcn primitives and `cn` from `@merqo/ui/primitives`; only `ui/alert` remains a local primitive. `button-touch.dom.test.tsx` guards the 44px touch sizes of the shared `Button`.

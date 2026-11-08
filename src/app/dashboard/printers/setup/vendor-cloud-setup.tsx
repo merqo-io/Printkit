@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@merqo/ui/primitives";
+import { Input } from "@merqo/ui/primitives";
+import { Label } from "@merqo/ui/primitives";
 import type { CatalogEntry } from "@/lib/printer-catalog";
 import { registerBrandCloudPrinter } from "./actions";
 import { SETUP_FAILED } from "./messages";

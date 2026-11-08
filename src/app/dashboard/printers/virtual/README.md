@@ -46,3 +46,5 @@ failures reset the busy state and show a retry message.
 `startVirtualPrinter` parses the booth id as a UUID first.
 
 The page moved here from `/dashboard/dev/virtual-printer`; `next.config.ts` redirects the old path permanently (query string kept).
+
+The virtual printer panel takes its primitives and `cn` from `@merqo/ui/primitives`.

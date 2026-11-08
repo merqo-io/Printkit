@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@merqo/ui/primitives";
 
 /** printkit wordmark. PascalCase compound (Apple's -Kit-style precedent,
  *  matching qkit/loopkit's logo-mark convention) with a magenta accent

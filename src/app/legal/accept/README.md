@@ -43,3 +43,5 @@ Regression fixtures restore environment and transport mocks between tests so mis
 The `next` form field is length-checked by Zod before `safeRedirectPath` runs.
 
 The Merqo base URL comes from the shared `merqoBaseUrl()` in `src/lib/merqo-url.ts`.
+
+The accept form takes `Button` and `cn` from `@merqo/ui/primitives`.

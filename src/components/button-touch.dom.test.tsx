@@ -1,11 +1,10 @@
 // @vitest-environment jsdom
+import { Button } from "@merqo/ui/primitives";
 import { render, screen } from "@testing-library/react";
 import { expect, it } from "vitest";
 
-import { Button } from "./button";
-
 // jsdom has no pointer media queries, so assert the coarse-pointer class that
-// lifts each size to the 44px (h-11 / size-11) touch minimum.
+// lifts each size to the 44px touch minimum vendors rely on.
 const sizes = [
   ["default", "pointer-coarse:h-11"],
   ["xs", "pointer-coarse:h-11"],

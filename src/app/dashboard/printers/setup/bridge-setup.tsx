@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Notice } from "@/components/notice";
 import { TextLink } from "@/components/text-link";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { InfoButton } from "@/components/info-button";
 import { BLUETOOTH_WARNING } from "@/lib/printer-info-copy";
 import { createBridgePairingCode } from "./actions";
