@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- `clientIp` now returns null for a header value that is not an IP or carries a port, so pairing falls into the strict `pair:noip` bucket and pre-auth checks skip the per-IP bucket.
+- `verifyKitAuth` rejects kit slugs longer than 64 characters and runs a decoy-hash comparison for unknown slugs, so response time does not reveal which slugs exist.
+- Replaced kit-local copies of pieces `@merqo/ui` ships (`useAsyncAction`, `ElevatedCard`, `ActionResult`, `safeRedirectPath`, `merqoBaseUrl`, `themeProps`, the proxy and CSP) with the shared exports and deleted the copies. The Supabase clients, rate limiter, kit auth and callback, and legal gate are now thin adapters over `@merqo/ui`. `merqoNoLocalCopies` is enabled in `eslint.config.mjs` so local copies cannot return; `brand-icon` and `segmented-control` stay local because they add printkit-only variants. Vitest inlines `@merqo/ui` so module mocks reach the shared code.
 - The local shadcn copies of `badge`, `button`, `input`, `label`, `select`, `switch` and `tooltip`, and `cn`, are replaced by `@merqo/ui/primitives`; only `alert` stays local. A touch-size test of the shared `Button` replaces `button.dom.test.tsx`. The assign-location `SelectTrigger size="sm"` is now 44px on touch screens (was 40px).
 
 ### Security

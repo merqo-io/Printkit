@@ -12,7 +12,7 @@ one-time `code`.
   (`exchangeCodeForSession`), then redirects on this origin. The return
   path is the `?next=` query param when present, else the
   `printkit_auth_next` cookie the login page set (`@/lib/auth-return`). It
-  is read through `safeRedirectPath` (`@/lib/safe-redirect`), so an
+  is read through `safeRedirectPath` (`@merqo/ui`), so an
   absolute URL, a `//host`, a backslash path or one with a control
   character falls back to `/dashboard`. Every response clears that cookie.
   A missing `code` or a failed exchange redirects to `/login?error=oauth`.

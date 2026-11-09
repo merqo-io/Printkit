@@ -1,4 +1,10 @@
 import { NextResponse } from "next/server";
+import {
+  clientIp as sharedClientIp,
+  rateLimit as sharedRateLimit,
+  rateLimitStrict as sharedRateLimitStrict,
+  type RateLimitStore,
+} from "@merqo/ui/kit-api";
 import { createServiceClient } from "@/lib/supabase/server";
 
 type ServiceClient = Awaited<ReturnType<typeof createServiceClient>>;
@@ -11,48 +17,41 @@ export const AGENT_IP_LIMIT = 240;
 export const RATE_WINDOW_SECONDS = 60;
 
 /**
- * Best-effort client IP, in order of trust: `x-vercel-forwarded-for` (set by
- * Vercel's edge, not client-controllable), `x-real-ip`, then the LAST
- * `x-forwarded-for` hop (the one appended by the nearest proxy; the first hop
- * is whatever the client claimed and is spoofable). Returns null when no
- * header is present, rather than a shared "unknown" value, so callers decide
- * what a missing IP means: pairing uses one strict shared `pair:noip` bucket
- * (fail closed), while kit and agent pre-auth checks skip the per-IP bucket
- * because a shared one would let anyone without an IP starve every caller;
- * the per-kit and per-credential limits still apply.
+ * Header order for the client IP, in order of trust: `x-vercel-forwarded-for`
+ * (set by Vercel's edge, not client-controllable), `x-real-ip`, then the LAST
+ * `x-forwarded-for` hop (appended by the nearest proxy; the first hop is
+ * whatever the client claimed and is spoofable).
+ */
+const TRUSTED_IP_HEADERS = [
+  "x-vercel-forwarded-for",
+  "x-real-ip",
+  "x-forwarded-for",
+];
+
+/**
+ * Best-effort client IP. Returns null when no usable header is present,
+ * rather than a shared "unknown" value, so callers decide what a missing IP
+ * means: pairing uses one strict shared `pair:noip` bucket (fail closed),
+ * while kit and agent pre-auth checks skip the per-IP bucket because a shared
+ * one would let anyone without an IP starve every caller; the per-kit and
+ * per-credential limits still apply.
  */
 export function clientIp(hdrs: Headers): string | null {
-  const vercel = hdrs.get("x-vercel-forwarded-for")?.split(",")[0]?.trim();
-  if (vercel) return vercel;
-  const real = hdrs.get("x-real-ip")?.trim();
-  if (real) return real;
-  const hops = hdrs.get("x-forwarded-for")?.split(",");
-  const last = hops?.[hops.length - 1]?.trim();
-  return last || null;
+  return sharedClientIp(hdrs, { trustedHeaders: TRUSTED_IP_HEADERS });
 }
 
-async function check(
-  supabase: ServiceClient,
-  bucket: { key: string; limit: number; windowSeconds: number },
-  failClosed: boolean,
-): Promise<boolean> {
-  const { key, limit, windowSeconds } = bucket;
-  const mode = failClosed ? "closed" : "open";
-  try {
-    const { data: allowed, error } = await supabase.rpc("check_rate_limit", {
-      p_key: key,
-      p_limit: limit,
-      p_window_seconds: windowSeconds,
-    });
-    if (error) {
-      console.error(`rateLimit degraded (failing ${mode})`, error.message);
-      return !failClosed;
-    }
-    return allowed !== false;
-  } catch {
-    console.error(`rateLimit unavailable (failing ${mode})`);
-    return !failClosed;
-  }
+function rpcStore(supabase: ServiceClient): RateLimitStore {
+  return {
+    async hit(key, limit, windowSeconds) {
+      const { data: allowed, error } = await supabase.rpc("check_rate_limit", {
+        p_key: key,
+        p_limit: limit,
+        p_window_seconds: windowSeconds,
+      });
+      if (error) throw new Error(error.message);
+      return allowed !== false;
+    },
+  };
 }
 
 /**
@@ -67,7 +66,7 @@ export function rateLimit(
   limit: number,
   windowSeconds: number,
 ): Promise<boolean> {
-  return check(supabase, { key, limit, windowSeconds }, false);
+  return sharedRateLimit(rpcStore(supabase), key, limit, windowSeconds);
 }
 
 /**
@@ -80,7 +79,7 @@ export function rateLimitStrict(
   limit: number,
   windowSeconds: number,
 ): Promise<boolean> {
-  return check(supabase, { key, limit, windowSeconds }, true);
+  return sharedRateLimitStrict(rpcStore(supabase), key, limit, windowSeconds);
 }
 
 export function tooManyRequests(): NextResponse {

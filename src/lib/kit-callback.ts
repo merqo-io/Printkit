@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { postKitCallback } from "@merqo/ui/kit-api";
 import { createServiceClient } from "@/lib/supabase/server";
 import { isTestPrint } from "@/lib/test-print";
 
@@ -6,19 +7,6 @@ import { isTestPrint } from "@/lib/test-print";
 // target kit's callback_url/callback_secret up from kit_api_keys instead of
 // one hardcoded kit's env vars. Fire-and-forget: never throws, and a kit
 // with no callback configured is skipped silently, not an error.
-
-// The secret travels in a header, so anything but https would expose it. An
-// address with credentials in it is refused too: fetch rejects one with an
-// error that quotes the whole URL.
-function httpsUrl(value: string): URL | null {
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "https:" || url.username || url.password) return null;
-    return url;
-  } catch {
-    return null;
-  }
-}
 
 export async function notifyKitPrintStatus(
   kitSlug: string,
@@ -28,9 +16,6 @@ export async function notifyKitPrintStatus(
 ): Promise<void> {
   // A dashboard test label belongs to no order, so there is nobody to tell.
   if (isTestPrint(kitSlug)) return;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5000);
-
   try {
     // Supabase returns UTC offsets; preserve microseconds when canonicalizing.
     const match =
@@ -59,43 +44,27 @@ export async function notifyKitPrintStatus(
       return;
     }
 
-    const target = httpsUrl(data.callback_url);
-    if (!target) {
-      console.error(
-        `notifyKitPrintStatus: ${kitSlug} callback_url is not a plain https address, skipped`,
-      );
-      return;
-    }
-
-    const res = await fetch(target, {
-      method: "POST",
-      cache: "no-store",
-      // A redirect would carry the secret to a URL the guard never vetted.
-      redirect: "error",
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${data.callback_secret}`,
-        "Content-Type": "application/json",
-      },
-      // source_ref is the calling kit's own reference for the job, under
-      // the name every printkit API uses for it. order_id carries the same
-      // value for a receiver that still reads that name.
-      body: JSON.stringify({
+    // source_ref is the calling kit's own reference for the job, under the
+    // name every printkit API uses for it. order_id carries the same value for
+    // a receiver that still reads that name.
+    const result = await postKitCallback(
+      { url: data.callback_url, secret: data.callback_secret },
+      {
         source_ref: sourceRef,
         order_id: sourceRef,
         status,
         attempt_at: attempt,
-      }),
-    });
-    if (!res.ok) {
-      console.error(`notifyKitPrintStatus: ${kitSlug} returned ${res.status}`);
+      },
+    );
+    if (!result.ok) {
+      console.error(
+        `notifyKitPrintStatus: ${kitSlug} callback failed (${[result.reason, result.status].filter(Boolean).join(" ")})`,
+      );
     }
   } catch (err) {
     console.error(
       "notifyKitPrintStatus failed",
       err instanceof Error ? err.message : err,
     );
-  } finally {
-    clearTimeout(timer);
   }
 }

@@ -10,7 +10,7 @@ folder's job is entirely to collect the vendor's consent and forward it.
 ## Contents
 
 - `page.tsx` — `LegalAcceptPage`. Reads the `next` search param (through
-  `safeRedirectPath`, `@/lib/safe-redirect`) and renders the client form.
+  `safeRedirectPath`, `@merqo/ui`) and renders the client form.
   Deliberately runs no legal-gate check itself — it is what the gate
   redirects to, so gating it would loop.
   Laid out like the login page: `Wordmark` above an `ElevatedCard`, title in the display face. Tab title "Accept the updated terms".
@@ -42,6 +42,6 @@ Regression fixtures restore environment and transport mocks between tests so mis
 
 The `next` form field is length-checked by Zod before `safeRedirectPath` runs.
 
-The Merqo base URL comes from the shared `merqoBaseUrl()` in `src/lib/merqo-url.ts`.
+The Merqo base URL comes from the shared `merqoBaseUrl()` from `@merqo/ui/kit-api`.
 
 The accept form takes `Button` and `cn` from `@merqo/ui/primitives`.

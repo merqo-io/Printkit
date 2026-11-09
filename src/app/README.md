@@ -73,3 +73,5 @@ Request boundaries use bounded body parsing before privileged work. Pending form
 `page-titles.test.ts` lists the virtual printer page at `/dashboard/printers/virtual`.
 
 Pages here import the shadcn primitives (`Button`, `Input`, `Label`, `Select`, `Badge`, `Switch`, `Tooltip`) and `cn` from `@merqo/ui/primitives`, not from local copies.
+
+Shared pieces (`useAsyncAction`, `ElevatedCard`, `safeRedirectPath`, `themeProps`) are imported from `@merqo/ui` rather than kept as local copies.

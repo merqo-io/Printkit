@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAsyncAction } from "@/hooks/use-async-action";
+import { useAsyncAction } from "@merqo/ui";
 import Link from "next/link";
 import { Notice } from "@/components/notice";
 import { TextLink } from "@/components/text-link";
@@ -22,7 +22,9 @@ export function BridgeSetup({
 }) {
   const [helper, setHelper] = useState<"android" | "pi" | null>(null);
   const [code, setCode] = useState<string | null>(null);
-  const { pending: busy, run } = useAsyncAction();
+  const { pending: busy, run } = useAsyncAction((fn: () => Promise<void>) =>
+    fn(),
+  );
 
   const onPairingCode = async () => {
     return run(async () => {

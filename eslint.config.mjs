@@ -1,6 +1,6 @@
 import next from "eslint-config-next";
 import sonarjs from "eslint-plugin-sonarjs";
-import { merqoEslintPreset } from "@merqo/ui/eslint";
+import { merqoEslintPreset, merqoNoLocalCopies } from "@merqo/ui/eslint";
 
 const tsPlugin = next.find((c) => c.plugins?.["@typescript-eslint"]).plugins[
   "@typescript-eslint"
@@ -53,6 +53,23 @@ const eslintConfig = [
   ...merqoEslintPreset({
     sonarjsPlugin: sonarjs.configs.recommended.plugins.sonarjs,
     tsPlugin,
+  }),
+  // Supabase, rate-limit, kit-auth, kit-callback and legal-gate wrap the
+  // shared piece with printkit's schema, tables and env. brand-icon keeps the
+  // magenta registration dot; segmented-control is link-based, while the
+  // shared one is a button radio group.
+  ...merqoNoLocalCopies({
+    allow: [
+      "supabase-client",
+      "supabase-server",
+      "supabase-middleware",
+      "rate-limit",
+      "kit-auth",
+      "kit-callback",
+      "legal-gate",
+      "brand-icon",
+      "segmented-control",
+    ],
   }),
   {
     // The service client bypasses RLS: keep it in lib helpers and bearer-gated

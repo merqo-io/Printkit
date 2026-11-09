@@ -36,3 +36,5 @@ The History header (the shared `@merqo/ui` `PageHeader`) carries a "Label histor
 When label access is denied, `reprintJob` also returns `upgradeUrl` (the Merqo dashboard) and `ReprintButton` shows the message in the toast with a real upgrade link. The `error` text is unchanged.
 
 History controls take `Button`, `Select`, `Badge` and `cn` from `@merqo/ui/primitives`; the assign-location `Select` trigger is 44px on touch screens.
+
+`ActionResult` and `useAsyncAction` come from `@merqo/ui` (`@merqo/ui/kit-api` for the type); the Upgrade link uses `merqoUpgradeUrl` from `@/lib/upgrade-url`.

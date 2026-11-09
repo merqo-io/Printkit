@@ -38,6 +38,16 @@ describe("clientIp", () => {
     ).toBe("203.0.113.5");
   });
 
+  it("returns null for a header value that is not an IP or carries a port", () => {
+    expect(clientIp(new Headers({ "x-real-ip": "not-an-ip" }))).toBeNull();
+    expect(
+      clientIp(new Headers({ "x-real-ip": "203.0.113.5:443" })),
+    ).toBeNull();
+    expect(
+      clientIp(new Headers({ "x-forwarded-for": "6.6.6.6, garbage" })),
+    ).toBeNull();
+  });
+
   it("returns null when no header names a client", () => {
     expect(clientIp(new Headers())).toBeNull();
   });

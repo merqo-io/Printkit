@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { ElevatedCard } from "@/components/elevated-card";
+import { ElevatedCard } from "@merqo/ui";
 import { Wordmark } from "@/components/wordmark";
 import { AcceptForm } from "./accept-form";
-import { safeRedirectPath } from "@/lib/safe-redirect";
+import { safeRedirectPath } from "@merqo/ui";
 
 export const metadata: Metadata = {
   title: "Accept the updated terms",

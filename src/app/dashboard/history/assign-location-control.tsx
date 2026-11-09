@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { useAsyncAction } from "@/hooks/use-async-action";
+import { useAsyncAction } from "@merqo/ui";
 import { toast } from "sonner";
 import { Button } from "@merqo/ui/primitives";
 import {
@@ -25,7 +25,7 @@ export function AssignLocationControl({
   jobId: string;
   locations: { id: string; label: string }[];
 }) {
-  const { pending, run } = useAsyncAction();
+  const { pending, run } = useAsyncAction((fn: () => Promise<void>) => fn());
   const [selected, setSelected] = useState("");
   const selectId = useId();
 
