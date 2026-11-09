@@ -47,3 +47,5 @@ The virtual printer step links to `/dashboard/printers/virtual`.
 `bridge-setup.tsx` names the Bluetooth page "Connect a Bluetooth printer" and its switch "Printing", matching the page itself.
 
 The setup forms take `Button`, `Input`, `Label` and `cn` from `@merqo/ui/primitives`.
+
+The setup forms import `useAsyncAction` from `@merqo/ui`.

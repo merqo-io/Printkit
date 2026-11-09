@@ -30,3 +30,5 @@ cleared only after a successful update) and `reset-password-form.dom.test.tsx`
 (form states and submit handling).
 
 The reset-password form takes `Button`, `Input`, `Label` and `cn` from `@merqo/ui/primitives`.
+
+The form takes `ElevatedCard`, `useAsyncAction` and `navigatingAway` from `@merqo/ui`.

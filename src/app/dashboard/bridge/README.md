@@ -54,3 +54,5 @@ A separate 40 by 60 mm calibration preview can be opened without printing; its b
 The page header (the shared `@merqo/ui` `PageHeader`) sets the "Printers" eyebrow and links back to Printers.
 
 The bridge panel and location picker take `Button`, `Select`, `Badge` and `cn` from `@merqo/ui/primitives`.
+
+`ActionResult` comes from `@merqo/ui/kit-api`.
