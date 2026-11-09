@@ -5,8 +5,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 // eslint-disable-next-line no-restricted-imports -- RLS has no client policy for this write; the caller is verified first
 import { createServerClient, createServiceClient } from "@/lib/supabase/server";
-import { safeRedirectPath } from "@/lib/safe-redirect";
-import { merqoBaseUrl } from "@/lib/merqo-url";
+import { safeRedirectPath } from "@merqo/ui";
+import { merqoBaseUrl } from "@merqo/ui/kit-api";
 import { getLegalDocSource, LEGAL_VERSIONS } from "@merqo/ui/legal";
 import { z } from "zod";
 

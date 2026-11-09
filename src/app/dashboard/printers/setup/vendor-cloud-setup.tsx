@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAsyncAction } from "@/hooks/use-async-action";
+import { useAsyncAction } from "@merqo/ui";
 import { toast } from "sonner";
 import { Button } from "@merqo/ui/primitives";
 import { Input } from "@merqo/ui/primitives";
@@ -20,7 +20,9 @@ export function VendorCloudSetup({
 }) {
   const [sn, setSn] = useState("");
   const [key, setKey] = useState("");
-  const { pending: busy, run } = useAsyncAction();
+  const { pending: busy, run } = useAsyncAction((fn: () => Promise<void>) =>
+    fn(),
+  );
   const [registered, setRegistered] = useState(false);
 
   const onSubmit = async (event: React.FormEvent) => {

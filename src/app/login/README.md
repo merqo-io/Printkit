@@ -29,9 +29,9 @@ OAuth, plus password reset. There is no sign-up: the tagline says "New to printk
     `/reset-password`.
   - `Wordmark` (`@/components/wordmark`) and `GoogleMark`
     (`@merqo/ui`) brand the card; the card container is `ElevatedCard`
-    (`@/components/elevated-card`), matching every other kit's login page.
+    (`@merqo/ui`), matching every other kit's login page.
   - The return path. `returnPath()` reads `?next=` through
-    `safeRedirectPath` (`@/lib/safe-redirect`), so an absolute URL, a
+    `safeRedirectPath` (`@merqo/ui`), so an absolute URL, a
     `//host` or a backslash path falls back to `/dashboard`. Password
     sign-in pushes to it. Google sign-in
     sends the bare `/auth/callback` URL as `redirectTo`

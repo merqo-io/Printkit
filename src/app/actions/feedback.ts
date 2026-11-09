@@ -2,7 +2,7 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { feedbackSchema } from "@/lib/schemas";
 import { submitVendorFeedback } from "@/lib/merqo-vendor-feedback";
-import type { ActionResult } from "@/lib/action-result";
+import type { ActionResult } from "@merqo/ui/kit-api";
 
 /**
  * Backs a Sheet-embedded widget off the dashboard nav, not a full page —

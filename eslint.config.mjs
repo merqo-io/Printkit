@@ -1,6 +1,6 @@
 import next from "eslint-config-next";
 import sonarjs from "eslint-plugin-sonarjs";
-import { merqoEslintPreset } from "@merqo/ui/eslint";
+import { merqoEslintPreset, merqoNoLocalCopies } from "@merqo/ui/eslint";
 
 const tsPlugin = next.find((c) => c.plugins?.["@typescript-eslint"]).plugins[
   "@typescript-eslint"
@@ -53,6 +53,22 @@ const eslintConfig = [
   ...merqoEslintPreset({
     sonarjsPlugin: sonarjs.configs.recommended.plugins.sonarjs,
     tsPlugin,
+  }),
+  // Each allowed file wraps the shared piece with printkit's own tables, env or
+  // test seams, so importers keep one local call shape; brand-icon and
+  // segmented-control add printkit-only variants the shared props cannot express.
+  ...merqoNoLocalCopies({
+    allow: [
+      "supabase-client",
+      "supabase-server",
+      "supabase-middleware",
+      "rate-limit",
+      "kit-auth",
+      "kit-callback",
+      "legal-gate",
+      "brand-icon",
+      "segmented-control",
+    ],
   }),
   {
     // The service client bypasses RLS: keep it in lib helpers and bearer-gated
