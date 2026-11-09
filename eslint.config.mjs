@@ -54,9 +54,10 @@ const eslintConfig = [
     sonarjsPlugin: sonarjs.configs.recommended.plugins.sonarjs,
     tsPlugin,
   }),
-  // Each allowed file wraps the shared piece with printkit's own tables, env or
-  // test seams, so importers keep one local call shape; brand-icon and
-  // segmented-control add printkit-only variants the shared props cannot express.
+  // Supabase, rate-limit, kit-auth, kit-callback and legal-gate wrap the
+  // shared piece with printkit's schema, tables and env. brand-icon keeps the
+  // magenta registration dot; segmented-control is link-based, while the
+  // shared one is a button radio group.
   ...merqoNoLocalCopies({
     allow: [
       "supabase-client",

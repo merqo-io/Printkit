@@ -16,9 +16,6 @@ export async function notifyKitPrintStatus(
 ): Promise<void> {
   // A dashboard test label belongs to no order, so there is nobody to tell.
   if (isTestPrint(kitSlug)) return;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5000);
-
   try {
     // Supabase returns UTC offsets; preserve microseconds when canonicalizing.
     const match =
@@ -69,7 +66,5 @@ export async function notifyKitPrintStatus(
       "notifyKitPrintStatus failed",
       err instanceof Error ? err.message : err,
     );
-  } finally {
-    clearTimeout(timer);
   }
 }

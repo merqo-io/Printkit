@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
-import { checkLegalAcceptance as checkSharedLegalAcceptance } from "@merqo/ui/auth";
+import {
+  checkLegalAcceptance as checkSharedLegalAcceptance,
+  type LegalGateClient,
+} from "@merqo/ui/auth";
 import { createServiceClient } from "@/lib/supabase/server";
 import { merqoBaseUrl } from "@merqo/ui/kit-api";
 
@@ -11,7 +14,10 @@ import { merqoBaseUrl } from "@merqo/ui/kit-api";
  */
 export function checkLegalAcceptance(email: string): Promise<boolean> {
   return checkSharedLegalAcceptance(email, {
-    createClient: createServiceClient as never,
+    // The shared check only uses the legal_check_state read and upsert, which
+    // the printkit service client provides; the cast is the structural bridge.
+    createClient: async () =>
+      (await createServiceClient()) as unknown as LegalGateClient,
     customerSecret: process.env.MERQO_CUSTOMER_SECRET,
     merqoBaseUrl: merqoBaseUrl(),
   });
