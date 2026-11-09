@@ -1,16 +1,13 @@
 # ui
 
-Local shadcn primitives used by Printkit: `alert`, `badge`, `button`, `input`,
-`label`, `select`, `switch` and `tooltip`. `alert` carries the Bridge page's
-unsupported-device message.
+Local shadcn primitive used by Printkit: `alert`, which carries the Bridge
+page's unsupported-device message.
 
-Feature components import these directly by name. `select` supports history
-location assignment; `switch` controls Bluetooth printing; printer setup explanations use shared InfoTooltip. Account menus and help drawers use the shared Merqo UI
-package rather than unused local copies.
-
-These primitives remain generator-managed. Put product behavior in feature
-components instead of changing generated structure.
+`badge`, `button`, `input`, `label`, `select`, `switch`, `tooltip` and `cn`
+come from `@merqo/ui/primitives`, so the kit does not drift from the shared
+source. On touch screens (`pointer-coarse`) every shared `Button` size is at
+least 44px (`lg` is 48px) and `Select` triggers are 44px, so vendors on an
+iPad get a full-size tap target; `src/components/button-touch.dom.test.tsx`
+guards the button sizes.
 
 [Parent components](../README.md)
-
-On touch screens (`pointer-coarse`) `button`, `input` and `select` grow taller (every `button` size, including `xs` and the icon sizes, is at least 44px; `lg` is 48px; `input` and `select` keep their own sizes) so vendors on an iPad get a full-size tap target; mouse and trackpad keep the compact sizes.

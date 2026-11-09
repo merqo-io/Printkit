@@ -18,6 +18,9 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321",
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-publishable-anon-key",
     },
+    // Inlined so Vite resolves the package's extensionless next/* imports and
+    // vi.mock reaches the @supabase/ssr and @supabase/supabase-js it loads.
+    server: { deps: { inline: [/@merqo\/ui/] } },
     passWithNoTests: true,
     setupFiles: ["./test/setup.ts"],
     include: [

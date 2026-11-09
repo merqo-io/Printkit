@@ -7,7 +7,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { uuidSchema } from "@/lib/schemas";
 import { dispatchJob } from "@/lib/job-dispatch";
 import { printerState } from "@/lib/printers";
-import { merqoUpgradeUrl } from "@/lib/merqo-url";
+import { merqoUpgradeUrl } from "@/lib/upgrade-url";
 import { TEST_PRINT_SOURCE_KIT } from "@/lib/test-print";
 import {
   LABELS_UPGRADE_MESSAGE,

@@ -21,10 +21,6 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
   `@/lib/printer-info-copy`. It composes shared InfoTooltip with a 24px trigger and opens on tap rather than hover, because
   vendors read these on an iPad where a hover tooltip never appears, and the
   trigger is a real button so it is reachable by keyboard.
-- `elevated-card.tsx` — `ElevatedCard({ as, className, children })`: the
-  shared raised-card container (rounded, bordered, soft shadow) used by the
-  login page and the root error boundary, matching every other kit's
-  login page.
 - `site-nav.tsx` — `SiteNav()`: `@merqo/ui`'s `LandingNav` with the printkit wordmark (to `/dashboard`), About and a "Sign in" button (to `/login`), the top bar of the public pages (`/about`, the Bluetooth guide).
 - `printers-back-link.tsx` — `PrintersBackLink()`: the `back` slot content for
   the shared `@merqo/ui` `PageHeader` on every child page of Printers, a
@@ -51,8 +47,7 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
 
 ## Connectivity
 
-`elevated-card.tsx` is used by `login/page.tsx` and
-`src/app/error.tsx`. `wordmark.tsx` is used by `src/app/error.tsx` and
+`wordmark.tsx` is used by `src/app/error.tsx` and
 `src/app/login/page.tsx` (not by `src/app/page.tsx`, which redirects to `/dashboard`). `printer-status-row.tsx` is used by overview and printers pages; offline timestamps are displayed in the Singapore timezone.
 `ui/` is used throughout `src/app/` and `src/components/`.
 
@@ -61,3 +56,5 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
 [printkit](../../README.md)
 
 - `labels-upgrade-message.tsx` - `LabelsUpgradeMessage`: the labels-blocked message with "Upgrade in your Merqo account" rendered as a `TextLink` to the Merqo dashboard (same tab).
+
+Shared components import shadcn primitives and `cn` from `@merqo/ui/primitives`; only `ui/alert` remains a local primitive. `button-touch.dom.test.tsx` guards the 44px touch sizes of the shared `Button`.

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { TermsAcceptanceCheckbox } from "@merqo/ui";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { signOutAction } from "@/app/actions/auth";
 import { acceptLegalTerms } from "./actions";
 

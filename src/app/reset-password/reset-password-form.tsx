@@ -4,11 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ElevatedCard } from "@/components/elevated-card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAsyncAction, navigatingAway } from "@/hooks/use-async-action";
+import { Button } from "@merqo/ui/primitives";
+import { Input } from "@merqo/ui/primitives";
+import { Label } from "@merqo/ui/primitives";
+import { ElevatedCard, useAsyncAction, navigatingAway } from "@merqo/ui";
 import { passwordChangeSchema } from "@/lib/password-change";
 import type { RecoveryState } from "@/lib/recovery-window";
 import { updatePasswordAction } from "./actions";
@@ -29,7 +28,7 @@ export function ResetPasswordForm({
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const { pending, run } = useAsyncAction();
+  const { pending, run } = useAsyncAction((fn: () => Promise<void>) => fn());
 
   function submit() {
     if (state !== "ready" || pending) return;

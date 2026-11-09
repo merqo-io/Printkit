@@ -20,3 +20,5 @@ session check rather than the redirecting `getVendorSession()` guard;
 ## Parent
 
 See [../README.md](../README.md).
+
+`ActionResult` comes from `@merqo/ui/kit-api`.

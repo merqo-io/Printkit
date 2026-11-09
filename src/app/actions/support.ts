@@ -2,7 +2,7 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { supportMessageSchema } from "@/lib/schemas";
 import { submitSupportMessage } from "@/lib/merqo-support";
-import type { ActionResult } from "@/lib/action-result";
+import type { ActionResult } from "@merqo/ui/kit-api";
 
 /** Same inline-session-check reasoning as feedback.ts's submitFeedbackAction. */
 export async function submitSupportMessageAction(

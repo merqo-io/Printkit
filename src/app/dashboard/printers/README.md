@@ -81,3 +81,7 @@ vendor-cloud driver. Links out to `/guides/bluetooth-printers` and
 The Printers header carries a "Printers" eyebrow, as do its child pages (designer, new, setup, and bridge).
 
 When label access is denied, `sendTestPrint` also returns `upgradeUrl` (the Merqo dashboard) and `TestPrintButton` renders the message with a real upgrade link. The `error` text is unchanged.
+
+Printer pages and actions take `Button`, `Badge` and `cn` from `@merqo/ui/primitives`.
+
+The Upgrade link uses `merqoUpgradeUrl` from `@/lib/upgrade-url`.

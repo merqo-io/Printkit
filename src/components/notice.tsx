@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@merqo/ui/primitives";
 
 const TONE = {
   neutral: "border-border bg-muted/60",

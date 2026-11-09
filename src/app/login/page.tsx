@@ -10,14 +10,13 @@ import {
   signInErrorMessage,
 } from "@/lib/auth-errors";
 import { createClient } from "@/lib/supabase/client";
-import { safeRedirectPath } from "@/lib/safe-redirect";
+import { safeRedirectPath } from "@merqo/ui";
 import { authNextCookie } from "@/lib/auth-return";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@merqo/ui/primitives";
+import { Input } from "@merqo/ui/primitives";
+import { Label } from "@merqo/ui/primitives";
 import { Wordmark } from "@/components/wordmark";
-import { ElevatedCard } from "@/components/elevated-card";
-import { GoogleMark } from "@merqo/ui";
+import { ElevatedCard, GoogleMark } from "@merqo/ui";
 
 const DEFAULT_RETURN_PATH = "/dashboard";
 

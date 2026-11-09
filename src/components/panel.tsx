@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@merqo/ui/primitives";
 
 /** The bordered container dashboard content sits in. Never nest one. */
 export function Panel({

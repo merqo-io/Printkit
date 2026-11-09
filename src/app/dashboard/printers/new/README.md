@@ -30,3 +30,5 @@ The page header (the shared `@merqo/ui` `PageHeader`) sets the "Printers" eyebro
 ## Parent
 
 [printers](../README.md)
+
+The printer picker takes its primitives and `cn` from `@merqo/ui/primitives`.

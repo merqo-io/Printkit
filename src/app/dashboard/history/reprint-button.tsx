@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAsyncAction } from "@/hooks/use-async-action";
+import { useAsyncAction } from "@merqo/ui";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { LabelsUpgradeMessage } from "@/components/labels-upgrade-message";
 import { reprintJob } from "./actions";
 
@@ -19,7 +19,7 @@ export function ReprintButton({
   jobId: string;
   boothLabel?: string | null;
 }) {
-  const { pending, run } = useAsyncAction();
+  const { pending, run } = useAsyncAction((fn: () => Promise<void>) => fn());
   const [confirming, setConfirming] = useState(false);
   const reprintRef = useRef<HTMLButtonElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);

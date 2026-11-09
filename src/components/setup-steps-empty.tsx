@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { TextLink } from "@/components/text-link";
-import { cn } from "@/lib/utils";
+import { cn } from "@merqo/ui/primitives";
 
 export type SetupStep = { done?: boolean; body: ReactNode };
 

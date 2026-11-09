@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { createServerClient } from "@/lib/supabase/server";
-import { safeRedirectPath } from "@/lib/safe-redirect";
+import { safeRedirectPath } from "@merqo/ui";
 import { AUTH_NEXT_COOKIE, AUTH_NEXT_PATH } from "@/lib/auth-return";
 import {
   RECOVERY_WINDOW_COOKIE,

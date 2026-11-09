@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { PageHeader } from "@merqo/ui";
 import { Panel } from "@/components/panel";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 
 /** Error fallback for dashboard pages, shown inside the dashboard layout. */
 export default function DashboardError({

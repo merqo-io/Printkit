@@ -49,3 +49,5 @@ call `createClient`.
 [lib](../README.md)
 
 `middleware.ts` clears the host-only copy of any auth cookie the browser sends twice (host-only plus `.merqo.io`) on every request, with no one-time marker, so a re-created duplicate cannot send the vendor back to /login.
+
+`client.ts` and `server.ts` are thin adapters over `@merqo/ui/supabase` and `@merqo/ui/supabase/server`, supplying the `printkit` schema, the cookie domain and the env; `middleware.ts` stays local and uses the shared `safeRedirectPath`.

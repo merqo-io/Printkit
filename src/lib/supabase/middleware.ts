@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
 import { publicEnv } from "@/lib/env";
 import { RECOVERY_WINDOW_COOKIE } from "@/lib/recovery-window";
-import { safeRedirectPath } from "@/lib/safe-redirect";
+import { safeRedirectPath } from "@merqo/ui";
 import type { Database } from "@/lib/types";
 
 const DEFAULT_SIGNED_IN_PATH = "/dashboard";

@@ -29,11 +29,6 @@ everything else sits flat here.
   `resetErrorMessage`, `passwordUpdateErrorMessage`, `oauthErrorMessage`).
   Unknown errors get a generic fallback so raw provider text never reaches
   the page.
-- `safe-redirect.ts` — `safeRedirectPath(next, fallback)`: rejects an absolute
-  URL, a protocol-relative `//`/`/\` path, or one carrying an embedded control
-  character, falling back otherwise. The open-redirect guard for every
-  `next` search param: the `/legal/accept` flow, the login page and
-  `/auth/callback`.
 - `auth-return.ts` — `authNextCookie(next, secure)`: the `document.cookie`
   string that saves the login page's return path as `printkit_auth_next`
   (`Path=/auth`, `Max-Age=600`, `SameSite=Lax`, `Secure` on https), or
@@ -231,9 +226,6 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
   `ImageResponse`-generated icons (favicon, apple-touch). Hex literals, not
   theme tokens, since `ImageResponse` needs concrete CSS colors; its test
   checks they equal the light-theme tokens in `globals.css`.
-- `action-result.ts` — `ActionResult<T>`: the discriminated
-  `{success:true,...T} | {success:false,error}` shape every Server Action
-  returns.
 - `env.ts` — `publicEnv`: required-env-var accessors that throw at import
   time if unset, instead of silently reading `undefined`.
 - `utils.ts` � `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
@@ -258,7 +250,7 @@ records a `print_failed` ops event.
 
 `bounded-body.ts` caps streamed request bytes before parsing. `bounded-json.ts` parses bounded JSON and form bodies, rejecting malformed Content-Length and JSON UTF-8 while cancelling oversized input. Public pairing and Feie callbacks use 16 KiB; authenticated CloudPRNT polling uses 64 KiB.
 
-`security-headers.ts` holds the nonce route list and CSP source lists (including the Vercel toolbar origin outside production); `theme-props.ts` is shared by the root layout and the CSP; `columns.ts` lists the columns each table read selects.
+`nonce-routes.ts` holds the route prefixes that render per request and so carry a CSP nonce (the CSP itself, `themeProps` and `safeRedirectPath` come from `@merqo/ui`); `columns.ts` lists the columns each table read selects.
 
 `label-batch.ts` validates bounded label batches; `print-jobs.ts` creates and reconciles their individual jobs. Batch callbacks report the aggregate order status.
 
@@ -270,5 +262,11 @@ The B1 calibration sample uses the shared label renderer at 40 mm across by 60 m
 
 `sticker-logo-cleanup.ts` is the pure logic behind `scripts/cleanup-sticker-logos.mjs`: it collects every logo path used by any saved template version or print job snapshot, lists the `sticker-logos` bucket (vendor and booth folders, paginated), and marks an object orphaned only when it is unreferenced and older than the grace period. A template or snapshot it cannot parse throws, so the run aborts before any deletion. It has no `@/` imports because plain node loads it.
 
-- `merqo-url.ts` - `merqoBaseUrl()` (`MERQO_BASE_URL`, default `https://www.merqo.io`), shared by the legal gate and the accept action, and `merqoUpgradeUrl()` (`<base>/dashboard`, where the kit cards hold the Upgrade button).
-- `labels-upgrade.ts` - client-safe `LABELS_UPGRADE_LINK_TEXT`, the phrase `LABELS_UPGRADE_MESSAGE` is built from and the dashboard turns into a link. `legal-gate.ts` imports `merqoBaseUrl` from `merqo-url.ts`.
+- `upgrade-url.ts` - `merqoUpgradeUrl()`, built on the shared `merqoBaseUrl()` from `@merqo/ui/kit-api` (`MERQO_BASE_URL`, default `https://www.merqo.io`): (`<base>/dashboard`, where the kit cards hold the Upgrade button).
+- `labels-upgrade.ts` - client-safe `LABELS_UPGRADE_LINK_TEXT`, the phrase `LABELS_UPGRADE_MESSAGE` is built from and the dashboard turns into a link. `legal-gate.ts` imports `merqoBaseUrl` from `@merqo/ui/kit-api`.
+
+`utils.ts` no longer exports `cn`; it moved to `@merqo/ui/primitives`. `formatDateTime` stays here.
+
+## Wrappers over @merqo/ui
+
+`supabase/client.ts`, `supabase/server.ts`, `supabase/middleware.ts`, `rate-limit.ts`, `kit-auth.ts`, `kit-callback.ts` and `legal-gate.ts` are thin adapters: the logic lives in `@merqo/ui` and the file supplies printkit's schema, tables, env and call shape. They are listed in `allow` for `merqoNoLocalCopies` in `eslint.config.mjs` so importers keep one local call shape.

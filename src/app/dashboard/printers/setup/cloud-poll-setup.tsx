@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAsyncAction } from "@/hooks/use-async-action";
+import { useAsyncAction } from "@merqo/ui";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@merqo/ui/primitives";
 import { TextLink } from "@/components/text-link";
 import { catalogName, type CatalogEntry } from "@/lib/printer-catalog";
 import { createPrinterUrl } from "./actions";
@@ -19,7 +19,9 @@ export function CloudPollSetup({
 }) {
   const [url, setUrl] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
-  const { pending: busy, run } = useAsyncAction();
+  const { pending: busy, run } = useAsyncAction((fn: () => Promise<void>) =>
+    fn(),
+  );
   const titleRef = useRef<HTMLParagraphElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const restoreFocus = useRef(false);
