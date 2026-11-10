@@ -79,6 +79,8 @@ ahead of this `layout.tsx`'s own `getVendorSession()` check.
 location's `source_ref`, matching `@/lib/print-locations`' return shape —
 see `bridge/README.md` for what reads it.
 
+`first-run-panel.tsx` keeps `isFirstRunComplete` module-private: only the panel itself decides when to hide.
+
 ## Parent
 
 [app](../README.md)

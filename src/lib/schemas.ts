@@ -4,7 +4,6 @@ export const feedbackSchema = z.object({
   nps: z.number().int().min(0).max(10),
   message: z.string().trim().max(2000).optional(),
 });
-export type FeedbackInput = z.infer<typeof feedbackSchema>;
 
 export const supportMessageSchema = z.object({
   category: z.enum(["printer", "account", "integration", "other"]),

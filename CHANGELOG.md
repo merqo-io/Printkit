@@ -6,19 +6,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-10
+
+### Added
+
+- The password reset page shows a loading placeholder while the recovery session is checked.
+- `knip.json` and a close-out sweep note (`docs/meta/2026-10-24-fresh-eyes-sweep.md`) with the dead-code result, deferred items and owner decisions.
+- Printers page: one shared dashed setup-steps empty state, the test print button is disabled with a plain note while the printer is offline, and the More menu closes on outside click and Escape with a 44px touch trigger.
+- The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard `<main>` uses the same `px-5 py-7` spacing as qkit.
+- `POST /api/merqo/entitlement` (bearer `MERQO_PROVISION_SECRET`) receives merqo's per-vendor entitlement into `printkit.vendor_entitlements` (migration 0017).
+- `PageHeader` takes optional `eyebrow` and `action` props and a larger responsive title.
+
 ### Changed
 
+- Removed the unused `@eslint/eslintrc` and `@tailwindcss/typography` dev dependencies and stopped exporting constants and types that nothing outside their module reads.
 - Bumped `@merqo/ui` to 0.44.1: the `verifyKitAuth` per-slug bucket now counts failures only, so a valid key is never blocked.
 - `clientIp` now returns null for a header value that is not an IP or carries a port, so pairing falls into the strict `pair:noip` bucket and pre-auth checks skip the per-IP bucket.
 - `verifyKitAuth` rejects kit slugs longer than 64 characters and runs a decoy-hash comparison for unknown slugs, so response time does not reveal which slugs exist.
 - Replaced kit-local copies of pieces `@merqo/ui` ships (`useAsyncAction`, `ElevatedCard`, `ActionResult`, `safeRedirectPath`, `merqoBaseUrl`, `themeProps`, the proxy and CSP) with the shared exports and deleted the copies. The Supabase clients, rate limiter, kit auth and callback, and legal gate are now thin adapters over `@merqo/ui`. `merqoNoLocalCopies` is enabled in `eslint.config.mjs` so local copies cannot return; `brand-icon` and `segmented-control` stay local because they add printkit-only variants. Vitest inlines `@merqo/ui` so module mocks reach the shared code.
 - The local shadcn copies of `badge`, `button`, `input`, `label`, `select`, `switch` and `tooltip`, and `cn`, are replaced by `@merqo/ui/primitives`; only `alert` stays local. A touch-size test of the shared `Button` replaces `button.dom.test.tsx`. The assign-location `SelectTrigger size="sm"` is now 44px on touch screens (was 40px).
+- Re-pin `@merqo/ui` to v0.44.0 (commit `250a4edd5399809b3c182cd381ba310d12dec5a7`) with matching build permission. The new legal text (`LEGAL_VERSIONS` 2026-11-08) makes vendors re-accept the terms at their next visit.
+- `@merqo/ui` moves to 0.42.1. Dashboard pages use its shared `PageHeader` (the local copy is gone; a small `PrintersBackLink` fills its back slot) and the remove-printer confirm uses its `ConfirmDialog`: a failed removal now shows its message inside the dialog, which stays open for a retry, instead of a toast. The page title is slightly tighter and the description is no longer capped at a reading width. The link-based `SegmentedControl` and the printer picker chips stay local.
+- The virtual printer page moved from `/dashboard/dev/virtual-printer` to `/dashboard/printers/virtual` (the old path redirects permanently, query string kept) and uses the shared page header. When label printing is blocked, the test print and reprint messages now link "Upgrade in your Merqo account" to the Merqo dashboard; API and kit responses keep the plain message and error code. The Merqo base URL lives in one helper (`src/lib/merqo-url.ts`).
+- The label designer is now called "Label design" and the Bluetooth page "Connect a Bluetooth printer" (was "Sticker designer" and "Bridge mode"). The on/off switch there reads "Printing", and the printer links, setup steps, leave warning and Bluetooth guide use the same names. Wording only; nothing works differently.
+- Printer copy: "Serial number" and "Key" replace SN and KEY, setup errors say what to do next, booths without a printer read "No printer yet", and the virtual printer is named "Virtual printer" without a brand. New virtual printers get that name; existing rows keep their stored name. Removing a printer opens a modal dialog (Escape or Cancel closes it, focus returns to More) with "Remove printer" and "Removing…". Picker chips are 44px tall on touch screens.
+- Dashboard pages share one header: every page has an eyebrow, and the child pages of Printers link back to it. The per-booth Design label link is gone from the Overview booth list.
+- Release flow is now `feat/*` | `fix/*` -> `staging` -> `main`. Vercel's git integration deploys `staging` (`vercel.json` `git.deploymentEnabled`) and CI also runs on pushes to `staging`. `staging-sync` only fast-forwards `staging` after a promotion; the `VERCEL_STAGING_DEPLOY_HOOK` deploy hook is retired.
+- A signed-in visitor who opens `/login` is sent to the dashboard (or a safe `next` path). A failed-callback `?error=` and an open password-reset window still show the form.
+- Public shell: the top bar offers "Sign in" instead of "Dashboard" to visitors, About and the Bluetooth guide use one filled button (sign in) with a text link for printer setup, the 404 and root error pages say "Back to overview" and tab titles read "printkit | Overview".
+- Sign-in, password reset and legal accept use plain sentence-case copy. Supabase auth errors map to short next-step messages (`src/lib/auth-errors.ts`) instead of showing raw text, the login email is validated inline, and the legal accept page gains "Sign out instead".
+- History shows a card list on phones (table from `sm` up, also on Overview), hides Reprint on test prints, filters with an "All labels / Needs a booth" control (`?unrouted=1` still works), and says "labels" instead of "jobs". Empty placeholders read "None" / "Not given" instead of em dashes.
+- Every `Button` size is at least 44px tall on touch screens; `TextLink` gets a clearer focus ring.
+- Label print jobs (`POST /api/v1/print-jobs` and the dashboard test label) now require a live paid entitlement or a running event pass. Kits get 403 `labels_not_entitled`; a failed lookup fails closed (503 on the API). Vendors with no pushed entitlement are blocked until merqo pushes.
+- Vercel builds from git only for `main` (`vercel.json` `git.deploymentEnabled`), so PR and branch pushes no longer use up the Hobby daily deployment cap. Staging still deploys through the staging-sync deploy hook; ad-hoc previews come from the `vercel` CLI.
 
 ### Security
 
 - Label-job payloads are cleared 90 days after printing (after creation for a job never printed), as the privacy notice states, by a daily `printkit-retention-purge` job (migration 0018). Job rows stay for history and metrics.
 - Expired bridge pairing codes are deleted a day after they expire.
 - Reprinting a label older than 90 days returns a clear error instead of printing a blank label.
+- Rate limiter picks the client IP from `x-vercel-forwarded-for`, then `x-real-ip`, then the last `x-forwarded-for` hop (the first hop is client-spoofable) and returns null instead of a shared `unknown` bucket.
+- Pairing fails closed when the limiter is down; requests with no IP share one `pair:noip` bucket (10/min).
+- New limits (60s window): kit routes 300/min per IP before auth and 600/min per kit after; bridge-agent token routes 240/min per IP before auth. 429 carries `Retry-After: 60`.
+- `source_ref`, `location_ref` and location `label` capped at 128 characters; the agent result body is bounded to 4 KiB and the print-locations body to 16 KiB.
+- `job_type` on `POST /api/v1/print-jobs` is limited to `label` or `label_batch`; other values return 400.
 
 ### Fixed
 
@@ -27,71 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Accepting the terms no longer fails when the local acceptance cache write fails; it is logged and ignored.
 - A failed write to the legal acceptance cache is logged and ignored, so a vendor who has accepted the current terms is no longer sent to `/legal/accept` when that write fails.
 
-### Changed
-
-- Re-pin `@merqo/ui` to v0.44.0 (commit `250a4edd5399809b3c182cd381ba310d12dec5a7`) with matching build permission. The new legal text (`LEGAL_VERSIONS` 2026-11-08) makes vendors re-accept the terms at their next visit.
-- `@merqo/ui` moves to 0.42.1. Dashboard pages use its shared `PageHeader` (the local copy is gone; a small `PrintersBackLink` fills its back slot) and the remove-printer confirm uses its `ConfirmDialog`: a failed removal now shows its message inside the dialog, which stays open for a retry, instead of a toast. The page title is slightly tighter and the description is no longer capped at a reading width. The link-based `SegmentedControl` and the printer picker chips stay local.
-- The virtual printer page moved from `/dashboard/dev/virtual-printer` to `/dashboard/printers/virtual` (the old path redirects permanently, query string kept) and uses the shared page header. When label printing is blocked, the test print and reprint messages now link "Upgrade in your Merqo account" to the Merqo dashboard; API and kit responses keep the plain message and error code. The Merqo base URL lives in one helper (`src/lib/merqo-url.ts`).
-- The label designer is now called "Label design" and the Bluetooth page "Connect a Bluetooth printer" (was "Sticker designer" and "Bridge mode"). The on/off switch there reads "Printing", and the printer links, setup steps, leave warning and Bluetooth guide use the same names. Wording only; nothing works differently.
-- Printer copy: "Serial number" and "Key" replace SN and KEY, setup errors say what to do next, booths without a printer read "No printer yet", and the virtual printer is named "Virtual printer" without a brand. New virtual printers get that name; existing rows keep their stored name. Removing a printer opens a modal dialog (Escape or Cancel closes it, focus returns to More) with "Remove printer" and "Removing…". Picker chips are 44px tall on touch screens.
-- Dashboard pages share one header: every page has an eyebrow, and the child pages of Printers link back to it. The per-booth Design label link is gone from the Overview booth list.
-- Release flow is now `feat/*` | `fix/*` -> `staging` -> `main`. Vercel's git integration deploys `staging` (`vercel.json` `git.deploymentEnabled`) and CI also runs on pushes to `staging`. `staging-sync` only fast-forwards `staging` after a promotion; the `VERCEL_STAGING_DEPLOY_HOOK` deploy hook is retired.
-
-### Added
-
-- Printers page: one shared dashed setup-steps empty state, the test print button is disabled with a plain note while the printer is offline, and the More menu closes on outside click and Escape with a 44px touch trigger.
-
-- The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard `<main>` uses the same `px-5 py-7` spacing as qkit.
-
-- `POST /api/merqo/entitlement` (bearer `MERQO_PROVISION_SECRET`) receives merqo's per-vendor entitlement into `printkit.vendor_entitlements` (migration 0017).
-
-- `PageHeader` takes optional `eyebrow` and `action` props and a larger responsive title.
-
-### Changed
-
-- A signed-in visitor who opens `/login` is sent to the dashboard (or a safe `next` path). A failed-callback `?error=` and an open password-reset window still show the form.
-- Public shell: the top bar offers "Sign in" instead of "Dashboard" to visitors, About and the Bluetooth guide use one filled button (sign in) with a text link for printer setup, the 404 and root error pages say "Back to overview" and tab titles read "printkit | Overview".
-- Sign-in, password reset and legal accept use plain sentence-case copy. Supabase auth errors map to short next-step messages (`src/lib/auth-errors.ts`) instead of showing raw text, the login email is validated inline, and the legal accept page gains "Sign out instead".
-- History shows a card list on phones (table from `sm` up, also on Overview), hides Reprint on test prints, filters with an "All labels / Needs a booth" control (`?unrouted=1` still works), and says "labels" instead of "jobs". Empty placeholders read "None" / "Not given" instead of em dashes.
-- Every `Button` size is at least 44px tall on touch screens; `TextLink` gets a clearer focus ring.
-- Label print jobs (`POST /api/v1/print-jobs` and the dashboard test label) now require a live paid entitlement or a running event pass. Kits get 403 `labels_not_entitled`; a failed lookup fails closed (503 on the API). Vendors with no pushed entitlement are blocked until merqo pushes.
-
-### Security
-
-- Rate limiter picks the client IP from `x-vercel-forwarded-for`, then `x-real-ip`, then the last `x-forwarded-for` hop (the first hop is client-spoofable) and returns null instead of a shared `unknown` bucket.
-- Pairing fails closed when the limiter is down; requests with no IP share one `pair:noip` bucket (10/min).
-- New limits (60s window): kit routes 300/min per IP before auth and 600/min per kit after; bridge-agent token routes 240/min per IP before auth. 429 carries `Retry-After: 60`.
-- `source_ref`, `location_ref` and location `label` capped at 128 characters; the agent result body is bounded to 4 KiB and the print-locations body to 16 KiB.
-- `job_type` on `POST /api/v1/print-jobs` is limited to `label` or `label_batch`; other values return 400.
-
 ## [0.8.0] - 2026-11-02
-
-### Changed
-
-- printkit is presented as the print companion for qkit booths. The root metadata is noindex/nofollow, `robots.ts` disallows every crawler in every environment, and the guide opens with the qkit framing.
-- The sign-in page no longer offers email sign-up; it points new vendors to qkit.
-- `@merqo/ui` pinned to v0.36.0.
-
-## Unreleased: plainer history and printer picker
-
-### Changed
-
-- An offline Merqo Virtual printer on the Printers page tells the vendor to open the virtual printer page and press Start, instead of the WiFi advice.
-- Failed jobs in History explain why in plain words. Reprint asks "Print this label again?" first, ignores a double tap, and names the booth when it succeeds. Jobs without a booth read "Needs a booth".
-- Printer picker cards show only how it connects, label width, price and whether it works with an iPad alone, with one info button. Setup, monthly cost and notes are behind a "Details" disclosure.
-
-## [Unreleased]
-
-### Changed
-
-- The virtual printer page moved from `/dashboard/dev/virtual-printer` to `/dashboard/printers/virtual` (the old path redirects permanently, query string kept) and uses the shared page header. When label printing is blocked, the test print and reprint messages now link "Upgrade in your Merqo account" to the Merqo dashboard; API and kit responses keep the plain message and error code. The Merqo base URL lives in one helper (`src/lib/merqo-url.ts`).
-- Dashboard pages share one header: every page has an eyebrow, and the child pages of Printers link back to it. The per-booth Design label link is gone from the Overview booth list.
-- Vercel builds from git only for `main` (`vercel.json` `git.deploymentEnabled`), so PR and branch pushes no longer use up the Hobby daily deployment cap. Staging still deploys through the staging-sync deploy hook; ad-hoc previews come from the `vercel` CLI.
-
-### Fixed
-
-- First-run steps only show done when every earlier step is done, so "Print your first label" is no longer ticked while "Pick your printer" is open.
-- Setting up the virtual printer shows its own steps (open the virtual printer page, start it for the booth, wait) instead of the Star CloudPRNT and WiFi steps.
 
 ### Added
 
@@ -107,14 +74,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- printkit is presented as the print companion for qkit booths. The root metadata is noindex/nofollow, `robots.ts` disallows every crawler in every environment, and the guide opens with the qkit framing.
+- The sign-in page no longer offers email sign-up; it points new vendors to qkit.
+- `@merqo/ui` pinned to v0.36.0.
+- An offline Merqo Virtual printer on the Printers page tells the vendor to open the virtual printer page and press Start, instead of the WiFi advice.
+- Failed jobs in History explain why in plain words. Reprint asks "Print this label again?" first, ignores a double tap, and names the booth when it succeeds. Jobs without a booth read "Needs a booth".
+- Printer picker cards show only how it connects, label width, price and whether it works with an iPad alone, with one info button. Setup, monthly cost and notes are behind a "Details" disclosure.
 - The staging sync workflow pushes `staging` with a `merqo-staging-sync` GitHub App token instead of `GITHUB_TOKEN`, so a ruleset can limit pushes to `staging` to that app.
 - The cloud printer setup keeps a "Make a new address" button after the address is shown, and asks before retiring the old address.
 - Removing a 4G printer also unregisters it from the maker's account (best effort), and the removal audit entry records the booth, type and model.
 - The "unrouted jobs" note on the Overview now reads "Needs a booth" and says in plain words that those orders did not print.
 
+### Fixed
+
+- First-run steps only show done when every earlier step is done, so "Print your first label" is no longer ticked while "Pick your printer" is open.
+- Setting up the virtual printer shows its own steps (open the virtual printer page, start it for the booth, wait) instead of the Star CloudPRNT and WiFi steps.
+
 ## [0.7.0] - 2026-10-31
 
 ### Added
+
+- Add a booth-scoped sticker design prototype and non-printing preview. Order printing integration remains unfinished.
+- Print live label jobs from the booth's saved sticker design, falling back to the default label when none exists or it cannot render. Long item names and options now wrap, shrink to a minimum size, then truncate with an ellipsis instead of failing the job.
+- Let vendors upload and place one PNG or JPEG logo in the sticker designer. Logos live in a private `sticker-logos` bucket, readable only by their owner; writes go through the service role. Logos are not printed yet. Included in migration 0016.
 
 - The designer print preview now draws logos: it sends logo elements with the booth id (`?location=`), and the route loads them only from the signed-in vendor's own folder.
 
@@ -589,16 +571,3 @@ actions.ts` to import `LEGAL_VERSIONS`/`getLegalDocSource`/`isLegalCurrent`
 - Auth scaffolding (login, session guard).
 - Data model: `print_jobs`, `kit_api_keys`, `admins`/`is_admin`/`admin_audit` with RLS, verified against real Postgres via pgTAP.
 - Bearer-secret kit-auth verification helper (`kit-auth.ts`), `create-kit-key.mjs` for minting calling-kit secrets.
-
-## Unreleased: B1 calibration preview
-
-- Add a digital 40 by 60 mm B1 sample preview and an explicit one-label calibration print.
-
-## Unreleased: sticker designer foundation
-
-- Add a booth-scoped sticker design prototype and non-printing preview. Order printing integration remains unfinished.
-- Print live label jobs from the booth's saved sticker design, falling back to the default label when none exists or it cannot render. Long item names and options now wrap, shrink to a minimum size, then truncate with an ellipsis instead of failing the job.
-
-## Unreleased: sticker logo upload
-
-- Let vendors upload and place one PNG or JPEG logo in the sticker designer. Logos live in a private `sticker-logos` bucket, readable only by their owner; writes go through the service role. Logos are not printed yet. Included in migration 0016.

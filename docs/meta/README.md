@@ -11,6 +11,7 @@ for the one MVP build; this is the standing backlog going forward).
 
 - `ai-harness-reference.md` holds the hook-by-hook and CI detail moved out of `AGENTS.md`, plus the project seeding notes.
 - `templatecentral-adoption-log.md` records the templateCentral 6.0.4 and 7.2.2 adopted and not-adopted history moved out of `AGENTS.md`.
+- `2026-10-24-fresh-eyes-sweep.md` records the close-out sweep: knip result, loading states, duplicates, coverage, and what was fixed, deferred or left for the owner.
 
 ## Parent
 

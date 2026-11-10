@@ -12,7 +12,7 @@ export type FirstRunProgress = {
 };
 
 /** Whether the vendor has finished every first-run step. */
-export function isFirstRunComplete(p: FirstRunProgress): boolean {
+function isFirstRunComplete(p: FirstRunProgress): boolean {
   return p.hasBooth && p.hasPrinter && p.hasPrintedJob;
 }
 

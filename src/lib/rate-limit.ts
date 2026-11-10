@@ -12,7 +12,7 @@ type ServiceClient = Awaited<ReturnType<typeof createServiceClient>>;
 export const PAIR_LIMIT = 10;
 export const CLOUDPRNT_LIMIT = 120;
 export const KIT_IP_LIMIT = 300;
-export const KIT_LIMIT = 600;
+const KIT_LIMIT = 600;
 export const AGENT_IP_LIMIT = 240;
 export const RATE_WINDOW_SECONDS = 60;
 

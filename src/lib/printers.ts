@@ -8,8 +8,8 @@ export type PrinterRow = Database["printkit"]["Tables"]["printers"]["Row"];
 
 export type PrinterState = "online" | "offline" | "not_set_up";
 
-export const HEALTH_ONLINE_MS = 60_000;
-export const SEEN_WRITE_THROTTLE_MS = 20_000;
+const HEALTH_ONLINE_MS = 60_000;
+const SEEN_WRITE_THROTTLE_MS = 20_000;
 
 /**
  * One health rule for every connector. "not_set_up" belongs to a location

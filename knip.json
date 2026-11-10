@@ -1,0 +1,9 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["scripts/*.mjs", "test/operators/*.test.mjs"],
+  "ignore": ["bridge-agent/**", ".claude/**"],
+  "ignoreIssues": {
+    "src/lib/merqo-entitlement-contract.ts": ["types"],
+    "src/lib/connectors/types.ts": ["types"]
+  }
+}

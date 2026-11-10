@@ -32,3 +32,5 @@ cleared only after a successful update) and `reset-password-form.dom.test.tsx`
 The reset-password form takes `Button`, `Input`, `Label` and `cn` from `@merqo/ui/primitives`.
 
 The form takes `ElevatedCard`, `useAsyncAction` and `navigatingAway` from `@merqo/ui`.
+
+`loading.tsx` is the card-shaped placeholder (`role="status"`) shown while `page.tsx` creates the server client and checks the recovery session; `loading.dom.test.tsx` covers it.
