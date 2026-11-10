@@ -181,3 +181,5 @@ AGENTS.md is kept under 200 lines; file layout, data model and harness detail li
 ## Dead-code check
 
 `knip.json` lists the operator scripts and their tests as entries and excludes `bridge-agent/` and `.claude/`. knip is not a dependency; run it with the pinned command in `docs/meta/2026-10-24-fresh-eyes-sweep.md`.
+
+The `Wordmark` in `src/components/wordmark.tsx` wraps `@merqo/ui`'s `Wordmark`, which always sets a size class, so the nav, dashboard nav and footer pass an explicit `text-*` size.

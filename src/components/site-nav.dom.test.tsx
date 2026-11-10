@@ -2,7 +2,8 @@
 import { render, screen } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 
-vi.mock("@merqo/ui", () => ({
+vi.mock("@merqo/ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@merqo/ui")>()),
   LandingNav: ({
     wordmark,
     end,
