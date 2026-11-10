@@ -90,3 +90,5 @@ Overview and printers pages share `listLocationPrinterSummaries`, which batches 
 The Overview header (the shared `@merqo/ui` `PageHeader`) carries a "Your booths" eyebrow. Its booth list shows each printer's status only; the per-booth "Design label" link was removed (the designer is reached from Printers).
 
 Dashboard pages import their shadcn primitives and `cn` from `@merqo/ui/primitives`.
+
+The shared `@merqo/ui` `Wordmark` always sets a size class, so `DashboardNav` and the other wordmark callers pass their own `text-*` size (`text-3xl` in the dashboard nav).
