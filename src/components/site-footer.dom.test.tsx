@@ -3,7 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 
 const footerProps = vi.fn();
-vi.mock("@merqo/ui", () => ({
+vi.mock("@merqo/ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@merqo/ui")>()),
   Footer: (props: Record<string, unknown>) => {
     footerProps(props);
     return <footer>{props.wordmark as React.ReactNode}</footer>;
