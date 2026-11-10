@@ -105,7 +105,7 @@ secondary, process-magenta accent) — see `src/app/globals.css`'s own header co
 The shared `@merqo/ui` `PageHeader` (props `eyebrow`, `title`, `description`,
 `action`, `back`, `responsive`) opens every dashboard page, and every `Button`
 size is at least 44px tall on touch screens, so tap targets stay
-finger-sized. The pinned `@merqo/ui` is 0.44.0 (its legal text makes vendors re-accept the terms); the
+finger-sized. The pinned `@merqo/ui` is 0.44.1 (0.44.0 legal text makes vendors re-accept the terms; 0.44.1 makes the kit-auth slug bucket count failures only); the
 remove-printer confirm uses its `ConfirmDialog`. See `src/components/README.md`.
 
 The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard
@@ -177,3 +177,7 @@ The sticker designer prototype supports configurable label geometry and a non-pr
 AGENTS.md is kept under 200 lines; file layout, data model and harness detail live in `docs/FILE-LAYOUT.md`, `docs/DATA-MODEL.md` and `docs/meta/`.
 
 `next.config.ts` also redirects the old `/dashboard/dev/virtual-printer` path permanently to `/dashboard/printers/virtual`, keeping the query string.
+
+## Dead-code check
+
+`knip.json` lists the operator scripts and their tests as entries and excludes `bridge-agent/` and `.claude/`. knip is not a dependency; run it with the pinned command in `docs/meta/2026-10-24-fresh-eyes-sweep.md`.

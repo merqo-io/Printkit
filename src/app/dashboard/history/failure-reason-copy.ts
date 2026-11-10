@@ -14,7 +14,7 @@ const FAILURE_COPY: Record<string, string> = {
     "The printer reported a problem, such as no paper or an open lid. Fix it, then print again.",
 };
 
-export const FAILURE_FALLBACK =
+const FAILURE_FALLBACK =
   "This label did not print. Check the printer, then print again.";
 
 export function failureReasonText(reason: string | null): string {

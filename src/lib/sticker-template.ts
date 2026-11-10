@@ -37,7 +37,7 @@ const logoElementSchema = boxSchema.extend({
   path: logoPathSchema,
 });
 
-export const MAX_LOGOS = 4;
+const MAX_LOGOS = 4;
 
 export const stickerTemplateSchema = z
   .object({

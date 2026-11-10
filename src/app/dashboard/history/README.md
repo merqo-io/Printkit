@@ -15,6 +15,8 @@ Vendor-facing print job history — full list, newest first.
 - `actions.ts` - `reprintJob(jobId)` server action: confirms the job belongs to the calling vendor and is `failed` or already `printed`, resets it to `queued` via `updatePrintJobStatus` (which stamps `requeued_at`, restarting the 30-minute expiry), requires label access first (upgrade message when denied, generic error when the lookup fails, so a lapsed vendor cannot reprint old jobs), hands it to `dispatchJob` so a 4G printer gets it straight away (polling printers and bridges pick it up on their next poll), logs an `admin_audit` entry, and calls `revalidatePath("/dashboard/history")` so the table reflects the new status without a manual reload. `assignPrintLocation(jobId, locationId)` is a separate sibling action that atomically requires a queued job without a booth, touches only `location_id` and `requeued_at` (so a job that waited a long time without a booth does not expire the moment it is routed), then dispatches it the same way, for assigning a booth to a job without one. It writes through the service-role client (print_jobs has no UPDATE grant for `authenticated`), first verifying `locationId` belongs to the calling vendor via a `print_locations` lookup scoped by `vendor_id`; also revalidates `/dashboard/history`.
 - `reprint-button.tsx` — client component wrapping `reprintJob` with a pending state and a success/error toast.
 
+`failure-reason-copy.ts` keeps its fallback sentence module-private; callers go through the reason lookup.
+
 ## Parent
 
 See [../README.md](../README.md).

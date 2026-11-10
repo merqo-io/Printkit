@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const MAX_BATCH_LABELS = 100;
+const MAX_BATCH_LABELS = 100;
 export const labelBatchSchema = z
   .array(
     z.object({

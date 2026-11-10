@@ -9,10 +9,7 @@ export type RecentIncident = NonNullable<
 >[number];
 
 /** Kinds printkit writes; must match the ops_events check constraint. */
-export type OpsEventKind = Extract<
-  IncidentKind,
-  "print_failed" | "webhook_rejected"
->;
+type OpsEventKind = Extract<IncidentKind, "print_failed" | "webhook_rejected">;
 
 export type OpsEvent = {
   vendorId: string;
@@ -21,7 +18,7 @@ export type OpsEvent = {
   code: string;
 };
 
-export const STUCK_AFTER_MS = 600_000;
+const STUCK_AFTER_MS = 600_000;
 const MAX_FIELD = 64;
 const RECENT_LIMIT = 10;
 // Row caps keep one vendor's summary bounded; counts saturate at these.

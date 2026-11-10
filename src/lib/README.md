@@ -270,3 +270,7 @@ The B1 calibration sample uses the shared label renderer at 40 mm across by 60 m
 ## Wrappers over @merqo/ui
 
 `supabase/client.ts`, `supabase/server.ts`, `supabase/middleware.ts`, `rate-limit.ts`, `kit-auth.ts`, `kit-callback.ts` and `legal-gate.ts` are thin adapters: the logic lives in `@merqo/ui` and the file supplies printkit's schema, tables, env and call shape. They are listed in `allow` for `merqoNoLocalCopies` in `eslint.config.mjs` so importers keep one local call shape.
+
+## Module-private constants
+
+Limits and windows that nothing outside their module reads (`KIT_LIMIT`, `STUCK_AFTER_MS`, `HEALTH_ONLINE_MS`, `SEEN_WRITE_THROTTLE_MS`, `MAX_BATCH_LABELS`, `MAX_LOGOS`, `AUTH_NEXT_MAX_AGE`) are not exported, so `knip` flags any that gain an unused export again. `job-expiry.ts` is the one source for `JOB_EXPIRY_MS` and `CONFIRM_TIMEOUT_MS`; `job-dispatch.ts` imports them rather than re-exporting. `render-job.test.ts` covers the saved-design path, the default-layout fallback and the booth-name lookup.

@@ -14,8 +14,6 @@ import type { Database, Json } from "@/lib/types";
 
 export type ClaimedJob = Database["printkit"]["Tables"]["print_jobs"]["Row"];
 
-export { JOB_EXPIRY_MS, CONFIRM_TIMEOUT_MS };
-
 const RECONCILE_AFTER_MS = 60_000;
 const RECONCILE_LIMIT = 10;
 
