@@ -19,7 +19,7 @@ export function SiteNav() {
           aria-label="printkit home"
           className="font-display text-3xl font-semibold tracking-tight transition-opacity hover:opacity-80"
         >
-          <Wordmark />
+          <Wordmark className="text-3xl" />
         </Link>
       }
       end={

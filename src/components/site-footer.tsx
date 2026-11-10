@@ -19,7 +19,7 @@ export function SiteFooter({ showSignIn = false }: { showSignIn?: boolean }) {
           aria-label="printkit home"
           className="text-lg transition-opacity hover:opacity-80"
         >
-          <Wordmark />
+          <Wordmark className="text-lg" />
         </Link>
       }
     />

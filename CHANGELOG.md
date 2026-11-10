@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- `src/components/wordmark.tsx` is now a thin wrapper over `@merqo/ui`'s `Wordmark`, keeping only the printkit letters and magenta accent. The nav, dashboard nav and footer pass their `text-*` size explicitly because the shared shell always sets one.
+
 ## [0.9.0] - 2026-11-10
 
 ### Added
