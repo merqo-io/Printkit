@@ -1,6 +1,6 @@
 {
   "name": "printkit",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "packageManager": "pnpm@11.10.0",
   "engines": {
@@ -37,12 +37,11 @@
     "zod": "4.6.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.2.0",
+    "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
     "@playwright/test": "1.61.1",
     "@stryker-mutator/core": "^9.6.1",
     "@stryker-mutator/vitest-runner": "^9.6.1",
     "@tailwindcss/postcss": "^4.0.0",
-    "@tailwindcss/typography": "^0.5.15",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -51,7 +50,6 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "4.1.12",
-    "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
     "eslint": "^9.17.0",
     "eslint-config-next": "16.4.2",
     "eslint-plugin-sonarjs": "4.2.2",

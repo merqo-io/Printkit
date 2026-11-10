@@ -177,3 +177,7 @@ The sticker designer prototype supports configurable label geometry and a non-pr
 AGENTS.md is kept under 200 lines; file layout, data model and harness detail live in `docs/FILE-LAYOUT.md`, `docs/DATA-MODEL.md` and `docs/meta/`.
 
 `next.config.ts` also redirects the old `/dashboard/dev/virtual-printer` path permanently to `/dashboard/printers/virtual`, keeping the query string.
+
+## Dead-code check
+
+`knip.json` lists the operator scripts and their tests as entries and excludes `bridge-agent/` and `.claude/`. knip is not a dependency; run it with the pinned command in `docs/meta/2026-10-24-fresh-eyes-sweep.md`.

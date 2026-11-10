@@ -6,7 +6,7 @@
  * fall back to the shared project's Site URL (another kit).
  */
 export const AUTH_NEXT_COOKIE = "printkit_auth_next";
-export const AUTH_NEXT_MAX_AGE = 600;
+const AUTH_NEXT_MAX_AGE = 600;
 export const AUTH_NEXT_PATH = "/auth";
 
 /**

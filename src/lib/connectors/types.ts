@@ -1,7 +1,7 @@
 import type { ConnectorId } from "@/lib/printer-catalog";
 import type { LabelLayout } from "@/lib/label-layout";
 
-export type OutputFormat = "png" | "markup";
+type OutputFormat = "png" | "markup";
 
 export type RenderedJob = {
   jobId: string;

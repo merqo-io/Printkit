@@ -19,6 +19,8 @@ new brand is one driver file inside an existing connector.
 
 ## Contents
 
+`OutputFormat` in `types.ts` is module-private; `BridgeDriver` stays exported because this README names it as part of the contract.
+
 - `types.ts` — `DriverMeta` plus the three driver interfaces
   (`CloudPollDriver`, `VendorCloudDriver`, `BridgeDriver`) and their shared
   result types. `outputFormat` says what a driver needs from a label layout:
