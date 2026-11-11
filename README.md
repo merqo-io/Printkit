@@ -162,7 +162,7 @@ The AI harness follows templateCentral 7.2.2: hook commands are anchored on the 
 
 ## Lint
 
-`eslint.config.mjs` consumes the shared `@merqo/ui/eslint` preset (comment and directive hygiene, size and complexity limits, no colour literals or em dashes in `src`). `eslint.config.test.ts` asserts the key rules stay at `error`. Colour literals are allowed only in `src/lib/brand-icon.tsx`. It also enables `merqoNoLocalCopies`, which reports any kit-local copy of a piece `@merqo/ui` ships; the wrappers listed in its `allow` array (Supabase clients, rate limiter, kit auth and callback, legal gate, `brand-icon`, `segmented-control`) adapt shared code to printkit's tables and variants.
+`eslint.config.mjs` consumes the shared `@merqo/ui/eslint` preset (comment and directive hygiene, size and complexity limits, no colour literals or em dashes in `src`). `eslint.config.test.ts` asserts the key rules stay at `error`. Colour literals are allowed only in `src/lib/brand-icon.tsx`. It also enables `merqoNoLocalCopies`, which reports any kit-local copy of a piece `@merqo/ui` ships; the wrappers listed in its `allow` array (Supabase clients, rate limiter, kit auth and callback, legal gate, `brand-icon`, `segmented-control`, and the path `src/app/dashboard/error`, whose boundary renders inside the dashboard layout) adapt shared code to printkit's tables and variants.
 
 ## Multi-label batch candidate
 
