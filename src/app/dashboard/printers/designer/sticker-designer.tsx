@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { FormError } from "@merqo/ui";
 import { saveStickerDesign } from "./actions";
 import { StickerSize } from "./sticker-size";
 import { PrinterFitNotice, type DesignerPrinter } from "./printer-fit-notice";
@@ -468,11 +469,7 @@ export function StickerDesigner({
               </button>
             </div>
           )}
-          {error && (
-            <p role="alert" className="text-destructive text-sm">
-              {error}
-            </p>
-          )}
+          <FormError message={error} />
           <button
             type="button"
             disabled={!history.length}

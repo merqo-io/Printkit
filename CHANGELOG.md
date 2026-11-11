@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Bumped `@merqo/ui` to 0.45.0. The root and dashboard error pages and `not-found.tsx` now render the shared `ErrorPage` and `NotFound` with the same copy; the job history empty state is the shared `EmptyState`; the sticker designer's save error is the shared `FormError`.
+- Added `src/app/global-error.tsx`, rendering the shared `GlobalError`, so a failure in the root layout shows a branded page.
 - Bumped `@merqo/ui` to 0.44.2: reworded terms, privacy policy, pilot agreement and About text (charging and incorporation are conditional, Merqo is a personal software project); legal version 2026-11-10 makes signed-in vendors re-accept.
 - `src/components/wordmark.tsx` is now a thin wrapper over `@merqo/ui`'s `Wordmark`, keeping only the printkit letters and magenta accent. The nav, dashboard nav and footer pass their `text-*` size explicitly because the shared shell always sets one.
 

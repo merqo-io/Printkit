@@ -26,8 +26,8 @@ importers:
   .:
     dependencies:
       '@merqo/ui':
-        specifier: github:merqo-io/merqo-ui#d3632502c43364f66288d2b08b1f35aef2619c6c
-        version: https://codeload.github.com/merqo-io/merqo-ui/tar.gz/d3632502c43364f66288d2b08b1f35aef2619c6c(@eslint-community/eslint-plugin-eslint-comments@4.8.1(eslint@9.39.5(jiti@2.7.0)))(@playwright/test@1.61.1)(@supabase/ssr@0.10.3(@supabase/supabase-js@2.112.3))(@supabase/supabase-js@2.112.3)(@types/react@19.2.18)(eslint-plugin-sonarjs@4.2.2(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))(next-themes@0.4.6(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(radix-ui@1.6.7(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sonner@1.7.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(tailwindcss@4.3.3)(zod@4.6.6)
+        specifier: github:merqo-io/merqo-ui#dac618bd703008feaac2ac6173913f999ebd87bc
+        version: https://codeload.github.com/merqo-io/merqo-ui/tar.gz/dac618bd703008feaac2ac6173913f999ebd87bc(@eslint-community/eslint-plugin-eslint-comments@4.8.1(eslint@9.39.5(jiti@2.7.0)))(@playwright/test@1.61.1)(@supabase/ssr@0.10.3(@supabase/supabase-js@2.112.3))(@supabase/supabase-js@2.112.3)(@types/react@19.2.18)(eslint-plugin-sonarjs@4.2.2(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))(next-themes@0.4.6(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(radix-ui@1.6.7(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sonner@1.7.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(tailwindcss@4.3.3)(zod@4.6.6)
       '@mmote/niimbluelib':
         specifier: 0.0.1-alpha.43
         version: 0.0.1-alpha.43
@@ -963,9 +963,9 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@merqo/ui@https://codeload.github.com/merqo-io/merqo-ui/tar.gz/d3632502c43364f66288d2b08b1f35aef2619c6c':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/merqo-io/merqo-ui/tar.gz/d3632502c43364f66288d2b08b1f35aef2619c6c}
-    version: 0.44.2
+  '@merqo/ui@https://codeload.github.com/merqo-io/merqo-ui/tar.gz/dac618bd703008feaac2ac6173913f999ebd87bc':
+    resolution: {gitHosted: true, integrity: sha512-dwlPwTv+tkJz480nwlNHHYNTeeNKnV+AVNdLue5fw4DdkKKN6lV4/BKJBfXMudzdp/bpi8yn6MogQZFdO4qCMw==, tarball: https://codeload.github.com/merqo-io/merqo-ui/tar.gz/dac618bd703008feaac2ac6173913f999ebd87bc}
+    version: 0.45.0
     engines: {node: '>=24'}
     peerDependencies:
       '@eslint-community/eslint-plugin-eslint-comments': '>=4.8.1'
@@ -5587,7 +5587,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@merqo/ui@https://codeload.github.com/merqo-io/merqo-ui/tar.gz/d3632502c43364f66288d2b08b1f35aef2619c6c(@eslint-community/eslint-plugin-eslint-comments@4.8.1(eslint@9.39.5(jiti@2.7.0)))(@playwright/test@1.61.1)(@supabase/ssr@0.10.3(@supabase/supabase-js@2.112.3))(@supabase/supabase-js@2.112.3)(@types/react@19.2.18)(eslint-plugin-sonarjs@4.2.2(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))(next-themes@0.4.6(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(radix-ui@1.6.7(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sonner@1.7.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(tailwindcss@4.3.3)(zod@4.6.6)':
+  '@merqo/ui@https://codeload.github.com/merqo-io/merqo-ui/tar.gz/dac618bd703008feaac2ac6173913f999ebd87bc(@eslint-community/eslint-plugin-eslint-comments@4.8.1(eslint@9.39.5(jiti@2.7.0)))(@playwright/test@1.61.1)(@supabase/ssr@0.10.3(@supabase/supabase-js@2.112.3))(@supabase/supabase-js@2.112.3)(@types/react@19.2.18)(eslint-plugin-sonarjs@4.2.2(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))(next-themes@0.4.6(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.61.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(radix-ui@1.6.7(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sonner@1.7.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(tailwindcss@4.3.3)(zod@4.6.6)':
     dependencies:
       '@icons-pack/react-simple-icons': 13.13.0(react@19.2.8)
       class-variance-authority: 0.7.1

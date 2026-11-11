@@ -105,7 +105,7 @@ secondary, process-magenta accent) — see `src/app/globals.css`'s own header co
 The shared `@merqo/ui` `PageHeader` (props `eyebrow`, `title`, `description`,
 `action`, `back`, `responsive`) opens every dashboard page, and every `Button`
 size is at least 44px tall on touch screens, so tap targets stay
-finger-sized. The pinned `@merqo/ui` is 0.44.2 (d363250; its reworded legal and About text, legal version 2026-11-10, makes vendors re-accept the terms); the
+finger-sized. The pinned `@merqo/ui` is 0.45.0 (dac618b; the shared `ErrorPage`, `NotFound`, `GlobalError`, `EmptyState` and `FormError` replace the kit's own copies); the
 remove-printer confirm uses its `ConfirmDialog`. See `src/components/README.md`.
 
 The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard
