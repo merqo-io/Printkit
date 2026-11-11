@@ -57,7 +57,9 @@ const eslintConfig = [
   // Supabase, rate-limit, kit-auth, kit-callback and legal-gate wrap the
   // shared piece with printkit's schema, tables and env. brand-icon keeps the
   // magenta registration dot; segmented-control is link-based, while the
-  // shared one is a button radio group.
+  // shared one is a button radio group. error-page also exempts
+  // src/app/dashboard/error.tsx: that boundary renders inside the dashboard
+  // layout, and the shared page is a full-screen card.
   ...merqoNoLocalCopies({
     allow: [
       "supabase-client",
@@ -69,6 +71,7 @@ const eslintConfig = [
       "legal-gate",
       "brand-icon",
       "segmented-control",
+      "error-page",
     ],
   }),
   {

@@ -1,14 +1,30 @@
-// @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
+
+const reset = vi.fn();
+const GlobalErrorMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@merqo/ui", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@merqo/ui")>();
+  GlobalErrorMock.mockImplementation(actual.GlobalError);
+  return { ...actual, GlobalError: GlobalErrorMock };
+});
+
 import GlobalErrorPage from "./global-error";
 
-it("offers a retry that calls Next's retry()", async () => {
-  const retry = vi.fn();
-  const user = userEvent.setup();
-  render(<GlobalErrorPage retry={retry} />);
+it("renders the fallback copy and a retry button inside a main landmark", () => {
+  const html = renderToStaticMarkup(<GlobalErrorPage retry={reset} />);
 
-  await user.click(screen.getByRole("button", { name: /try again/i }));
-  expect(retry).toHaveBeenCalledTimes(1);
+  expect(html).toContain("<html");
+  expect(html).toContain("<main");
+  expect(html).toMatch(/something went wrong/i);
+  expect(html).toMatch(/<button[^>]*>Try again<\/button>/);
+});
+
+it("wires Next's retry into the shared page's reset", () => {
+  renderToStaticMarkup(<GlobalErrorPage retry={reset} />);
+
+  const props = GlobalErrorMock.mock.calls.at(-1)?.[0] as { reset: () => void };
+  props.reset();
+  expect(reset).toHaveBeenCalledTimes(1);
 });
