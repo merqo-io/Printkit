@@ -1,4 +1,4 @@
-import { DataTable, type DataTableColumn } from "@merqo/ui";
+import { DataTable, EmptyState, type DataTableColumn } from "@merqo/ui";
 import { JobStatusBadge } from "../job-status-badge";
 import { JobHistoryCards } from "./job-history-cards";
 import { ReprintButton } from "./reprint-button";
@@ -19,12 +19,7 @@ export function JobHistoryTable({
   emptyMessage?: string;
 }) {
   if (jobs.length === 0) {
-    return (
-      <div className="rounded-xl border border-dashed px-5 py-10 text-center">
-        <p className="font-display text-2xl">No labels yet.</p>
-        <p className="text-muted-foreground mt-2 text-sm">{emptyMessage}</p>
-      </div>
-    );
+    return <EmptyState title="No labels yet." description={emptyMessage} />;
   }
 
   const columns: DataTableColumn<PrintJob>[] = [

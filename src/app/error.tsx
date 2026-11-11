@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@merqo/ui/primitives";
-import { ElevatedCard } from "@merqo/ui";
+import { ErrorPage } from "@merqo/ui";
 import { Wordmark } from "@/components/wordmark";
+
+function report(error: Error) {
+  console.error("Root error boundary caught", error);
+}
 
 /** Branded fallback for route errors, with retry and home navigation. */
 export default function RootError({
@@ -13,44 +16,22 @@ export default function RootError({
 }: {
   error: Error & { digest?: string };
   retry: () => void;
-  reset: () => void;
 }) {
-  useEffect(() => {
-    console.error("Root error boundary caught", error);
-  }, [error]);
-
+  // Next's `retry` re-fetches the segment; `reset` only clears the error
+  // state, so the shared page's reset slot gets `retry`.
   return (
-    <main className="flex min-h-screen items-center justify-center p-5">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <Wordmark className="text-3xl" />
-        </div>
-        <ElevatedCard className="px-7 py-10 text-center">
-          <h1 className="font-display text-2xl font-bold tracking-tight">
-            Something went wrong
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            We hit a snag loading this page. Try again, or go back to the
-            overview if it keeps happening.
-          </p>
-          <div className="mt-7 flex flex-col gap-2.5">
-            <Button
-              type="button"
-              onClick={() => retry()}
-              className="h-11 w-full rounded-xl"
-            >
-              Try again
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="h-11 w-full rounded-xl"
-            >
-              <Link href="/dashboard">Back to overview</Link>
-            </Button>
-          </div>
-        </ElevatedCard>
-      </div>
-    </main>
+    <ErrorPage
+      error={error}
+      reset={retry}
+      onError={report}
+      wordmark={<Wordmark className="text-3xl" />}
+      title="Something went wrong"
+      description="We hit a snag loading this page. Try again, or go back to the overview if it keeps happening."
+      actions={
+        <Button asChild variant="outline" className="h-11 w-full rounded-xl">
+          <Link href="/dashboard">Back to overview</Link>
+        </Button>
+      }
+    />
   );
 }

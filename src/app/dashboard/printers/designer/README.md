@@ -12,3 +12,5 @@ Logos are drawn into the print preview and live labels as dithered 1-bit images.
 
 The page header (the shared `@merqo/ui` `PageHeader`) sets the "Printers" eyebrow and links back to Printers.
 The designer page carries the tab title "Label design", matching its heading.
+
+A failed save shows its message through the shared `@merqo/ui` `FormError`.
