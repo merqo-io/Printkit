@@ -69,6 +69,8 @@ const eslintConfig = [
       "legal-gate",
       "brand-icon",
       "segmented-control",
+      // Renders inside the dashboard layout; the shared page is full-screen.
+      "src/app/dashboard/error",
     ],
   }),
   {
