@@ -15,7 +15,9 @@ export default function AboutPage() {
       <SiteNav />
       <main className="flex-1">
         <AboutMerqo kitName="printkit">
-          <TextLink href="/dashboard/printers">Set up a printer</TextLink>
+          <TextLink href="/guides/bluetooth-printers">
+            Read the Bluetooth printer guide
+          </TextLink>
         </AboutMerqo>
       </main>
       <SiteFooter showSignIn />

@@ -4,13 +4,16 @@ import { expect, it } from "vitest";
 
 import AboutPage from "./page";
 
-it("renders the real about copy for printkit and points at printer setup", () => {
+it("renders the real about copy for printkit and points at the public printer guide", () => {
   const { container } = render(<AboutPage />);
   const copy = (container.textContent ?? "").replace(/\s+/g, " ");
   expect(copy).toContain("printkit");
   expect(
-    screen.getByRole("link", { name: "Set up a printer" }),
-  ).toHaveAttribute("href", "/dashboard/printers");
+    screen.getByRole("link", { name: "Read the Bluetooth printer guide" }),
+  ).toHaveAttribute("href", "/guides/bluetooth-printers");
+  expect(
+    screen.queryByRole("link", { name: "Set up a printer" }),
+  ).not.toBeInTheDocument();
   expect(copy).not.toMatch(/\$/);
   expect(copy).not.toContain("—");
   expect(copy).not.toMatch(
