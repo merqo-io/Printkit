@@ -19,7 +19,8 @@ one-time `code`.
 - A reset link's exchange returns `redirectType: "recovery"` (supabase-js
   reads it from the code verifier `resetPasswordForEmail` stored). Only
   that exchange goes to `/reset-password` and sets the `printkit_recovery`
-  cookie (`@/lib/recovery-window`), bound to the new session's id from
+  cookie (`setRecoveryWindowCookie` in `@/lib/recovery-window`, shared with
+  `../confirm/verify/`), bound to the new session's id from
   `getClaims()`. A Google or email sign-in never opens a recovery window,
   even with `next=/reset-password`. `redirectType` is not in supabase-js's
   declared return type, so it is read through a Zod schema.

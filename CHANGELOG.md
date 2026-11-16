@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `/auth/confirm` page and `POST /auth/confirm/verify` for emailed links that carry a `token_hash` (reset, signup, invite, magic link, email change). A GET never consumes the token; only the Continue button's POST does. A recovery link opens the same 15-minute recovery window as `/auth/callback`, through the shared `setRecoveryWindowCookie`. Failures go to `/login?error=link`, which the login page now explains. `/auth/callback` and every `redirectTo` are unchanged.
+
 ### Changed
+
+- Bumped `@merqo/ui` to 0.49.1 (from 0.45.1).
 
 - The public About page's call to action now reads "Read the Bluetooth printer guide" and links to `/guides/bluetooth-printers` instead of sending signed-out visitors into `/dashboard/printers`.
 - Bumped `@merqo/ui` to 0.45.1. The root error page and `not-found.tsx` now render the shared `ErrorPage` and `NotFound` with the same copy, and the root page shows a "Reference" line with Next's digest when one is supplied (the dashboard error page stays local because it renders inside the dashboard layout, and the shared page is a full-screen card); the job history empty state is the shared `EmptyState`; the sticker designer's save error is the shared `FormError`.
