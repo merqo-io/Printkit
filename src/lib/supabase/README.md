@@ -35,7 +35,7 @@ deliberate.
   fragment never reaches the server, so it is not in `next`. A signed-in
   visitor on `/login` is redirected to the safe `next` (its own query kept)
   or `/dashboard`, carrying refreshed auth cookies on the redirect. That
-  bounce is skipped when `?error=` is set or the recovery-window cookie
+  bounce is skipped when `?error=` is set (`oauth` or `link`) or the recovery-window cookie
   exists, since those pages must still show. Called from `src/proxy.ts`.
 
 ## Connectivity

@@ -3,11 +3,7 @@ import { z } from "zod";
 import { createServerClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@merqo/ui";
 import { AUTH_NEXT_COOKIE, AUTH_NEXT_PATH } from "@/lib/auth-return";
-import {
-  RECOVERY_WINDOW_COOKIE,
-  mintRecoveryWindow,
-  recoveryWindowCookieOptions,
-} from "@/lib/recovery-window";
+import { setRecoveryWindowCookie } from "@/lib/recovery-window";
 
 const RESET_PASSWORD_PATH = "/reset-password";
 
@@ -65,17 +61,10 @@ export async function GET(request: Request | NextRequest) {
     return redirect(`${origin}${safeNext}`);
 
   const response = redirect(`${origin}${RESET_PASSWORD_PATH}`);
-  const accessToken = data?.session?.access_token;
-  if (accessToken) {
-    const { data: claims } = await supabase.auth.getClaims(accessToken);
-    const sessionId = claims?.claims.session_id;
-    if (sessionId) {
-      response.cookies.set(
-        RECOVERY_WINDOW_COOKIE,
-        mintRecoveryWindow(sessionId),
-        recoveryWindowCookieOptions,
-      );
-    }
-  }
+  await setRecoveryWindowCookie(
+    supabase,
+    response,
+    data?.session?.access_token,
+  );
   return response;
 }
