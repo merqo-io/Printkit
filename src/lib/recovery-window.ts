@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import type { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const RECOVERY_WINDOW_COOKIE = "printkit_recovery";
@@ -63,6 +64,31 @@ export function verifyRecoveryWindow(
   const expected = Buffer.from(sign(sessionId, expiresAt));
   const actual = Buffer.from(signature);
   return expected.length === actual.length && timingSafeEqual(expected, actual);
+}
+
+type TokenClaimsClient = {
+  auth: {
+    getClaims(jwt: string): Promise<{
+      data: { claims: { session_id?: string } } | null;
+    }>;
+  };
+};
+
+/** Opens the recovery window for the session the access token belongs to. */
+export async function setRecoveryWindowCookie(
+  supabase: TokenClaimsClient,
+  response: NextResponse,
+  accessToken: string | undefined,
+): Promise<void> {
+  if (!accessToken) return;
+  const { data: claims } = await supabase.auth.getClaims(accessToken);
+  const sessionId = claims?.claims.session_id;
+  if (!sessionId) return;
+  response.cookies.set(
+    RECOVERY_WINDOW_COOKIE,
+    mintRecoveryWindow(sessionId),
+    recoveryWindowCookieOptions,
+  );
 }
 
 type ClaimsClient = {

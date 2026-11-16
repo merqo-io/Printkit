@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { NextResponse } from "next/server";
 
 const { cookieGet } = vi.hoisted(() => ({ cookieGet: vi.fn() }));
 vi.mock("next/headers", () => ({
@@ -11,6 +12,7 @@ import {
   getRecoveryState,
   mintRecoveryWindow,
   recoveryWindowCookieOptions,
+  setRecoveryWindowCookie,
   verifyRecoveryWindow,
 } from "./recovery-window";
 
@@ -79,6 +81,45 @@ describe("recovery window token", () => {
       path: "/reset-password",
       maxAge: RECOVERY_WINDOW_SECONDS,
     });
+  });
+});
+
+describe("setRecoveryWindowCookie", () => {
+  const claimsClient = (sessionId?: string) => ({
+    auth: {
+      getClaims: vi.fn().mockResolvedValue({
+        data: sessionId ? { claims: { session_id: sessionId } } : null,
+      }),
+    },
+  });
+
+  it("sets a cookie that getRecoveryState accepts for the same session", async () => {
+    const response = NextResponse.redirect("http://localhost/reset-password");
+    await setRecoveryWindowCookie(claimsClient("session-1"), response, "jwt");
+    const cookie = response.cookies.get(RECOVERY_WINDOW_COOKIE);
+    expect(cookie?.path).toBe("/reset-password");
+    expect(cookie?.maxAge).toBe(RECOVERY_WINDOW_SECONDS);
+    cookieGet.mockReturnValue({ value: cookie?.value });
+    const state = await getRecoveryState({
+      auth: {
+        getClaims: vi.fn().mockResolvedValue({
+          data: { claims: { session_id: "session-1" } },
+          error: null,
+        }),
+      },
+    });
+    expect(state).toBe("ready");
+  });
+
+  it("sets nothing without an access token or a session id", async () => {
+    const response = NextResponse.redirect("http://localhost/reset-password");
+    await setRecoveryWindowCookie(
+      claimsClient("session-1"),
+      response,
+      undefined,
+    );
+    await setRecoveryWindowCookie(claimsClient(), response, "jwt");
+    expect(response.cookies.get(RECOVERY_WINDOW_COOKIE)).toBeUndefined();
   });
 });
 

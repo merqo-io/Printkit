@@ -53,6 +53,7 @@ const PAGES: [string, () => Promise<MetadataModule>, string][] = [
     () => import("./reset-password/page"),
     "Set a new password",
   ],
+  ["/auth/confirm", () => import("./auth/confirm/page"), "Confirm"],
   [
     "/legal/accept",
     () => import("./legal/accept/page"),

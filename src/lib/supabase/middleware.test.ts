@@ -195,6 +195,21 @@ describe("updateSession: /login for a signed-in visitor", () => {
     expect(getUser).not.toHaveBeenCalled();
   });
 
+  it("keeps the page for an invalid or expired emailed link", async () => {
+    const response = await go("/login?error=link");
+    expect(response.status).toBe(200);
+    expect(getUser).not.toHaveBeenCalled();
+  });
+
+  it.each(["/auth/confirm", "/auth/confirm/verify"])(
+    "passes %s through without checking auth",
+    async (path) => {
+      const response = await go(path);
+      expect(response.status).toBe(200);
+      expect(getUser).not.toHaveBeenCalled();
+    },
+  );
+
   it("keeps the page while a password-reset window is open", async () => {
     const response = await go("/login", { cookie: "printkit_recovery=x" });
     expect(response.status).toBe(200);

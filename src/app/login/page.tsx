@@ -23,6 +23,14 @@ const DEFAULT_RETURN_PATH = "/dashboard";
 const OAUTH_ERROR_MESSAGE =
   "Could not sign in with Google. Try again in a minute.";
 
+const LINK_ERROR_MESSAGE =
+  "That link is invalid or has expired. Request a new one.";
+
+const URL_ERROR_MESSAGES = new Map([
+  ["oauth", OAUTH_ERROR_MESSAGE],
+  ["link", LINK_ERROR_MESSAGE],
+]);
+
 const emailSchema = z.string().trim().email();
 const EMAIL_ERROR = "Enter a valid email, like you@business.sg.";
 
@@ -40,7 +48,7 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(
-    searchParams.get("error") === "oauth" ? OAUTH_ERROR_MESSAGE : null,
+    URL_ERROR_MESSAGES.get(searchParams.get("error") ?? "") ?? null,
   );
   const [emailError, setEmailError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

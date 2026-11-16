@@ -9,7 +9,7 @@ OAuth, plus password reset. There is no sign-up: the tagline says "New to printk
 
 - `layout.tsx` — a pass-through server layout that sets the tab title "Sign in"; `page.tsx` is a client component and cannot export `metadata`.
 - `page.tsx` — `LoginPage()` wraps the actual `LoginForm` client component
-  in `<Suspense>` (it reads `useSearchParams()` for `?error=oauth`).
+  in `<Suspense>` (it reads `useSearchParams()` for `?error=oauth` and `?error=link`, the latter for an invalid or expired emailed link).
   `LoginForm` handles:
   - Google OAuth via `supabase.auth.signInWithOAuth`, redirecting through
     `/auth/callback`; `queryParams: { hl: "en" }` forces an English consent
