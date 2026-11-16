@@ -99,6 +99,15 @@ describe("POST /auth/confirm/verify", () => {
     expect(recoveryCookie(res)).toBeUndefined();
   });
 
+  it("sets no cookie and still redirects when getClaims throws", async () => {
+    getClaimsMock.mockRejectedValue(new Error("network"));
+    const { POST } = await import("./route");
+    const res = await POST(post("token_hash=abc&type=recovery"));
+    expect(res.status).toBe(303);
+    expect(res.headers.get("location")).toBe("http://localhost/reset-password");
+    expect(recoveryCookie(res)).toBeUndefined();
+  });
+
   it("sets no cookie when the verification result has no session", async () => {
     verifyOtpMock.mockResolvedValue({ data: { session: null }, error: null });
     const { POST } = await import("./route");

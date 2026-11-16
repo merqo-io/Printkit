@@ -15,8 +15,10 @@ spends the emailed `token_hash` with `verifyOtp` and redirects with a 303.
   here. For a recovery link, `onRecovery` validates the verify result with Zod
   and calls `setRecoveryWindowCookie` (`@/lib/recovery-window`), the helper
   `../../callback/` also uses, so the `printkit_recovery` cookie is identical.
-  If the session id cannot be read, no cookie is set and the redirect still
-  goes to `/reset-password`, as in the callback.
+  The cookie is minted only when the submitted `type` is `recovery`, and is
+  bound to the session that verification created. If the session id cannot be
+  read, or `getClaims` throws, no cookie is set and the redirect still goes to
+  `/reset-password`, where the page reports the recovery state.
 - `route.test.ts` — the default and `next` redirects, the recovery window and
   its cookie (also when the session id or session is missing), the failure
   redirect, a cross-origin post and that only POST is exported.

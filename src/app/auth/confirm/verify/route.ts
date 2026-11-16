@@ -16,11 +16,15 @@ export async function POST(request: Request) {
       onRecovery: async ({ supabase, data, response }) => {
         const result = verifyResultSchema.safeParse(data);
         if (!result.success) return;
-        await setRecoveryWindowCookie(
-          supabase,
-          response,
-          result.data.session?.access_token,
-        );
+        try {
+          await setRecoveryWindowCookie(
+            supabase,
+            response,
+            result.data.session?.access_token,
+          );
+        } catch {
+          // The reset page reports the missing window; failing here would bounce a signed-in user to /login.
+        }
       },
     },
   });
