@@ -81,12 +81,16 @@ describe("updatePasswordAction", () => {
 
   it("keeps the window open for a retry when Supabase rejects the update", async () => {
     updateUser.mockResolvedValue({
-      error: { message: "Password is too weak", code: "weak_password" },
+      error: {
+        message: "Password should be at least 8 characters.",
+        code: "weak_password",
+        reasons: ["length"],
+      },
     });
     const result = await updatePasswordAction(input);
     expect(result).toEqual({
       success: false,
-      error: "That password is too easy to guess. Try a longer one.",
+      error: "Password is too short. Use at least 8 characters.",
     });
     expect(cookieDelete).not.toHaveBeenCalled();
   });

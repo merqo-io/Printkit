@@ -17,6 +17,7 @@ const { updatePasswordAction, push, refresh, toast } = vi.hoisted(() => ({
 vi.mock("./actions", () => ({ updatePasswordAction }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 vi.mock("sonner", () => ({ toast }));
+import { PASSWORD_REQUIREMENTS_HINT } from "@/lib/auth-errors";
 import { ResetPasswordForm } from "./reset-password-form";
 
 beforeEach(() => {
@@ -62,6 +63,30 @@ describe("password recovery", () => {
     await enterPasswords("long-password", "different-password");
     expect(updatePasswordAction).not.toHaveBeenCalled();
     expect(screen.getByText(/passwords.*match/i)).toBeInTheDocument();
+  });
+
+  it("shows the requirements hint beside the new-password field", () => {
+    render(<ResetPasswordForm initialState="ready" />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Password requirements" }),
+    );
+    expect(
+      screen.getAllByText(PASSWORD_REQUIREMENTS_HINT).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("shows the specific weak-password message from the server", async () => {
+    updatePasswordAction.mockResolvedValue({
+      success: false,
+      error: "Password is too short. Use at least 8 characters.",
+    });
+    render(<ResetPasswordForm initialState="ready" />);
+    await enterPasswords();
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Password is too short. Use at least 8 characters.",
+      ),
+    );
   });
 
   it("blocks short passwords before the server", async () => {
