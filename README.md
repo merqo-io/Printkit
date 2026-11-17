@@ -128,7 +128,8 @@ have no Reprint, and the copy says "labels" rather than "jobs".
 `/reset-password` shows its form only to the session a fresh reset link
 created, within 15 minutes, through a signed recovery-window cookie set by
 `/auth/callback`. Any other signed-in session gets the expired card. See
-`src/app/reset-password/README.md`.
+`src/app/reset-password/README.md`. A rejected weak password shows which rule
+failed, and the new-password field has a tap-friendly requirements hint.
 
 Sign-in, password reset and terms acceptance show plain sentence-case copy.
 Supabase auth errors are mapped to short next-step messages in
