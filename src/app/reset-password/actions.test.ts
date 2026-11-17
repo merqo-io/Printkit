@@ -69,7 +69,7 @@ describe("updatePasswordAction", () => {
   });
 
   it.each([
-    [{ password: "short", confirm: "short" }, /at least 8/],
+    [{ password: "", confirm: "" }, /enter a new password/i],
     [{ password: "long-password", confirm: "different" }, /do not match/],
     [null, /could not use that password/i],
   ])("rejects invalid input %j before the auth API", async (bad, message) => {
@@ -77,6 +77,11 @@ describe("updatePasswordAction", () => {
     expect(result.success).toBe(false);
     expect(!result.success && result.error).toMatch(message);
     expect(updateUser).not.toHaveBeenCalled();
+  });
+
+  it("passes a short password to Supabase instead of rejecting it locally", async () => {
+    await updatePasswordAction({ password: "short", confirm: "short" });
+    expect(updateUser).toHaveBeenCalledWith({ password: "short" });
   });
 
   it("keeps the window open for a retry when Supabase rejects the update", async () => {

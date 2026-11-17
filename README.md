@@ -129,7 +129,7 @@ have no Reprint, and the copy says "labels" rather than "jobs".
 created, within 15 minutes, through a signed recovery-window cookie set by
 `/auth/callback`. Any other signed-in session gets the expired card. See
 `src/app/reset-password/README.md`. A rejected weak password shows which rule
-failed, and the new-password field has a tap-friendly requirements hint.
+Supabase says failed (the client states no length rule of its own), and the new-password field has a tap-friendly requirements hint.
 
 Sign-in, password reset and terms acceptance show plain sentence-case copy.
 Supabase auth errors are mapped to short next-step messages in
@@ -156,6 +156,10 @@ Device result handlers report persistence failures and recheck delivery state
 in the update. Feie callbacks also bind the update to the signed attempt ID.
 
 The AI harness follows templateCentral 7.2.2: hook commands are anchored on the project directory, and the guard against committing to `main` reads the branch of the directory a command runs in (a strict `&&` chain only by the directories git runs in). The dependency audit is the fail-closed `.claude/deps-gate.sh`, with expiring suppressions only in `.claude/dep-audit-allow.txt`. The dated entry in `AGENTS.md` lists what was adopted.
+
+## Framework
+
+printkit runs Next.js 16.4.6 (pinned exactly, with a matching `eslint-config-next`), which includes the fix for GHSA-mfr8-8qww-v76h.
 
 ## Security headers
 
