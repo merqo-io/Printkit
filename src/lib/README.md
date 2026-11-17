@@ -28,7 +28,9 @@ everything else sits flat here.
   login and reset-password screens (`signInErrorMessage`,
   `resetErrorMessage`, `passwordUpdateErrorMessage`, `oauthErrorMessage`).
   Unknown errors get a generic fallback so raw provider text never reaches
-  the page.
+  the page. `weakPasswordMessage` names the failed password rules from
+  Supabase's `reasons` and message; `PASSWORD_REQUIREMENTS_HINT` is the
+  requirements copy the reset form shows beside the new-password field.
 - `auth-return.ts` — `authNextCookie(next, secure)`: the `document.cookie`
   string that saves the login page's return path as `printkit_auth_next`
   (`Path=/auth`, `Max-Age=600`, `SameSite=Lax`, `Secure` on https), or

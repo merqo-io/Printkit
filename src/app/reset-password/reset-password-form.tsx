@@ -7,7 +7,13 @@ import { toast } from "sonner";
 import { Button } from "@merqo/ui/primitives";
 import { Input } from "@merqo/ui/primitives";
 import { Label } from "@merqo/ui/primitives";
-import { ElevatedCard, useAsyncAction, navigatingAway } from "@merqo/ui";
+import {
+  ElevatedCard,
+  InfoTooltip,
+  useAsyncAction,
+  navigatingAway,
+} from "@merqo/ui";
+import { PASSWORD_REQUIREMENTS_HINT } from "@/lib/auth-errors";
 import { passwordChangeSchema } from "@/lib/password-change";
 import type { RecoveryState } from "@/lib/recovery-window";
 import { updatePasswordAction } from "./actions";
@@ -88,9 +94,6 @@ export function ResetPasswordForm({
       <h1 className="font-display text-2xl font-semibold leading-tight">
         Set a new password
       </h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">
-        Use at least 8 characters.
-      </p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -99,9 +102,16 @@ export function ResetPasswordForm({
         className="mt-6 space-y-5"
       >
         <div className="space-y-2">
-          <Label htmlFor="new-password" className="text-sm font-medium">
-            New password
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="new-password" className="text-sm font-medium">
+              New password
+            </Label>
+            <InfoTooltip
+              content={PASSWORD_REQUIREMENTS_HINT}
+              ariaLabel="Password requirements"
+              trigger="tap"
+            />
+          </div>
           <Input
             id="new-password"
             type="password"
