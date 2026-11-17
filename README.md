@@ -157,6 +157,10 @@ in the update. Feie callbacks also bind the update to the signed attempt ID.
 
 The AI harness follows templateCentral 7.2.2: hook commands are anchored on the project directory, and the guard against committing to `main` reads the branch of the directory a command runs in (a strict `&&` chain only by the directories git runs in). The dependency audit is the fail-closed `.claude/deps-gate.sh`, with expiring suppressions only in `.claude/dep-audit-allow.txt`. The dated entry in `AGENTS.md` lists what was adopted.
 
+## Framework
+
+printkit runs Next.js 16.4.6 (pinned exactly, with a matching `eslint-config-next`), which includes the fix for GHSA-mfr8-8qww-v76h.
+
 ## Security headers
 
 `src/proxy.ts` sets the CSP (nonce on per-request routes) and `X-Robots-Tag` off production; see `docs/security/`. The site is noindex in every environment (root `metadata.robots`, `robots.ts` disallow-all) and presents printkit as the print companion for qkit booths.
