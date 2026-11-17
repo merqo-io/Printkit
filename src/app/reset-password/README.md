@@ -31,6 +31,6 @@ cleared only after a successful update) and `reset-password-form.dom.test.tsx`
 
 The reset-password form takes `Button`, `Input`, `Label` and `cn` from `@merqo/ui/primitives`.
 
-The form takes `ElevatedCard`, `useAsyncAction` and `navigatingAway` from `@merqo/ui`.
+The form takes `ElevatedCard`, `InfoTooltip`, `useAsyncAction` and `navigatingAway` from `@merqo/ui`. An `InfoTooltip` (tap trigger) beside the "New password" label shows `PASSWORD_REQUIREMENTS_HINT` from `@/lib/auth-errors`. A weak-password rejection shows the specific rule from `weakPasswordMessage`.
 
 `loading.tsx` is the card-shaped placeholder (`role="status"`) shown while `page.tsx` creates the server client and checks the recovery session; `loading.dom.test.tsx` covers it.

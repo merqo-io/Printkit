@@ -4,7 +4,12 @@ export interface AuthErrorLike {
   code?: string;
   status?: number;
   name?: string;
+  reasons?: readonly string[];
 }
+
+/** Shown beside the new-password field; mirrors the production Supabase policy. */
+export const PASSWORD_REQUIREMENTS_HINT =
+  "Use at least 8 characters, with a lowercase letter, an uppercase letter, a number and a symbol.";
 
 export const SIGN_IN_FALLBACK = "Could not sign in. Try again in a minute.";
 
@@ -66,6 +71,72 @@ export function resetErrorMessage(error: AuthErrorLike): string {
   return "Could not send a reset link. Try again in a minute.";
 }
 
+const CHARACTER_SETS = [
+  { chars: "abcdefghijklmnopqrstuvwxyz", label: "a lowercase letter" },
+  { chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", label: "an uppercase letter" },
+  { chars: "0123456789", label: "a number" },
+] as const;
+
+function joinWithAnd(items: string[]): string {
+  if (items.length < 2) return items.join("");
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+function lengthMessage(message: string): string {
+  const min = /at least (\d+) characters/i.exec(message)?.[1];
+  return min
+    ? `Password is too short. Use at least ${min} characters.`
+    : "Password is too short. Use a longer one.";
+}
+
+function charactersMessage(message: string): string {
+  const listed = /character of each:([\s\S]*)$/i.exec(message)?.[1];
+  if (listed) {
+    const named: string[] = CHARACTER_SETS.filter(({ chars }) =>
+      listed.includes(chars),
+    ).map(({ label }) => label);
+    const rest = CHARACTER_SETS.reduce(
+      (left, { chars }) => left.replace(chars, ""),
+      listed,
+    );
+    if (rest.replace(/[\s,.]/g, "")) named.push("a symbol");
+    if (named.length) return `Password must include ${joinWithAnd(named)}.`;
+  }
+  return "Password needs a wider mix of characters, such as upper and lower case letters, numbers and symbols.";
+}
+
+/**
+ * Turns a Supabase weak-password rejection into copy naming the failed rules.
+ * The numbers and character classes come from the server's message, so the
+ * copy follows whatever policy that environment enforces.
+ */
+export function weakPasswordMessage({
+  reasons,
+  message = "",
+}: {
+  reasons?: readonly string[];
+  message?: string;
+}): string {
+  const found = reasons?.length
+    ? reasons
+    : [
+        ...(/at least \d+ characters/i.test(message) ? ["length"] : []),
+        ...(/character of each/i.test(message) ? ["characters"] : []),
+      ];
+  const parts = found.flatMap((reason) => {
+    if (reason === "length") return [lengthMessage(message)];
+    if (reason === "characters") return [charactersMessage(message)];
+    if (reason === "pwned")
+      return [
+        "This password has appeared in a data breach. Choose a different one.",
+      ];
+    return [];
+  });
+  return parts.length
+    ? parts.join(" ")
+    : "That password is too weak. Choose a longer, less common one.";
+}
+
 /** Maps a rejected password update; raw text is never shown. */
 export function passwordUpdateErrorMessage(error: AuthErrorLike): string {
   if (error.code === "same_password")
@@ -74,7 +145,10 @@ export function passwordUpdateErrorMessage(error: AuthErrorLike): string {
     error.code === "weak_password" ||
     /weak|easy to guess/i.test(error.message ?? "")
   )
-    return "That password is too easy to guess. Try a longer one.";
+    return weakPasswordMessage({
+      reasons: error.reasons,
+      message: error.message,
+    });
   if (isNetworkError(error))
     return "Could not update your password. Check your connection and try again.";
   return "Could not update your password. Try again in a minute.";
