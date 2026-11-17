@@ -89,11 +89,32 @@ describe("password recovery", () => {
     );
   });
 
-  it("blocks short passwords before the server", async () => {
+  it("keeps submit disabled while the password is empty", async () => {
+    render(<ResetPasswordForm initialState="ready" />);
+    expect(
+      await screen.findByRole("button", { name: "Update password" }),
+    ).toBeDisabled();
+    expect(updatePasswordAction).not.toHaveBeenCalled();
+  });
+
+  it("sends a short password to the server and shows its message", async () => {
+    updatePasswordAction.mockResolvedValue({
+      success: false,
+      error: "Password is too short. Use at least 8 characters.",
+    });
     render(<ResetPasswordForm initialState="ready" />);
     await enterPasswords("short");
-    expect(screen.getByRole("alert")).toHaveTextContent(/at least 8/);
-    expect(updatePasswordAction).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(updatePasswordAction).toHaveBeenCalledWith({
+        password: "short",
+        confirm: "short",
+      }),
+    );
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Password is too short. Use at least 8 characters.",
+      ),
+    );
   });
 
   it("shows update errors and permits a retry without redirecting", async () => {

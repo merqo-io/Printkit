@@ -10,8 +10,8 @@ A plain signed-in session, a signed-out visitor, and a used or expired link
 all get the "This link has expired" card with a route back to sign in. If
 the session cannot be checked, the card says so instead.
 
-`actions.ts` — `updatePasswordAction` validates matching passwords with an
-eight-character floor in Zod, checks the recovery window again on the
+`actions.ts` — `updatePasswordAction` validates a non-empty, matching pair in
+Zod (no length or character rule, so the client cannot drift from Supabase), checks the recovery window again on the
 server, then calls Supabase `updateUser` with the cookie-bound server
 client. A successful update deletes the cookie, so the same session cannot
 change the password a second time. A Supabase error keeps the window open
