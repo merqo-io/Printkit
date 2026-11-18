@@ -1,5 +1,7 @@
 # printkit
 
+Public page rules (radius, shadow, hover and motion) are recorded in `DESIGN.md`.
+
 Hardware print connector for Merqo vendors. Prints a label for every
 order, through one of three connectors (`src/lib/connectors/`):
 `cloud_poll` for printers that fetch their own jobs (Star CloudPRNT),
