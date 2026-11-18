@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `DESIGN.md` records printkit's public-page values (no landing by design) and the places the public pages still break the shared rules.
 - Reset-password: a rejected weak password now says which rule failed (length, character mix or a known breach), using the limits Supabase reports. The new-password field has a tap-friendly requirements hint.
 - `/auth/confirm` page and `POST /auth/confirm/verify` for emailed links that carry a `token_hash` (reset, signup, invite, magic link, email change). A GET never consumes the token; only the Continue button's POST does. A recovery link opens the same 15-minute recovery window as `/auth/callback`, through the shared `setRecoveryWindowCookie`. Failures go to `/login?error=link`, which the login page now explains. `/auth/callback` and every `redirectTo` are unchanged.
 
