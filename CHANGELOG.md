@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Bumped `@merqo/ui` to 0.54.1 (from 0.54.0): the legal gate no longer caches a failed legal-status check, and idempotent Supabase and merqo requests retry once on a dropped connection, which fixes the sign-in loop back to `/legal/accept`.
+
 - Bumped `@merqo/ui` to 0.54.0 (from 0.49.1); no code changes were needed.
 - The public About page's call to action now reads "Read the Bluetooth printer guide" and links to `/guides/bluetooth-printers` instead of sending signed-out visitors into `/dashboard/printers`.
 - Bumped `@merqo/ui` to 0.45.1. The root error page and `not-found.tsx` now render the shared `ErrorPage` and `NotFound` with the same copy, and the root page shows a "Reference" line with Next's digest when one is supplied (the dashboard error page stays local because it renders inside the dashboard layout, and the shared page is a full-screen card); the job history empty state is the shared `EmptyState`; the sticker designer's save error is the shared `FormError`.
