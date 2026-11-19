@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `/auth/confirm` page and `POST /auth/confirm/verify` for emailed links that carry a `token_hash` (reset, signup, invite, magic link, email change). A GET never consumes the token; only the Continue button's POST does. A recovery link opens the same 15-minute recovery window as `/auth/callback`, through the shared `setRecoveryWindowCookie`. Failures go to `/login?error=link`, which the login page now explains. `/auth/callback` and every `redirectTo` are unchanged.
 
 ### Changed
+
 - Bumped `@merqo/ui` to 0.54.1 (from 0.54.0): the legal gate no longer caches a failed legal-status check, and idempotent Supabase and merqo requests retry once on a dropped connection, which fixes the sign-in loop back to `/legal/accept`.
 
 - Bumped `@merqo/ui` to 0.54.0 (from 0.49.1); no code changes were needed.
