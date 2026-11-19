@@ -4,10 +4,7 @@ import Link from "next/link";
 import { Wordmark } from "@/components/wordmark";
 import { usePathname } from "next/navigation";
 import { DashboardNav as SharedDashboardNav, getSwitchKits } from "@merqo/ui";
-import { SUPPORT_CATEGORY_LABELS } from "@/lib/schemas";
-import type { SupportMessageInput } from "@/lib/schemas";
-import { submitFeedbackAction } from "@/app/actions/feedback";
-import { submitSupportMessageAction } from "@/app/actions/support";
+import { GET_HELP, submitAccountFeedback } from "@/lib/account-menu-wiring";
 
 const LINKS = [
   { href: "/dashboard", label: "Overview" },
@@ -17,22 +14,6 @@ const LINKS = [
 
 function isActive(path: string, href: string): boolean {
   return href === "/dashboard" ? path === "/dashboard" : path.startsWith(href);
-}
-
-const HELP_CATEGORIES: {
-  value: SupportMessageInput["category"];
-  label: string;
-}[] = Object.entries(SUPPORT_CATEGORY_LABELS).map(([value, label]) => ({
-  value: value as SupportMessageInput["category"],
-  label,
-}));
-const HELP_CATEGORY_VALUES: readonly string[] = HELP_CATEGORIES.map(
-  (c) => c.value,
-);
-function isHelpCategory(
-  value: string | undefined,
-): value is SupportMessageInput["category"] {
-  return value !== undefined && HELP_CATEGORY_VALUES.includes(value);
 }
 
 /**
@@ -79,24 +60,8 @@ export function DashboardNav({
         href: "/guides/bluetooth-printers",
         label: "Bluetooth guide",
       }}
-      getHelp={{
-        type: "form",
-        onSubmit: async ({ message, category }) => {
-          const res = await submitSupportMessageAction({
-            category: isHelpCategory(category) ? category : "other",
-            body: message,
-          });
-          if (!res.success) throw new Error(res.error);
-        },
-        categories: HELP_CATEGORIES,
-      }}
-      onFeedbackSubmit={async ({ message, nps }) => {
-        const res = await submitFeedbackAction({
-          nps: nps ?? 0,
-          message: message.trim() || undefined,
-        });
-        if (!res.success) throw new Error(res.error);
-      }}
+      getHelp={GET_HELP}
+      onFeedbackSubmit={submitAccountFeedback}
       feedbackSource="vendor"
       feedbackMetric="nps"
       showNps

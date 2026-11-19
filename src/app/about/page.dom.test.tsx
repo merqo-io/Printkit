@@ -1,11 +1,15 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
+
+vi.mock("@/lib/nav-account", () => ({
+  getNavAccount: vi.fn().mockResolvedValue(undefined),
+}));
 
 import AboutPage from "./page";
 
-it("renders the real about copy for printkit and points at the public printer guide", () => {
-  const { container } = render(<AboutPage />);
+it("renders the real about copy for printkit and points at the public printer guide", async () => {
+  const { container } = render(await AboutPage());
   const copy = (container.textContent ?? "").replace(/\s+/g, " ");
   expect(copy).toContain("printkit");
   expect(

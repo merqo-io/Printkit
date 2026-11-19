@@ -3,6 +3,7 @@ import { BackToTop } from "@merqo/ui";
 import { Notice } from "@/components/notice";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
+import { getNavAccount } from "@/lib/nav-account";
 import { TextLink } from "@/components/text-link";
 import { BLUETOOTH_WARNING } from "@/lib/printer-info-copy";
 
@@ -52,10 +53,11 @@ function Command({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function BluetoothPrintersGuide() {
+export default async function BluetoothPrintersGuide() {
+  const account = await getNavAccount();
   return (
     <>
-      <SiteNav />
+      <SiteNav account={account} />
       <main className="mx-auto max-w-2xl px-5 py-12">
         <h1 className="font-display text-4xl leading-tight font-semibold">
           Bluetooth printers
