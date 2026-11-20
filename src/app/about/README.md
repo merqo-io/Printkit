@@ -9,7 +9,7 @@ printkit, the same way qkit and loopkit do, so that link never lands on the
 
 ## Contents
 
-- `page.tsx` — `AboutPage`: `SiteNav` (shared `LandingNav`), `AboutMerqo kitName="printkit"`
+- `page.tsx` — `AboutPage`: `SiteNav` (shared `LandingNav`, with Dashboard and the account menu when signed in, resolved by `getNavAccount()`), `AboutMerqo kitName="printkit"`
   with a "Read the Bluetooth printer guide" text link to the public
   `/guides/bluetooth-printers` (a signed-out visitor is not sent into the
   dashboard), and `SiteFooter`
