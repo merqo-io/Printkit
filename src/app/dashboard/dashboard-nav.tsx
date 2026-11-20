@@ -23,11 +23,11 @@ function isActive(path: string, href: string): boolean {
  */
 export function DashboardNav({
   signOut,
-  vendorName,
+  accountName,
   avatarUrl = null,
 }: {
   signOut: () => Promise<void>;
-  vendorName: string;
+  accountName: string;
   avatarUrl?: string | null;
 }) {
   const path = usePathname();
@@ -47,12 +47,11 @@ export function DashboardNav({
       LinkComponent={Link}
       isActiveHref={(href) => isActive(path, href)}
       vendor={{
-        name: vendorName || "Account",
+        name: accountName,
         avatarUrl: avatarUrl ?? undefined,
-        // `subtitle` is the only line @merqo/ui's AccountMenu renders next
-        // to the trigger and in the dropdown header, so the vendor name
-        // needs to go there, not just into the initials-only `name` field.
-        subtitle: vendorName || "Account",
+        // `subtitle` is the only line AccountMenu renders next to the trigger
+        // and in the dropdown header; the label is already resolved upstream.
+        subtitle: accountName,
       }}
       signOutAction={signOut}
       switchKits={getSwitchKits("printkit")}

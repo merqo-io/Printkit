@@ -10,7 +10,9 @@ The authenticated vendor area (`/dashboard/*`).
   Gates access via `getVendorSession()` (`@/lib/vendor-session`, which also
   bounces a stale legal acceptance to `/legal/accept`), resolves
   the vendor's stall name via `getOrCreateVendorProfile`
-  (`@/lib/merqo-vendor-profile`), then wraps `children` in
+  (`@/lib/merqo-vendor-profile`) and turns it into the account label with
+  `@merqo/ui`'s `accountLabel` (stall name, else name, else email local part),
+  passed to the nav as `accountName`, then wraps `children` in
   `dashboard-nav.tsx`'s `DashboardNav` and a `max-w-7xl` `<main>`, followed by
   a `<footer>` rendering `@merqo/ui`'s `LegalFooterLinks` — printkit has no
   public landing page for a marketing footer to live on, so the Terms/Privacy

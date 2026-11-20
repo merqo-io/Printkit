@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- The account menu shows the stall name through the shared `accountLabel` fallback (name, then email local part, then "Account"), so the dashboard and landing nav match and the full email is no longer shown. `@merqo/ui` repinned to v0.58.0.
 - Bumped `@merqo/ui` to 0.56.0 (from 0.54.1). The public pages' account menu is now the shared `LandingAccountNav` with `toNavUser`: the name comes from the merqo vendor profile (stall name) before the sign-in name, and printkit is listed in Switch products. `LandingAccountMenu` and `nav-account.ts` are removed.
 - Bumped `@merqo/ui` to 0.54.1 (from 0.54.0): the legal gate no longer caches a failed legal-status check, and idempotent Supabase and merqo requests retry once on a dropped connection, which fixes the sign-in loop back to `/legal/accept`.
 
