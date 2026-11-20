@@ -43,7 +43,6 @@ export function SiteNav({ user }: { user?: NavUser | null }) {
               dashboardHref="/dashboard"
               user={user}
               signOutAction={signOutAction}
-              LinkComponent={Link}
               actions={{
                 submitSupport: submitLandingSupportAction,
                 submitFeedback: submitFeedbackAction,

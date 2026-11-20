@@ -21,7 +21,7 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
   `@/lib/printer-info-copy`. It composes shared InfoTooltip with a 24px trigger and opens on tap rather than hover, because
   vendors read these on an iPad where a hover tooltip never appears, and the
   trigger is a real button so it is reachable by keyboard.
-- `site-nav.tsx` — `SiteNav()`: `@merqo/ui`'s `LandingNav` with the printkit wordmark (to `/dashboard`), About and a "Sign in" button (to `/login`), the top bar of the public pages (`/about`, the Bluetooth guide). Given a `user` (the signed-in visitor as a `NavUser`, from `getNavUser()`), it shows `@merqo/ui`'s `LandingAccountNav` (Dashboard link, account menu) instead of Sign in; it stays a Server Component.
+- `site-nav.tsx` — `SiteNav()`: `@merqo/ui`'s `LandingNav` with the printkit wordmark (to `/dashboard`), About and a "Sign in" button (to `/login`), the top bar of the public pages (`/about`, the Bluetooth guide). Given a `user` (the signed-in visitor as a `NavUser`, from `getNavUser()`), it shows `@merqo/ui`'s `LandingAccountNav` (Dashboard link, account menu) instead of Sign in; it stays a Server Component, so it passes no function props (such as `LinkComponent`) to the client account nav.
 - `printers-back-link.tsx` — `PrintersBackLink()`: the `back` slot content for
   the shared `@merqo/ui` `PageHeader` on every child page of Printers, a
   `BackButton` to `/dashboard/printers`.

@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Signed-in pages that render the site nav no longer return a 500. The Server Component nav passed next/link as `LinkComponent` to the client `LandingAccountNav`, and a function cannot cross that boundary. The nav now uses the library's plain anchors for the Dashboard and menu links.
 - Signed-in vendors on `/about` and the Bluetooth guide now get a Dashboard link and the account menu (avatar, Get help, Feedback, Sign out) in the nav instead of a Sign in button that only bounced them to the dashboard. Signed-out visitors see the same nav as before.
 - The reset-password form no longer enforces a hardcoded 8-character rule on the client. Supabase owns the password policy, which differs per environment, so a weak password now shows the server-derived reason.
 
