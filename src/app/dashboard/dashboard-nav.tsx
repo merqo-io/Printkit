@@ -44,7 +44,6 @@ export function DashboardNav({
         </Link>
       }
       navLinks={LINKS}
-      LinkComponent={Link}
       isActiveHref={(href) => isActive(path, href)}
       vendor={{
         name: vendorName || "Account",
