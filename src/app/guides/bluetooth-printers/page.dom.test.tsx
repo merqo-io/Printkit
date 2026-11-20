@@ -1,11 +1,15 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
+
+vi.mock("@/lib/nav-account", () => ({
+  getNavAccount: vi.fn().mockResolvedValue(undefined),
+}));
 
 import BluetoothPrintersGuide from "./page";
 
-it("frames the guide with the shared nav, footer and back-to-top button", () => {
-  render(<BluetoothPrintersGuide />);
+it("frames the guide with the shared nav, footer and back-to-top button", async () => {
+  render(await BluetoothPrintersGuide());
   expect(
     screen.getByRole("heading", { level: 1, name: "Bluetooth printers" }),
   ).toBeInTheDocument();
@@ -18,8 +22,8 @@ it("frames the guide with the shared nav, footer and back-to-top button", () => 
   ).toBeInTheDocument();
 });
 
-it("presents printkit as the print companion for qkit booths in plain copy", () => {
-  const { container } = render(<BluetoothPrintersGuide />);
+it("presents printkit as the print companion for qkit booths in plain copy", async () => {
+  const { container } = render(await BluetoothPrintersGuide());
   const prose = container.cloneNode(true) as HTMLElement;
   prose.querySelectorAll("code").forEach((el) => el.remove());
   const copy = (prose.textContent ?? "").replace(/\s+/g, " ");
