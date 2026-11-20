@@ -274,7 +274,7 @@ The B1 calibration sample uses the shared label renderer at 40 mm across by 60 m
 
 `supabase/client.ts`, `supabase/server.ts`, `supabase/middleware.ts`, `rate-limit.ts`, `kit-auth.ts`, `kit-callback.ts` and `legal-gate.ts` are thin adapters: the logic lives in `@merqo/ui` and the file supplies printkit's schema, tables, env and call shape. They are listed in `allow` for `merqoNoLocalCopies` in `eslint.config.mjs` so importers keep one local call shape.
 
-`nav-account.ts` resolves the signed-in visitor for the public pages: `navAccount(user)` takes the name from `user_metadata.full_name`, then the email, then "Account", and the avatar from `avatar_url`; `getNavAccount()` reads the user with the server client and returns `undefined` when signed out. `account-menu-wiring.ts` holds the Get help and Feedback adapters shared by the dashboard nav and `LandingAccountMenu`; they throw the action's error so the shared forms can show it.
+`nav-user.ts` resolves the signed-in visitor for the public pages: `getNavUser()` reads the auth user with the server client, takes the name from the merqo vendor profile's `stall_name` (falling back to the auth user's own name if that read fails) through `@merqo/ui`'s `toNavUser`, and returns `null` when signed out. `account-menu-wiring.ts` holds the Get help and Feedback adapters used by the dashboard nav; they throw the action's error so the shared forms can show it.
 
 ## Module-private constants
 

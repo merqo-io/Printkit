@@ -2,8 +2,8 @@
 import { render, screen } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
 
-vi.mock("@/lib/nav-account", () => ({
-  getNavAccount: vi.fn().mockResolvedValue(undefined),
+vi.mock("@/lib/nav-user", () => ({
+  getNavUser: vi.fn().mockResolvedValue(null),
 }));
 
 import BluetoothPrintersGuide from "./page";
