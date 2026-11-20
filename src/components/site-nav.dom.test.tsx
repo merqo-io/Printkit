@@ -6,6 +6,9 @@ import { expect, it, vi } from "vitest";
 const signOutAction = vi.hoisted(() => vi.fn());
 vi.mock("@/app/actions/auth", () => ({ signOutAction }));
 vi.mock("@/app/actions/feedback", () => ({ submitFeedbackAction: vi.fn() }));
+vi.mock("@/app/actions/landing-account", () => ({
+  submitLandingSupportAction: vi.fn(),
+}));
 vi.mock("@/app/actions/support", () => ({
   submitSupportMessageAction: vi.fn(),
 }));
@@ -55,7 +58,7 @@ it("shows no account menu or Dashboard link when signed out", () => {
 });
 
 it("swaps Sign in for Dashboard and the avatar menu when signed in", () => {
-  render(<SiteNav account={{ name: "Ada Lovelace" }} />);
+  render(<SiteNav user={{ name: "Ada Stall", email: "ada@example.com" }} />);
   expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
     "href",
     "/dashboard",
@@ -68,9 +71,14 @@ it("swaps Sign in for Dashboard and the avatar menu when signed in", () => {
   ).not.toBeInTheDocument();
 });
 
+it("identifies the vendor by the initials of the name it is given", () => {
+  render(<SiteNav user={{ name: "Ada Stall", email: "ada@example.com" }} />);
+  expect(screen.getByText("AS")).toBeInTheDocument();
+});
+
 it("opens by touch and signs out", async () => {
   const user = userEvent.setup();
-  render(<SiteNav account={{ name: "Ada Lovelace" }} />);
+  render(<SiteNav user={{ name: "Ada Stall", email: "ada@example.com" }} />);
   await user.pointer({
     keys: "[TouchA]",
     target: screen.getByRole("button", { name: "Account menu" }),

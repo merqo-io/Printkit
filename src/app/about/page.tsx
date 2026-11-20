@@ -3,7 +3,7 @@ import { AboutMerqo } from "@merqo/ui";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { TextLink } from "@/components/text-link";
-import { getNavAccount } from "@/lib/nav-account";
+import { getNavUser } from "@/lib/nav-user";
 
 export const metadata: Metadata = {
   title: "About",
@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 
 /** The footer's About link: the family's shared Merqo story, for printkit. */
 export default async function AboutPage() {
-  const account = await getNavAccount();
+  const user = await getNavUser();
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteNav account={account} />
+      <SiteNav user={user} />
       <main className="flex-1">
         <AboutMerqo kitName="printkit">
           <TextLink href="/guides/bluetooth-printers">

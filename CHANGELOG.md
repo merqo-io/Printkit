@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Bumped `@merqo/ui` to 0.56.0 (from 0.54.1). The public pages' account menu is now the shared `LandingAccountNav` with `toNavUser`: the name comes from the merqo vendor profile (stall name) before the sign-in name, and printkit is listed in Switch products. `LandingAccountMenu` and `nav-account.ts` are removed.
 - Bumped `@merqo/ui` to 0.54.1 (from 0.54.0): the legal gate no longer caches a failed legal-status check, and idempotent Supabase and merqo requests retry once on a dropped connection, which fixes the sign-in loop back to `/legal/accept`.
 
 - Bumped `@merqo/ui` to 0.54.0 (from 0.49.1); no code changes were needed.
@@ -26,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Signed-in pages that render the site nav no longer return a 500. The Server Component nav passed next/link as `LinkComponent` to the client `LandingAccountNav`, and a function cannot cross that boundary. The nav now uses the library's plain anchors for the Dashboard and menu links.
 - Signed-in vendors on `/about` and the Bluetooth guide now get a Dashboard link and the account menu (avatar, Get help, Feedback, Sign out) in the nav instead of a Sign in button that only bounced them to the dashboard. Signed-out visitors see the same nav as before.
 - The reset-password form no longer enforces a hardcoded 8-character rule on the client. Supabase owns the password policy, which differs per environment, so a weak password now shows the server-derived reason.
 
