@@ -1,19 +1,21 @@
 import Link from "next/link";
-import { LandingNav } from "@merqo/ui";
+import { LandingAccountNav, LandingNav, type NavUser } from "@merqo/ui";
 import { Button } from "@merqo/ui/primitives";
-import { LandingAccountMenu } from "@/components/landing-account-menu";
+import { signOutAction } from "@/app/actions/auth";
+import { submitFeedbackAction } from "@/app/actions/feedback";
+import { submitLandingSupportAction } from "@/app/actions/landing-account";
 import { Wordmark } from "@/components/wordmark";
-import type { NavAccount } from "@/lib/nav-account";
+import { SUPPORT_CATEGORY_LABELS } from "@/lib/schemas";
 
 /**
  * The top bar of printkit's public pages (`/about` and the Bluetooth guide):
  * `@merqo/ui`'s shared `LandingNav` with the printkit wordmark. printkit has
  * no landing page or sign-up of its own (vendors arrive from qkit), so the
- * one primary action is signing in. With an `account` (a signed-in visitor)
+ * one primary action is signing in. With a `user` (a signed-in visitor)
  * the Sign in button is replaced by a Dashboard link and the shared account
  * menu, which carries Sign out; the wordmark leads to the dashboard too.
  */
-export function SiteNav({ account }: { account?: NavAccount }) {
+export function SiteNav({ user }: { user?: NavUser | null }) {
   return (
     <LandingNav
       wordmark={
@@ -35,16 +37,19 @@ export function SiteNav({ account }: { account?: NavAccount }) {
           >
             <Link href="/about">About</Link>
           </Button>
-          {account ? (
-            <>
-              <Button asChild variant="ghost" size="sm" className="rounded-lg">
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-              <LandingAccountMenu
-                name={account.name}
-                avatarUrl={account.avatarUrl}
-              />
-            </>
+          {user ? (
+            <LandingAccountNav
+              kit="printkit"
+              dashboardHref="/dashboard"
+              user={user}
+              signOutAction={signOutAction}
+              LinkComponent={Link}
+              actions={{
+                submitSupport: submitLandingSupportAction,
+                submitFeedback: submitFeedbackAction,
+              }}
+              supportCategories={SUPPORT_CATEGORY_LABELS}
+            />
           ) : (
             <Button asChild className="h-10 rounded-lg px-5 font-semibold">
               <Link href="/login">Sign in</Link>

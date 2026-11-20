@@ -14,6 +14,7 @@ session check rather than the redirecting `getVendorSession()` guard;
   `DashboardNav` as its `signOut` prop from `dashboard/layout.tsx`.
 - `feedback.ts` — `submitFeedbackAction`: vendor NPS feedback, via the
   shared cross-kit `merqo.submit_vendor_feedback` RPC.
+- `landing-account.ts` — `submitLandingSupportAction`: adapts `LandingAccountNav`'s `{ category, message }` to `submitSupportMessageAction`'s `{ category, body }`.
 - `support.ts` — `submitSupportMessageAction`: vendor "Get help" message,
   via the shared cross-kit `merqo.submit_support_message` RPC.
 
