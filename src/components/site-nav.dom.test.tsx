@@ -17,13 +17,20 @@ vi.mock("@merqo/ui", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@merqo/ui")>()),
   LandingNav: ({
     wordmark,
+    links,
     end,
   }: {
     wordmark: React.ReactNode;
+    links?: { label: string; href: string }[];
     end: React.ReactNode;
   }) => (
     <header>
       {wordmark}
+      {links?.map((link) => (
+        <a key={link.href} href={link.href}>
+          {link.label}
+        </a>
+      ))}
       {end}
     </header>
   ),
