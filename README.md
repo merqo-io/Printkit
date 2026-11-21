@@ -191,4 +191,4 @@ AGENTS.md is kept under 200 lines; file layout, data model and harness detail li
 
 The `Wordmark` in `src/components/wordmark.tsx` wraps `@merqo/ui`'s `Wordmark`, which always sets a size class, so the nav, dashboard nav and footer pass an explicit `text-*` size.
 
-The accept page renders the shared `AuthShell` and `AcceptTermsForm` (with a local sign-out exit), and the cloud-print setup address uses the shared `CopyButton`.
+The legal pages render the shared `LegalPage` (through a small client wrapper) and the accept page renders the shared `AuthShell` and `AcceptTermsForm` (with a local sign-out exit), and the cloud-print setup address uses the shared `CopyButton`.
