@@ -11,15 +11,10 @@ export const metadata: Metadata = {
 
 export const revalidate = 0;
 
-// Deliberately does NOT call any legal-gate check (getVendorSession) — this
-// page is what that gate redirects TO, so gating it the same way is an
-// infinite redirect loop. acceptLegalTerms (actions.ts) re-checks for a
-// signed-in user on submit and sends a signed-out visitor to /login.
-//
-// AuthShell + AcceptTermsForm are used instead of AcceptTermsPage because the
-// latter has no slot for the "Sign out instead" exit a visitor who declines
-// the terms needs. The sign-out form sits in the footer, a sibling of the
-// accept form, since forms cannot nest.
+// Deliberately runs no legal-gate check: this is where the gate redirects, so
+// gating it would loop. acceptLegalTerms re-checks the user on submit.
+// AcceptTermsPage has no slot for the "Sign out instead" exit, so the
+// shell and form are composed here, with sign-out as a sibling form.
 export default async function LegalAcceptPage({
   searchParams,
 }: {

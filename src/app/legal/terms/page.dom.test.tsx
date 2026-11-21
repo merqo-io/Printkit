@@ -4,12 +4,8 @@ import { render, screen } from "@testing-library/react";
 import TermsPage from "./page";
 
 describe("TermsPage", () => {
-  it("renders the Terms of Service via LegalPage", () => {
+  it("renders the Terms of Service via LegalDocument", () => {
     render(<TermsPage />);
     expect(screen.getByText("Who we are")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /printkit/i })).toHaveAttribute(
-      "href",
-      "/",
-    );
   });
 });

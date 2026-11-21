@@ -9,10 +9,12 @@ routes to it and, on `accept/`, records the vendor's acceptance with merqo.
 ## Contents
 
 - `terms/page.tsx` — `TermsPage`, a one-line Server Component rendering
-  `@merqo/ui`'s `<LegalPage doc="terms" kit="printkit" />` with the kit
-  `Wordmark` linking home (`LinkComponent={Link}` is safe: `LegalPage` is a
-  server component). Metadata comes from `legalPageMetadata`.
-- `privacy/page.tsx` — `PrivacyPage`, the same for `<LegalPage doc="privacy" />`.
+  `@merqo/ui`'s `<LegalDocument doc="terms" kit="printkit" />` (the component brings its own
+  `mx-auto max-w-3xl` prose container, so there's no local layout). It stays on
+  `LegalDocument` rather than `LegalPage`: at the pinned `@merqo/ui`, `LegalPage`
+  bundles `LegalDocument` without its `"use client"` directive and fails
+  `next build` (an `onClick` in a Server Component).
+- `privacy/page.tsx` — `PrivacyPage`, the same for `<LegalDocument doc="privacy" />`.
 - Tab titles: "Terms of Service", "Privacy Policy" and "Accept the updated terms".
 - `accept/page.tsx` — `LegalAcceptPage`. The interstitial
   `getVendorSession` (`@/lib/vendor-session`) redirects a signed-in vendor to
