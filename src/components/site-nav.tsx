@@ -14,6 +14,8 @@ import { SUPPORT_CATEGORY_LABELS } from "@/lib/schemas";
  * one primary action is signing in. With a `user` (a signed-in visitor)
  * the Sign in button is replaced by a Dashboard link and the shared account
  * menu, which carries Sign out; the wordmark leads to the dashboard too.
+ * Secondary links (About) are plain data in `links`, so `LandingNav` shows
+ * them inline from `sm` up and folds them into a burger below it.
  */
 export function SiteNav({ user }: { user?: NavUser | null }) {
   return (
@@ -27,16 +29,9 @@ export function SiteNav({ user }: { user?: NavUser | null }) {
           <Wordmark className="text-3xl" />
         </Link>
       }
+      links={[{ label: "About", href: "/about" }]}
       end={
         <>
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="hidden rounded-lg sm:inline-flex"
-          >
-            <Link href="/about">About</Link>
-          </Button>
           {user ? (
             <LandingAccountNav
               kit="printkit"
