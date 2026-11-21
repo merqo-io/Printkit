@@ -10,7 +10,9 @@ The authenticated vendor area (`/dashboard/*`).
   Gates access via `getVendorSession()` (`@/lib/vendor-session`, which also
   bounces a stale legal acceptance to `/legal/accept`), resolves
   the vendor's stall name via `getOrCreateVendorProfile`
-  (`@/lib/merqo-vendor-profile`), then wraps `children` in
+  (`@/lib/merqo-vendor-profile`) and turns it into the account label with
+  `@merqo/ui`'s `accountLabel` (stall name, else name, else email local part),
+  passed to the nav as `accountName`, then wraps `children` in
   `dashboard-nav.tsx`'s `DashboardNav` and a `max-w-7xl` `<main>`, followed by
   a `<footer>` rendering `@merqo/ui`'s `LegalFooterLinks` — printkit has no
   public landing page for a marketing footer to live on, so the Terms/Privacy
@@ -22,7 +24,7 @@ The authenticated vendor area (`/dashboard/*`).
 - `error.tsx` — the error fallback for dashboard pages. It renders inside the layout, so the nav and footer stay, with "Try again" and a link back to the overview, and logs the error with `console.error`. "Try again" calls `retry()`, which re-fetches the failed segment from the server; `reset()` only re-renders the cached payload, so a Server Component error would come straight back. It does not catch an error thrown by `layout.tsx` itself: that reaches the root `src/app/error.tsx`. Proven in a real browser by `e2e/dashboard-states.spec.ts` through `src/app/dev/ui-states/`.
 - `dashboard-nav.tsx` — `DashboardNav` (Get help and Feedback adapters come from `src/lib/account-menu-wiring.ts`): composes `@merqo/ui`'s shared
   `DashboardNav`/`AccountMenu` — same shared-component contract every
-  sibling kit uses. Owns the printkit wordmark, the Overview/Printers/History
+  sibling kit uses. It passes no `LinkComponent`: the root layout's `AppLinks` provides `next/link`. Owns the printkit wordmark, the Overview/Printers/History
   nav links, active-route highlighting, and thin throw-adapting wrappers
   around `submitFeedbackAction`/`submitSupportMessageAction`
   (`@/app/actions/{feedback,support}`), which both return a

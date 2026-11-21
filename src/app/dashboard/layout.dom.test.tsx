@@ -15,11 +15,12 @@ vi.mock("@/lib/merqo-vendor-profile", () => ({
 }));
 vi.mock("@/app/actions/auth", () => ({ signOutAction: vi.fn() }));
 vi.mock("./dashboard-nav", () => ({
-  DashboardNav: ({ vendorName }: { vendorName: string }) => (
-    <div>{vendorName}</div>
+  DashboardNav: ({ accountName }: { accountName: string }) => (
+    <div>{accountName}</div>
   ),
 }));
-vi.mock("@merqo/ui", () => ({
+vi.mock("@merqo/ui", async (importActual) => ({
+  ...(await importActual<typeof import("@merqo/ui")>()),
   Footer: ({ kitName }: { kitName: string }) => (
     <footer>
       <span>© 2026 {kitName}</span>
@@ -30,12 +31,22 @@ vi.mock("@merqo/ui", () => ({
 }));
 
 import DashboardLayout from "./layout";
+import { getOrCreateVendorProfile } from "@/lib/merqo-vendor-profile";
 
 describe("DashboardLayout", () => {
   it("renders the nav with the vendor's stall name and the page content", async () => {
     render(await DashboardLayout({ children: <p>page content</p> }));
     expect(screen.getByText("Ada's Prints")).toBeInTheDocument();
     expect(screen.getByText("page content")).toBeInTheDocument();
+  });
+
+  it("shows the email local part, never the full email, for a blank stall name", async () => {
+    vi.mocked(getOrCreateVendorProfile).mockResolvedValueOnce({
+      stall_name: "  ",
+    } as never);
+    render(await DashboardLayout({ children: <p>page content</p> }));
+    expect(screen.getByText("vendor")).toBeInTheDocument();
+    expect(screen.queryByText("vendor@test.dev")).not.toBeInTheDocument();
   });
 
   it("uses the qkit main container rhythm", async () => {

@@ -8,12 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `@merqo/ui` is pinned to 0.57.0 and `AppLinks` (`src/components/app-link-provider.tsx`) mounts its `AppLinkProvider` with `next/link` in the root layout, so the shared client components navigate client-side without a `LinkComponent` prop.
 - `DESIGN.md` records printkit's public-page values (no landing by design) and the places the public pages still break the shared rules.
 - Reset-password: a rejected weak password now says which rule failed (length, character mix or a known breach), using the limits Supabase reports. The new-password field has a tap-friendly requirements hint.
 - `/auth/confirm` page and `POST /auth/confirm/verify` for emailed links that carry a `token_hash` (reset, signup, invite, magic link, email change). A GET never consumes the token; only the Continue button's POST does. A recovery link opens the same 15-minute recovery window as `/auth/callback`, through the shared `setRecoveryWindowCookie`. Failures go to `/login?error=link`, which the login page now explains. `/auth/callback` and every `redirectTo` are unchanged.
 
 ### Changed
 
+- `/legal/terms` and `/legal/privacy` render `@merqo/ui`'s `LegalPage` through a local `"use client"` wrapper (`legal-page-client.tsx`) with the printkit wordmark linking home; `/legal/accept` uses the shared `AuthShell` and `AcceptTermsForm` (the local `accept-form.tsx` is deleted, the "Sign out instead" exit stays). The printer setup "Copy address" button is the shared `CopyButton`.
+- The account menu shows the stall name through the shared `accountLabel` fallback (name, then email local part, then "Account"), so the dashboard and landing nav match and the full email is no longer shown. `@merqo/ui` repinned to v0.58.0.
 - Bumped `@merqo/ui` to 0.56.0 (from 0.54.1). The public pages' account menu is now the shared `LandingAccountNav` with `toNavUser`: the name comes from the merqo vendor profile (stall name) before the sign-in name, and printkit is listed in Switch products. `LandingAccountMenu` and `nav-account.ts` are removed.
 - Bumped `@merqo/ui` to 0.54.1 (from 0.54.0): the legal gate no longer caches a failed legal-status check, and idempotent Supabase and merqo requests retry once on a dropped connection, which fixes the sign-in loop back to `/legal/accept`.
 
