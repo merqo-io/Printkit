@@ -10,16 +10,16 @@ folder's job is entirely to collect the vendor's consent and forward it.
 ## Contents
 
 - `page.tsx` — `LegalAcceptPage`. Reads the `next` search param (through
-  `safeRedirectPath`, `@merqo/ui`) and renders the client form.
+  `safeRedirectPath`, `@merqo/ui`) and renders `@merqo/ui`'s `AuthShell` around its `AcceptTermsForm`.
   Deliberately runs no legal-gate check itself — it is what the gate
   redirects to, so gating it would loop.
-  Laid out like the login page: `Wordmark` above an `ElevatedCard`, title in the display face. Tab title "Accept the updated terms".
-- `accept-form.tsx` — `AcceptForm`, a client component wrapping `@merqo/ui`'s
-  `TermsAcceptanceCheckbox` (just the agree checkbox — no typed name); the
-  "Accept and continue" is disabled until it's checked and posts to
-  `acceptLegalTerms`. A separate "Sign out instead" form posts to
+  Tab title "Accept the updated terms".
+- The form is `@merqo/ui`'s `AcceptTermsForm` (agree checkbox; "Accept and
+  continue" is disabled until it's checked and posts to `acceptLegalTerms`).
+  A separate "Sign out instead" form in the `AuthShell` footer posts to
   `signOutAction` (`@/app/actions/auth`), so a visitor who declines is not
-  stuck on this page.
+  stuck on this page. `AcceptTermsPage` is not used: it has no slot for that
+  exit.
 - `actions.ts` — `acceptLegalTerms` server action. Re-checks for a signed-in
   user (redirects to `/login` otherwise), reads the vendor's real
   `ip`/`user_agent`, then `POST`s `/api/merqo/legal-accept` on merqo once
@@ -44,4 +44,4 @@ The `next` form field is length-checked by Zod before `safeRedirectPath` runs.
 
 The Merqo base URL comes from the shared `merqoBaseUrl()` from `@merqo/ui/kit-api`.
 
-The accept form takes `Button` and `cn` from `@merqo/ui/primitives`.
+The sign-out button takes `Button` from `@merqo/ui/primitives`.

@@ -49,3 +49,5 @@ The virtual printer step links to `/dashboard/printers/virtual`.
 The setup forms take `Button`, `Input`, `Label` and `cn` from `@merqo/ui/primitives`.
 
 The setup forms import `useAsyncAction` from `@merqo/ui`.
+
+The cloud printer address copy button is `@merqo/ui`'s `CopyButton`.

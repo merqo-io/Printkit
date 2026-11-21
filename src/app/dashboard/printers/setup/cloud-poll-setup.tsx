@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAsyncAction } from "@merqo/ui";
+import { CopyButton, useAsyncAction } from "@merqo/ui";
 import { toast } from "sonner";
 import { Button } from "@merqo/ui/primitives";
 import { TextLink } from "@/components/text-link";
@@ -95,18 +95,12 @@ export function CloudPollSetup({
             <code className="bg-muted block rounded-md px-3 py-2 font-mono text-xs break-all">
               {url}
             </code>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                navigator.clipboard
-                  .writeText(url)
-                  .then(() => toast.success("Address copied"))
-                  .catch(() => toast.error("Could not copy the address"));
-              }}
-            >
-              Copy address
-            </Button>
+            <CopyButton
+              value={url}
+              label="Copy address"
+              onCopied={() => toast.success("Address copied")}
+              onError={() => toast.error("Could not copy the address")}
+            />
             <p className="text-muted-foreground text-xs">
               Keep this private. Anyone with it can print to this booth. Make a
               new one if it leaks. The old one stops working.

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { ElevatedCard } from "@merqo/ui";
+import { AcceptTermsForm, AuthShell, safeRedirectPath } from "@merqo/ui";
+import { Button } from "@merqo/ui/primitives";
+import { signOutAction } from "@/app/actions/auth";
 import { Wordmark } from "@/components/wordmark";
-import { AcceptForm } from "./accept-form";
-import { safeRedirectPath } from "@merqo/ui";
+import { acceptLegalTerms } from "./actions";
 
 export const metadata: Metadata = {
   title: "Accept the updated terms",
@@ -10,10 +11,10 @@ export const metadata: Metadata = {
 
 export const revalidate = 0;
 
-// Deliberately does NOT call any legal-gate check (getVendorSession) — this
-// page is what that gate redirects TO, so gating it the same way is an
-// infinite redirect loop. acceptLegalTerms (actions.ts) re-checks for a
-// signed-in user on submit and sends a signed-out visitor to /login.
+// Deliberately runs no legal-gate check: this is where the gate redirects, so
+// gating it would loop. acceptLegalTerms re-checks the user on submit.
+// AcceptTermsPage has no slot for the "Sign out instead" exit, so the
+// shell and form are composed here, with sign-out as a sibling form.
 export default async function LegalAcceptPage({
   searchParams,
 }: {
@@ -22,21 +23,27 @@ export default async function LegalAcceptPage({
   const { next } = await searchParams;
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-5">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <Wordmark className="text-3xl" />
-        </div>
-        <ElevatedCard className="px-7 py-8">
-          <h1 className="font-display text-2xl leading-tight font-semibold">
-            Our terms have been updated
-          </h1>
-          <p className="mt-1.5 mb-6 text-sm text-muted-foreground">
-            Please review and accept before continuing.
-          </p>
-          <AcceptForm next={safeRedirectPath(next, "/dashboard")} />
-        </ElevatedCard>
-      </div>
-    </main>
+    <AuthShell
+      wordmark={<Wordmark className="text-3xl" />}
+      title="Our terms have been updated"
+      subtitle="Please review and accept before continuing."
+      footer={
+        <form action={signOutAction}>
+          <Button
+            type="submit"
+            variant="outline"
+            className="h-11 w-full text-sm"
+          >
+            Sign out instead
+          </Button>
+        </form>
+      }
+    >
+      <AcceptTermsForm
+        action={acceptLegalTerms}
+        next={safeRedirectPath(next, "/dashboard")}
+        submitLabel="Accept and continue"
+      />
+    </AuthShell>
   );
 }
