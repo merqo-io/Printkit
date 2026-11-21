@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { LegalDocument } from "@merqo/ui";
+import Link from "next/link";
+import { LegalPage, legalPageMetadata } from "@merqo/ui";
+import { Wordmark } from "@/components/wordmark";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-};
+export const metadata: Metadata = legalPageMetadata("privacy");
 
 export default function PrivacyPage() {
-  return <LegalDocument doc="privacy" />;
+  return (
+    <LegalPage
+      doc="privacy"
+      wordmark={<Wordmark className="text-2xl" />}
+      homeHref="/"
+      LinkComponent={Link}
+    />
+  );
 }

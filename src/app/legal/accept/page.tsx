@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { ElevatedCard } from "@merqo/ui";
+import { AcceptTermsForm, AuthShell, safeRedirectPath } from "@merqo/ui";
+import { Button } from "@merqo/ui/primitives";
+import { signOutAction } from "@/app/actions/auth";
 import { Wordmark } from "@/components/wordmark";
-import { AcceptForm } from "./accept-form";
-import { safeRedirectPath } from "@merqo/ui";
+import { acceptLegalTerms } from "./actions";
 
 export const metadata: Metadata = {
   title: "Accept the updated terms",
@@ -14,6 +15,11 @@ export const revalidate = 0;
 // page is what that gate redirects TO, so gating it the same way is an
 // infinite redirect loop. acceptLegalTerms (actions.ts) re-checks for a
 // signed-in user on submit and sends a signed-out visitor to /login.
+//
+// AuthShell + AcceptTermsForm are used instead of AcceptTermsPage because the
+// latter has no slot for the "Sign out instead" exit a visitor who declines
+// the terms needs. The sign-out form sits in the footer, a sibling of the
+// accept form, since forms cannot nest.
 export default async function LegalAcceptPage({
   searchParams,
 }: {
@@ -22,21 +28,27 @@ export default async function LegalAcceptPage({
   const { next } = await searchParams;
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-5">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <Wordmark className="text-3xl" />
-        </div>
-        <ElevatedCard className="px-7 py-8">
-          <h1 className="font-display text-2xl leading-tight font-semibold">
-            Our terms have been updated
-          </h1>
-          <p className="mt-1.5 mb-6 text-sm text-muted-foreground">
-            Please review and accept before continuing.
-          </p>
-          <AcceptForm next={safeRedirectPath(next, "/dashboard")} />
-        </ElevatedCard>
-      </div>
-    </main>
+    <AuthShell
+      wordmark={<Wordmark className="text-3xl" />}
+      title="Our terms have been updated"
+      subtitle="Please review and accept before continuing."
+      footer={
+        <form action={signOutAction}>
+          <Button
+            type="submit"
+            variant="outline"
+            className="h-11 w-full text-sm"
+          >
+            Sign out instead
+          </Button>
+        </form>
+      }
+    >
+      <AcceptTermsForm
+        action={acceptLegalTerms}
+        next={safeRedirectPath(next, "/dashboard")}
+        submitLabel="Accept and continue"
+      />
+    </AuthShell>
   );
 }

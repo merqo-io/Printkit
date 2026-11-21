@@ -9,21 +9,22 @@ routes to it and, on `accept/`, records the vendor's acceptance with merqo.
 ## Contents
 
 - `terms/page.tsx` — `TermsPage`, a one-line Server Component rendering
-  `@merqo/ui`'s `<LegalDocument doc="terms" />` (the component brings its own
-  `mx-auto max-w-3xl` prose container, so there's no local layout).
-- `privacy/page.tsx` — `PrivacyPage`, the same for `<LegalDocument doc="privacy" />`.
+  `@merqo/ui`'s `<LegalPage doc="terms" kit="printkit" />` with the kit
+  `Wordmark` linking home (`LinkComponent={Link}` is safe: `LegalPage` is a
+  server component). Metadata comes from `legalPageMetadata`.
+- `privacy/page.tsx` — `PrivacyPage`, the same for `<LegalPage doc="privacy" />`.
 - Tab titles: "Terms of Service", "Privacy Policy" and "Accept the updated terms".
 - `accept/page.tsx` — `LegalAcceptPage`. The interstitial
   `getVendorSession` (`@/lib/vendor-session`) redirects a signed-in vendor to
   when their accepted terms/privacy versions are behind `@merqo/ui`'s
   `LEGAL_VERSIONS`. Reads the `next` search param (through
-  `safeRedirectPath`, `@merqo/ui`) and renders the client form.
+  `safeRedirectPath`, `@merqo/ui`) and renders `@merqo/ui`'s `AuthShell` around its `AcceptTermsForm`.
   Deliberately runs **no** legal-gate check itself — it is what the gate
   redirects to, so gating it would loop.
-- `accept/accept-form.tsx` — `AcceptForm`, a client component wrapping
-  `@merqo/ui`'s `TermsAcceptanceCheckbox` (just the agree checkbox — no
-  typed name); the submit button is disabled until it's checked. Posts to
-  `acceptLegalTerms`.
+- The accept form is `@merqo/ui`'s `AcceptTermsForm` (agree checkbox, submit
+  disabled until ticked, posts to `acceptLegalTerms`). The "Sign out instead"
+  form lives in the `AuthShell` footer; `AcceptTermsPage` is not used because
+  it has no slot for that exit.
 - `accept/actions.ts` — `acceptLegalTerms` server action. Re-checks for a
   signed-in user (redirects to `/login` otherwise), reads the vendor's
   real `ip`/`user_agent` (via `headers()`/a local `clientIp` helper, since

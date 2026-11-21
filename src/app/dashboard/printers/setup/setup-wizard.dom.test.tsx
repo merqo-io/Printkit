@@ -63,11 +63,17 @@ it("retries address creation and reports clipboard outcomes", async () => {
     .spyOn(navigator.clipboard, "writeText")
     .mockRejectedValueOnce(new Error("denied"))
     .mockResolvedValueOnce(undefined);
-  await user.click(await screen.findByRole("button", { name: "Copy address" }));
+  await user.pointer({
+    keys: "[TouchA]",
+    target: await screen.findByRole("button", { name: "Copy address" }),
+  });
   await waitFor(() =>
     expect(m.error).toHaveBeenCalledWith("Could not copy the address"),
   );
-  await user.click(screen.getByRole("button", { name: "Copy address" }));
+  await user.pointer({
+    keys: "[TouchA]",
+    target: screen.getByRole("button", { name: "Copy address" }),
+  });
   await waitFor(() => expect(m.success).toHaveBeenCalledWith("Address copied"));
   expect(write).toHaveBeenCalledWith("https://test.invalid/printer/token");
 });
