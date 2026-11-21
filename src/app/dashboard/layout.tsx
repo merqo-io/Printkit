@@ -3,6 +3,7 @@ import { getVendorSession } from "@/lib/vendor-session";
 import { getOrCreateVendorProfile } from "@/lib/merqo-vendor-profile";
 import { signOutAction } from "@/app/actions/auth";
 import { SiteFooter } from "@/components/site-footer";
+import { accountLabel } from "@merqo/ui";
 import { DashboardNav } from "./dashboard-nav";
 
 export default async function DashboardLayout({
@@ -21,7 +22,7 @@ export default async function DashboardLayout({
       <div className="contents print:hidden">
         <DashboardNav
           signOut={signOutAction}
-          vendorName={profile.stall_name || (user.email ?? "Account")}
+          accountName={accountLabel(user, profile.stall_name)}
           avatarUrl={avatarUrl}
         />
       </div>
