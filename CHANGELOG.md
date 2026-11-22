@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-23
+
 ### Added
 
 - Printers, History, Label design, printer setup and Bridge now each have a loading skeleton matching the page's width and shape, and a bad `/dashboard/...` URL shows a not-found page inside the dashboard shell with a "Back to overview" link.
@@ -17,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Bumped `@merqo/ui` to 0.60.0 (from 0.59.1): the Terms "Fees and billing" section changed and the legal version date moved, so signed-in vendors are asked to accept the new terms. No code changes were needed.
 - History and Overview jobs list switch from table to cards at `md` (768px) instead of `sm`, so portrait tablets get the uncramped card layout.
 
 - Bumped `@merqo/ui` to 0.59.1: the public pages' About link goes through `LandingNav`'s `links` prop, so it collapses into a burger menu on phones.
