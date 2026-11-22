@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- History and Overview jobs list switch from table to cards at `md` (768px) instead of `sm`, so portrait tablets get the uncramped card layout.
+
 - Bumped `@merqo/ui` to 0.59.1: the public pages' About link goes through `LandingNav`'s `links` prop, so it collapses into a burger menu on phones.
 - `/legal/terms` and `/legal/privacy` render `@merqo/ui`'s `LegalPage` through a local `"use client"` wrapper (`legal-page-client.tsx`) with the printkit wordmark linking home; `/legal/accept` uses the shared `AuthShell` and `AcceptTermsForm` (the local `accept-form.tsx` is deleted, the "Sign out instead" exit stays). The printer setup "Copy address" button is the shared `CopyButton`.
 - The account menu shows the stall name through the shared `accountLabel` fallback (name, then email local part, then "Account"), so the dashboard and landing nav match and the full email is no longer shown. `@merqo/ui` repinned to v0.58.0.

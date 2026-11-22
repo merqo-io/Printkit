@@ -123,7 +123,7 @@ dialog, and a failed setup shows one plain message while the cause goes to the
 server log.
 
 History (and the Overview's recent list) shows each label as a card on a phone
-and as a table from the `sm` breakpoint up. An "All labels / Needs a booth"
+and as a table from the `md` (768px) breakpoint up. An "All labels / Needs a booth"
 control filters the list (`?unrouted=1` still deep-links to it), test prints
 have no Reprint, and the copy says "labels" rather than "jobs".
 
