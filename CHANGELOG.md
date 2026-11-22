@@ -9,12 +9,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Printers, History, Label design, printer setup and Bridge now each have a loading skeleton matching the page's width and shape, and a bad `/dashboard/...` URL shows a not-found page inside the dashboard shell with a "Back to overview" link.
+- Dashboard sub-page widths follow two tiers: list pages (printers, history, error, loading) use `max-w-lg md:max-w-4xl`; form and flow pages (new printer, setup, bridge, virtual) share `max-w-2xl`. The overview stays uncapped.
 - `@merqo/ui` is pinned to 0.57.0 and `AppLinks` (`src/components/app-link-provider.tsx`) mounts its `AppLinkProvider` with `next/link` in the root layout, so the shared client components navigate client-side without a `LinkComponent` prop.
 - `DESIGN.md` records printkit's public-page values (no landing by design) and the places the public pages still break the shared rules.
 - Reset-password: a rejected weak password now says which rule failed (length, character mix or a known breach), using the limits Supabase reports. The new-password field has a tap-friendly requirements hint.
 - `/auth/confirm` page and `POST /auth/confirm/verify` for emailed links that carry a `token_hash` (reset, signup, invite, magic link, email change). A GET never consumes the token; only the Continue button's POST does. A recovery link opens the same 15-minute recovery window as `/auth/callback`, through the shared `setRecoveryWindowCookie`. Failures go to `/login?error=link`, which the login page now explains. `/auth/callback` and every `redirectTo` are unchanged.
 
 ### Changed
+
+- History and Overview jobs list switch from table to cards at `md` (768px) instead of `sm`, so portrait tablets get the uncramped card layout.
 
 - Bumped `@merqo/ui` to 0.59.1: the public pages' About link goes through `LandingNav`'s `links` prop, so it collapses into a burger menu on phones.
 - `/legal/terms` and `/legal/privacy` render `@merqo/ui`'s `LegalPage` through a local `"use client"` wrapper (`legal-page-client.tsx`) with the printkit wordmark linking home; `/legal/accept` uses the shared `AuthShell` and `AcceptTermsForm` (the local `accept-form.tsx` is deleted, the "Sign out instead" exit stays). The printer setup "Copy address" button is the shared `CopyButton`.
@@ -32,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Accessibility: sticker designer elements are keyboard-operable (Tab, arrow keys move 1 mm, Shift+arrow 10 mm, clamped to the printable area like dragging) and named "Move <field>"; drag state also clears on lost pointer capture. The printers "More" menu is now the shared `DropdownMenu` (Escape close, focus return, `aria-expanded`), and the printer online/offline text is announced politely when it changes.
 - The dashboard Overview and its loading skeleton no longer cap at `max-w-4xl`, so they fill the same `max-w-7xl` width as the other Merqo kits.
 - Signed-in pages that render the site nav no longer return a 500. The Server Component nav passed next/link as `LinkComponent` to the client `LandingAccountNav`, and a function cannot cross that boundary. The nav now uses the library's plain anchors for the Dashboard and menu links.
 - Signed-in vendors on `/about` and the Bluetooth guide now get a Dashboard link and the account menu (avatar, Get help, Feedback, Sign out) in the nav instead of a Sign in button that only bounced them to the dashboard. Signed-out visitors see the same nav as before.

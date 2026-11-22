@@ -32,3 +32,7 @@ The page header (the shared `@merqo/ui` `PageHeader`) sets the "Printers" eyebro
 [printers](../README.md)
 
 The printer picker takes its primitives and `cn` from `@merqo/ui/primitives`.
+
+## Width
+
+The page column is `max-w-2xl` (form/flow tier).

@@ -50,7 +50,7 @@ export default async function PrintersPage() {
   const rows = await listLocationPrinterSummaries(user.id);
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-lg md:max-w-4xl">
       <AutoRefresh />
       <PageHeader
         responsive

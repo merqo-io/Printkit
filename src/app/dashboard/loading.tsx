@@ -1,7 +1,11 @@
 /** Holds the page's shape while the server reads printers and jobs. */
 export default function DashboardLoading() {
   return (
-    <div role="status" aria-label="Loading" className="animate-pulse">
+    <div
+      role="status"
+      aria-label="Loading"
+      className="mx-auto max-w-lg animate-pulse md:max-w-4xl"
+    >
       <div className="bg-muted h-9 w-48 rounded-md" />
       <div className="bg-muted mt-3 h-4 w-80 max-w-full rounded" />
       <div className="mt-8 space-y-3">

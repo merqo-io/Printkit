@@ -95,3 +95,7 @@ The Overview header (the shared `@merqo/ui` `PageHeader`) carries a "Your booths
 Dashboard pages import their shadcn primitives and `cn` from `@merqo/ui/primitives`.
 
 The shared `@merqo/ui` `Wordmark` always sets a size class, so `DashboardNav` and the other wordmark callers pass their own `text-*` size (`text-3xl` in the dashboard nav).
+
+## Page widths
+
+Sub-pages use two tiers inside the `max-w-7xl` layout: list pages (`printers`, `history`, `error.tsx`, `loading.tsx`) use `max-w-lg md:max-w-4xl`; form/flow pages (`printers/new`, `printers/setup`, `bridge`, `printers/virtual`) use `max-w-2xl`. The overview is uncapped.

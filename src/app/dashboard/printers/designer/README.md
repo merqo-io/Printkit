@@ -4,6 +4,10 @@ The authenticated, booth-scoped editor supports sticker dimensions, field positi
 
 Saved designs print on live orders, scaled to the paired printer's label size. The designer shows a note when that size differs from the design, and, for a Feie printer, that it prints the standard label. The sample preview never sends a print job.
 
+## Moving fields
+
+Each field on the preview is a focusable button named "Select <field>" and described by the arrow-key instructions. Dragging and the arrow keys (1 mm, Shift 10 mm) share `clampPosition` in `sticker-move.ts`, so both stay inside the printable margins.
+
 ## Logos
 
 A vendor can upload one PNG or JPEG logo (512 KB and 1024 by 1024 pixels at most) and place it as a `logo` element. `uploadStickerLogo` decides the type from magic bytes, reads the pixel size from the PNG or JPEG header (`logo-image.ts`), and stores the file with the service role at `<vendor_id>/<booth_id>/<uuid>.<png|jpg>` in the private `sticker-logos` bucket. The template holds only that storage path. The page signs short-lived URLs with the vendor session so bucket RLS decides what is visible. `removeStickerLogo` deletes the file unless a saved version still uses it and returns `kept` so the client knows whether it survived, and `saveStickerDesign` refuses logos outside the vendor and booth folder or missing from storage.
