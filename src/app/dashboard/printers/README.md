@@ -86,4 +86,4 @@ Printer pages and actions take `Button`, `Badge` and `cn` from `@merqo/ui/primit
 
 The Upgrade link uses `merqoUpgradeUrl` from `@/lib/upgrade-url`.
 
-`loading.tsx` is the route's skeleton, using the page's `max-w-4xl` cap so the layout does not jump when data arrives; it pulses only when motion is allowed.
+`loading.tsx` is the route's skeleton, using the page's `max-w-lg md:max-w-4xl` cap so the layout does not jump when data arrives; it pulses only when motion is allowed.
