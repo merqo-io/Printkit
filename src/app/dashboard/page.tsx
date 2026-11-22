@@ -37,7 +37,7 @@ export default async function DashboardPage() {
   const qkitUrl = process.env.NEXT_PUBLIC_QKIT_URL;
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div>
       <AutoRefresh />
       <PageHeader
         responsive
