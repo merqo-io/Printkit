@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Accessibility: sticker designer elements are keyboard-operable (Tab, arrow keys move 1 mm, Shift+arrow 10 mm, clamped to the printable area like dragging) and named "Move <field>"; drag state also clears on lost pointer capture. The printers "More" menu is now the shared `DropdownMenu` (Escape close, focus return, `aria-expanded`), and the printer online/offline text is announced politely when it changes.
+
 ### Added
 
 - `@merqo/ui` is pinned to 0.57.0 and `AppLinks` (`src/components/app-link-provider.tsx`) mounts its `AppLinkProvider` with `next/link` in the root layout, so the shared client components navigate client-side without a `LinkComponent` prop.

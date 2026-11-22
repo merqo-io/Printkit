@@ -36,6 +36,11 @@ const props = {
   connector: "cloud_poll",
 };
 
+async function pick(user: ReturnType<typeof userEvent.setup>, name: string) {
+  await user.click(screen.getByRole("button", { name: "More" }));
+  await user.click(await screen.findByRole("menuitem", { name }));
+}
+
 beforeEach(() => vi.resetAllMocks());
 afterEach(cleanup);
 
@@ -43,7 +48,7 @@ it("opens a modal dialog that says what happens, then cancels", async () => {
   const user = userEvent.setup();
   render(<PrinterActions {...props} />);
   expect(screen.queryByRole("alertdialog")).toBeNull();
-  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  await pick(user, "Remove printer");
   const dialog = await screen.findByRole("alertdialog");
   expect(dialog).toHaveTextContent("This printer will stop receiving orders.");
   expect(dialog).toHaveTextContent(/30 minutes/);
@@ -60,7 +65,7 @@ it("removes the printer and refreshes the list", async () => {
   const user = userEvent.setup();
   m.remove.mockResolvedValue({ ok: true });
   render(<PrinterActions {...props} />);
-  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  await pick(user, "Remove printer");
   await user.click(
     within(await screen.findByRole("alertdialog")).getByRole("button", {
       name: "Remove printer",
@@ -74,9 +79,7 @@ it("sends the vendor to the picker after changing printer", async () => {
   const user = userEvent.setup();
   m.remove.mockResolvedValue({ ok: true });
   render(<PrinterActions {...props} />);
-  await user.click(
-    screen.getByRole("button", { name: "Use a different printer" }),
-  );
+  await pick(user, "Use a different printer");
   await user.click(
     screen.getByRole("button", { name: "Remove and choose another" }),
   );
@@ -89,12 +92,10 @@ it("sends the vendor to the picker after changing printer", async () => {
 
 it("moves focus into the dialog and closes the menu", async () => {
   const user = userEvent.setup();
-  const { container } = render(<PrinterActions {...props} />);
-  const menu = container.querySelector("details") as HTMLDetailsElement;
-  menu.open = true;
-  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  render(<PrinterActions {...props} />);
+  await pick(user, "Remove printer");
   const dialog = await screen.findByRole("alertdialog");
-  expect(menu.open).toBe(false);
+  expect(screen.queryByRole("menu")).toBeNull();
   expect(dialog).toContainElement(document.activeElement as HTMLElement);
   expect(dialog).toHaveAccessibleName(/Remove the printer from Stall/);
 });
@@ -102,11 +103,13 @@ it("moves focus into the dialog and closes the menu", async () => {
 it("cancels on Escape and returns focus to the More trigger", async () => {
   const user = userEvent.setup();
   render(<PrinterActions {...props} />);
-  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  await pick(user, "Remove printer");
   await screen.findByRole("alertdialog");
   await user.keyboard("{Escape}");
   await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
-  await waitFor(() => expect(screen.getByText("More")).toHaveFocus());
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: "More" })).toHaveFocus(),
+  );
   expect(m.remove).not.toHaveBeenCalled();
 });
 
@@ -114,7 +117,7 @@ it("shows Removing… while the removal is pending", async () => {
   const user = userEvent.setup();
   m.remove.mockReturnValue(new Promise(() => {}));
   render(<PrinterActions {...props} />);
-  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  await pick(user, "Remove printer");
   await user.click(
     within(await screen.findByRole("alertdialog")).getByRole("button", {
       name: "Remove printer",
@@ -131,7 +134,7 @@ it("keeps the printer and shows the error when removal fails", async () => {
   const user = userEvent.setup();
   m.remove.mockResolvedValue({ ok: false, error: "Nope" });
   render(<PrinterActions {...props} />);
-  await user.click(screen.getByRole("button", { name: "Remove printer" }));
+  await pick(user, "Remove printer");
   await user.click(
     within(await screen.findByRole("alertdialog")).getByRole("button", {
       name: "Remove printer",
@@ -198,20 +201,28 @@ it("disables the test button and says the printer is offline", () => {
   ).toHaveAccessibleDescription(/printer is offline/i);
 });
 
-it("closes the More menu on outside click and on Escape", async () => {
+it("opens the More menu by keyboard, closes on Escape and returns focus", async () => {
   const user = userEvent.setup();
-  const { container } = render(<PrinterActions {...props} />);
-  const details = container.querySelector("details") as HTMLDetailsElement;
-  const summary = screen.getByText("More");
+  render(<PrinterActions {...props} />);
+  const trigger = screen.getByRole("button", { name: "More" });
+  expect(trigger).toHaveAttribute("aria-expanded", "false");
 
-  await user.click(summary);
-  await waitFor(() => expect(details.open).toBe(true));
-  await user.click(document.body);
-  await waitFor(() => expect(details.open).toBe(false));
+  trigger.focus();
+  await user.keyboard("{Enter}");
+  expect(await screen.findByRole("menu")).toBeVisible();
+  expect(trigger).toHaveAttribute("aria-expanded", "true");
 
-  await user.click(summary);
-  await waitFor(() => expect(details.open).toBe(true));
   await user.keyboard("{Escape}");
-  await waitFor(() => expect(details.open).toBe(false));
-  expect(summary).toHaveFocus();
+  await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+  expect(trigger).toHaveFocus();
+  expect(trigger).toHaveAttribute("aria-expanded", "false");
+});
+
+it("lists the menu links with their destinations", async () => {
+  const user = userEvent.setup();
+  render(<PrinterActions {...props} />);
+  await user.click(screen.getByRole("button", { name: "More" }));
+  expect(
+    await screen.findByRole("menuitem", { name: "Design label" }),
+  ).toHaveAttribute("href", "/dashboard/printers/designer?location=loc-1");
 });

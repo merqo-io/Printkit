@@ -26,3 +26,17 @@ it("stacks the status under the booth on a narrow screen", () => {
   );
   expect(container.firstChild).toHaveClass("flex-col", "sm:flex-row");
 });
+it("announces the status text politely, not the whole row", () => {
+  const { container } = render(
+    <PrinterStatusRow
+      label="A"
+      printerName="B"
+      state="online"
+      lastSeenAt={null}
+    />,
+  );
+  const status = screen.getByRole("status");
+  expect(status).toHaveTextContent("Printer connected");
+  expect(status).toHaveAttribute("aria-live", "polite");
+  expect(container.firstChild).not.toHaveAttribute("aria-live");
+});
