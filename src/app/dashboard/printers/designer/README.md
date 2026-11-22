@@ -6,7 +6,7 @@ Saved designs print on live orders, scaled to the paired printer's label size. T
 
 ## Moving fields
 
-Each field on the preview is a focusable button named "Move <field>". Dragging and the arrow keys (1 mm, Shift 10 mm) share `clampPosition` in `sticker-move.ts`, so both stay inside the printable margins.
+Each field on the preview is a focusable button named "Select <field>" and described by the arrow-key instructions. Dragging and the arrow keys (1 mm, Shift 10 mm) share `clampPosition` in `sticker-move.ts`, so both stay inside the printable margins.
 
 ## Logos
 

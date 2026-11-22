@@ -298,14 +298,14 @@ export function StickerDesigner({
             }}
           >
             <p id="designer-move-hint" className="sr-only">
-              Use the arrow keys to move this field by 1 millimetre, or hold
+              Press the arrow keys to move this field by 1 millimetre, or hold
               Shift to move it by 10.
             </p>
             {template.elements.map((element) => (
               <button
                 key={element.id}
                 type="button"
-                aria-label={`Move ${element.kind === "field" ? names[element.field] : "logo"}`}
+                aria-label={`Select ${element.kind === "field" ? names[element.field] : "logo"}`}
                 aria-describedby="designer-move-hint"
                 aria-pressed={selectedId === element.id}
                 onKeyDown={(event) => nudge(event, element)}

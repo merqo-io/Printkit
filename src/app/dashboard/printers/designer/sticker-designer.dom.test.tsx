@@ -23,7 +23,7 @@ describe("sticker designer prototype", () => {
     expect(screen.getByLabelText("Width (mm)")).toHaveValue(40);
     expect(screen.getByLabelText("Length (mm)")).toHaveValue(60);
     expect(
-      screen.getByRole("button", { name: "Move Drink options" }),
+      screen.getByRole("button", { name: "Select Drink options" }),
     ).toHaveTextContent("Normal sugar");
   });
   it("warns when the printer label size differs from the design, and shows nothing when it matches", () => {
@@ -69,7 +69,7 @@ describe("sticker designer prototype", () => {
   });
   it("moves a focused element with the arrow keys and clamps to the label", () => {
     render(<StickerDesigner />);
-    const element = screen.getByRole("button", { name: "Move Order number" });
+    const element = screen.getByRole("button", { name: "Select Order number" });
     expect(element).toHaveAccessibleDescription(/arrow keys/i);
     element.focus();
     fireEvent.keyDown(element, { key: "ArrowRight" });
@@ -155,15 +155,15 @@ describe("sticker designer prototype", () => {
     render(<StickerDesigner />);
     fireEvent.click(screen.getByRole("button", { name: "Add Booth name" }));
     expect(
-      screen.getByRole("button", { name: "Move Booth name" }),
+      screen.getByRole("button", { name: "Select Booth name" }),
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Remove field" }));
     expect(
-      screen.queryByRole("button", { name: "Move Booth name" }),
+      screen.queryByRole("button", { name: "Select Booth name" }),
     ).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
     expect(
-      screen.getByRole("button", { name: "Move Booth name" }),
+      screen.getByRole("button", { name: "Select Booth name" }),
     ).toBeInTheDocument();
   });
   describe("logo", () => {
