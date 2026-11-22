@@ -51,3 +51,5 @@ The setup forms take `Button`, `Input`, `Label` and `cn` from `@merqo/ui/primiti
 The setup forms import `useAsyncAction` from `@merqo/ui`.
 
 The cloud printer address copy button is `@merqo/ui`'s `CopyButton`.
+
+`loading.tsx` is the route's skeleton, using the page's `max-w-2xl` cap so the layout does not jump when data arrives; it pulses only when motion is allowed.
