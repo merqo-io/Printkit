@@ -77,7 +77,7 @@ for the security context). The Vercel build does not use
 
 Shared shadcn primitives (`Badge`, `Button`, `Input`, `Label`, `Select`, `Switch`, `Tooltip`, `cn`) come from `@merqo/ui/primitives`; only `alert` is a local copy under `src/components/ui/`.
 
-The Overview shows three first-run steps (booth, printer, first label) until a label has printed (a step shows done only when every earlier step is done), refreshes itself on tab focus and every 30 seconds while visible, and every dashboard page header carries a short eyebrow (Overview: "Your booths"); the designer is reached from Printers. Set the optional `NEXT_PUBLIC_QKIT_URL` (see `.env.example`) before building to make the first step link to qkit.
+The Overview fills the dashboard layout's full `max-w-7xl` width, shows three first-run steps (booth, printer, first label) until a label has printed (a step shows done only when every earlier step is done), refreshes itself on tab focus and every 30 seconds while visible, and every dashboard page header carries a short eyebrow (Overview: "Your booths"); the designer is reached from Printers. Set the optional `NEXT_PUBLIC_QKIT_URL` (see `.env.example`) before building to make the first step link to qkit.
 
 The Printers page lets a vendor remove or swap a booth's printer (with a confirm), regenerate a cloud printer's address, edit a Feie SN and KEY, and reach the designer, and print a test label to any booth's printer (it goes through the normal queue, never reaches a calling kit, and shows as "Test print" in History, and the button is disabled while the printer is offline). The page refreshes itself; an offline virtual printer gets its own hint (press Start on its page) rather than the WiFi one. Overview and printers share a vendor-scoped batch loader. Connector setup flows live in separate local components; history uses shared DataTable with Printkit-specific action eligibility.
 
@@ -107,7 +107,7 @@ secondary, process-magenta accent) — see `src/app/globals.css`'s own header co
 The shared `@merqo/ui` `PageHeader` (props `eyebrow`, `title`, `description`,
 `action`, `back`, `responsive`) opens every dashboard page, and every `Button`
 size is at least 44px tall on touch screens, so tap targets stay
-finger-sized. The pinned `@merqo/ui` is 0.58.0 (716824e; `AppLinks` in the root layout gives its client components `next/link`, so none takes a `LinkComponent` prop; 0.54.0 added the shared `/auth/confirm` form and handler back `src/app/auth/confirm/`, the shared `ErrorPage`, `NotFound`, `GlobalError`, `EmptyState` and `FormError` replace the kit's own copies); the
+finger-sized. The pinned `@merqo/ui` is 0.59.1 (94eb454; `LandingNav` folds its `links` (About) into a burger below `sm`; `AppLinks` in the root layout gives its client components `next/link`, so none takes a `LinkComponent` prop; 0.54.0 added the shared `/auth/confirm` form and handler back `src/app/auth/confirm/`, the shared `ErrorPage`, `NotFound`, `GlobalError`, `EmptyState` and `FormError` replace the kit's own copies); the
 remove-printer confirm uses its `ConfirmDialog`. See `src/components/README.md`.
 
 The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard

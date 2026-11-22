@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Bumped `@merqo/ui` to 0.59.1: the public pages' About link goes through `LandingNav`'s `links` prop, so it collapses into a burger menu on phones.
 - `/legal/terms` and `/legal/privacy` render `@merqo/ui`'s `LegalPage` through a local `"use client"` wrapper (`legal-page-client.tsx`) with the printkit wordmark linking home; `/legal/accept` uses the shared `AuthShell` and `AcceptTermsForm` (the local `accept-form.tsx` is deleted, the "Sign out instead" exit stays). The printer setup "Copy address" button is the shared `CopyButton`.
 - The account menu shows the stall name through the shared `accountLabel` fallback (name, then email local part, then "Account"), so the dashboard and landing nav match and the full email is no longer shown. `@merqo/ui` repinned to v0.58.0.
 - Bumped `@merqo/ui` to 0.56.0 (from 0.54.1). The public pages' account menu is now the shared `LandingAccountNav` with `toNavUser`: the name comes from the merqo vendor profile (stall name) before the sign-in name, and printkit is listed in Switch products. `LandingAccountMenu` and `nav-account.ts` are removed.
@@ -30,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- The dashboard Overview and its loading skeleton no longer cap at `max-w-4xl`, so they fill the same `max-w-7xl` width as the other Merqo kits.
 - Signed-in pages that render the site nav no longer return a 500. The Server Component nav passed next/link as `LinkComponent` to the client `LandingAccountNav`, and a function cannot cross that boundary. The nav now uses the library's plain anchors for the Dashboard and menu links.
 - Signed-in vendors on `/about` and the Bluetooth guide now get a Dashboard link and the account menu (avatar, Get help, Feedback, Sign out) in the nav instead of a Sign in button that only bounced them to the dashboard. Signed-out visitors see the same nav as before.
 - The reset-password form no longer enforces a hardcoded 8-character rule on the client. Supabase owns the password policy, which differs per environment, so a weak password now shows the server-derived reason.
