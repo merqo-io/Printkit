@@ -111,7 +111,7 @@ finger-sized. The pinned `@merqo/ui` is 0.59.1 (94eb454; `LandingNav` folds its 
 remove-printer confirm uses its `ConfirmDialog`. See `src/components/README.md`.
 
 The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard
-`<main>` uses qkit's `px-5 py-7` spacing. See `src/app/dashboard/README.md`.
+`<main>` uses qkit's `px-5 py-7` spacing. See `src/app/dashboard/README.md`. Dashboard sub-pages use two width tiers: list pages `max-w-lg md:max-w-4xl`, form/flow pages `max-w-2xl`.
 
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.

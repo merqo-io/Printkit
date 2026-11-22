@@ -48,3 +48,7 @@ failures reset the busy state and show a retry message.
 The page moved here from `/dashboard/dev/virtual-printer`; `next.config.ts` redirects the old path permanently (query string kept).
 
 The virtual printer panel takes its primitives and `cn` from `@merqo/ui/primitives`.
+
+## Width
+
+The page column is `max-w-2xl` (form/flow tier).

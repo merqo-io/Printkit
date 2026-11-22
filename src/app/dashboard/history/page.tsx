@@ -40,7 +40,7 @@ export default async function HistoryPage({
   else if (cursor) emptyMessage = "No older labels.";
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-lg md:max-w-4xl">
       <PageHeader
         responsive
         eyebrow="Label history"

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Dashboard sub-page widths follow two tiers: list pages (printers, history, error, loading) use `max-w-lg md:max-w-4xl`; form and flow pages (new printer, setup, bridge, virtual) share `max-w-2xl`. The overview stays uncapped.
 - `@merqo/ui` is pinned to 0.57.0 and `AppLinks` (`src/components/app-link-provider.tsx`) mounts its `AppLinkProvider` with `next/link` in the root layout, so the shared client components navigate client-side without a `LinkComponent` prop.
 - `DESIGN.md` records printkit's public-page values (no landing by design) and the places the public pages still break the shared rules.
 - Reset-password: a rejected weak password now says which rule failed (length, character mix or a known breach), using the limits Supabase reports. The new-password field has a tap-friendly requirements hint.

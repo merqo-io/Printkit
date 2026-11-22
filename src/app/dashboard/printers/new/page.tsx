@@ -28,7 +28,7 @@ export default async function NewPrinterPage({
     : locations[0];
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-2xl">
       <PageHeader
         responsive
         eyebrow="Printers"

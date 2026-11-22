@@ -20,7 +20,7 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-lg md:max-w-4xl">
       <PageHeader title="Something went wrong" responsive />
       <Panel>
         <p className="text-muted-foreground text-sm">

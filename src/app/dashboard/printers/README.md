@@ -85,3 +85,7 @@ When label access is denied, `sendTestPrint` also returns `upgradeUrl` (the Merq
 Printer pages and actions take `Button`, `Badge` and `cn` from `@merqo/ui/primitives`.
 
 The Upgrade link uses `merqoUpgradeUrl` from `@/lib/upgrade-url`.
+
+## Width
+
+The list page column is `max-w-lg md:max-w-4xl` (list tier).
