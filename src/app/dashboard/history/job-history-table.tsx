@@ -83,10 +83,10 @@ export function JobHistoryTable({
   ];
   return (
     <>
-      <div className="sm:hidden">
+      <div className="md:hidden">
         <JobHistoryCards jobs={jobs} locations={locations} />
       </div>
-      <div className="hidden sm:block">
+      <div className="hidden md:block">
         <DataTable rows={jobs} columns={columns} getRowKey={(job) => job.id} />
       </div>
     </>
