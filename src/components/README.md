@@ -51,7 +51,7 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
 ## Connectivity
 
 `wordmark.tsx` is used by `src/app/error.tsx` and
-`src/app/login/page.tsx` (not by `src/app/page.tsx`, which redirects to `/dashboard`). `printer-status-row.tsx` is used by overview and printers pages; offline timestamps are displayed in the Singapore timezone.
+`src/app/login/page.tsx` (not by `src/app/page.tsx`, which redirects to `/dashboard`). `printer-status-row.tsx` announces its status text through a polite live region and is used by overview and printers pages; offline timestamps are displayed in the Singapore timezone.
 `ui/` is used throughout `src/app/` and `src/components/`.
 
 ## Parent

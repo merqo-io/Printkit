@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -86,14 +87,16 @@ it.each([
   expect(
     screen.getByRole("link", { name: label }).getAttribute("href"),
   ).toContain(href);
-  expect(screen.getByRole("link", { name: "View setup steps" })).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Design label" })).toHaveAttribute(
-    "href",
-    "/dashboard/printers/designer?location=loc-1",
-  );
-  expect(screen.getByRole("button", { name: "Remove printer" })).toBeTruthy();
+  await userEvent.click(screen.getByRole("button", { name: "More" }));
   expect(
-    screen.getByRole("button", { name: "Use a different printer" }),
+    await screen.findByRole("menuitem", { name: "View setup steps" }),
+  ).toBeTruthy();
+  expect(
+    screen.getByRole("menuitem", { name: "Design label" }),
+  ).toHaveAttribute("href", "/dashboard/printers/designer?location=loc-1");
+  expect(screen.getByRole("menuitem", { name: "Remove printer" })).toBeTruthy();
+  expect(
+    screen.getByRole("menuitem", { name: "Use a different printer" }),
   ).toBeTruthy();
 });
 it.each([

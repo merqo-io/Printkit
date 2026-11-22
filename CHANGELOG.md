@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Accessibility: sticker designer elements are keyboard-operable (Tab, arrow keys move 1 mm, Shift+arrow 10 mm, clamped to the printable area like dragging) and named "Move <field>"; drag state also clears on lost pointer capture. The printers "More" menu is now the shared `DropdownMenu` (Escape close, focus return, `aria-expanded`), and the printer online/offline text is announced politely when it changes.
 - The dashboard Overview and its loading skeleton no longer cap at `max-w-4xl`, so they fill the same `max-w-7xl` width as the other Merqo kits.
 - Signed-in pages that render the site nav no longer return a 500. The Server Component nav passed next/link as `LinkComponent` to the client `LandingAccountNav`, and a function cannot cross that boundary. The nav now uses the library's plain anchors for the Dashboard and menu links.
 - Signed-in vendors on `/about` and the Bluetooth guide now get a Dashboard link and the account menu (avatar, Get help, Feedback, Sign out) in the nav instead of a Sign in button that only bounced them to the dashboard. Signed-out visitors see the same nav as before.

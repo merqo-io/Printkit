@@ -45,6 +45,8 @@ export function PrinterStatusRow(props: PrinterStatusRowProps) {
           )}
         />
         <span
+          role="status"
+          aria-live="polite"
           className={cn(
             "text-sm",
             props.state === "online"
