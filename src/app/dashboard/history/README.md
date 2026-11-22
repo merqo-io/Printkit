@@ -40,3 +40,5 @@ When label access is denied, `reprintJob` also returns `upgradeUrl` (the Merqo d
 History controls take `Button`, `Select`, `Badge` and `cn` from `@merqo/ui/primitives`; the assign-location `Select` trigger is 44px on touch screens.
 
 `ActionResult` and `useAsyncAction` come from `@merqo/ui` (`@merqo/ui/kit-api` for the type); the Upgrade link uses `merqoUpgradeUrl` from `@/lib/upgrade-url`.
+
+`loading.tsx` is the route's skeleton, using the page's `max-w-4xl` cap so the layout does not jump when data arrives; it pulses only when motion is allowed.
