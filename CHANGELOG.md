@@ -7,10 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ## [0.9.1] - 2026-11-23
+### Fixed
+
+- An unknown `/dashboard/...` URL now renders the dashboard not-found page inside the dashboard nav and header instead of the bare root 404, via a `src/app/dashboard/[...slug]` catch-all.
 
 ### Added
 
-- Printers, History, Label design, printer setup and Bridge now each have a loading skeleton matching the page's width and shape, and a bad `/dashboard/...` URL shows a not-found page inside the dashboard shell with a "Back to overview" link.
+- Printers, History, Label design, printer setup and Bridge now each have a loading skeleton matching the page's width and shape,, and the dashboard has a not-found page with a "Back to overview" link.
 - Dashboard sub-page widths follow two tiers: list pages (printers, history, error, loading) use `max-w-lg md:max-w-4xl`; form and flow pages (new printer, setup, bridge, virtual) share `max-w-2xl`. The overview stays uncapped.
 - `@merqo/ui` is pinned to 0.57.0 and `AppLinks` (`src/components/app-link-provider.tsx`) mounts its `AppLinkProvider` with `next/link` in the root layout, so the shared client components navigate client-side without a `LinkComponent` prop.
 - `DESIGN.md` records printkit's public-page values (no landing by design) and the places the public pages still break the shared rules.
