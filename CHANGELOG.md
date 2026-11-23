@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- An unknown `/dashboard/...` URL now renders the dashboard not-found page inside the dashboard nav and header instead of the bare root 404, via a `src/app/dashboard/[...slug]` catch-all.
+
 ### Added
 
 - Printers, History, Label design, printer setup and Bridge now each have a loading skeleton matching the page's width and shape, and a bad `/dashboard/...` URL shows a not-found page inside the dashboard shell with a "Back to overview" link.
