@@ -67,6 +67,25 @@ describe("sticker designer prototype", () => {
     });
     expect(screen.getByLabelText("Left (mm)")).toHaveValue(4);
   });
+  it("moves a focused element with the arrow keys and clamps to the label", () => {
+    render(<StickerDesigner />);
+    const element = screen.getByRole("button", { name: "Select Order number" });
+    expect(element).toHaveAccessibleDescription(/arrow keys/i);
+    element.focus();
+    fireEvent.keyDown(element, { key: "ArrowRight" });
+    fireEvent.click(screen.getByRole("button", { name: "Order number" }));
+    expect(screen.getByLabelText("Left (mm)")).toHaveValue(4);
+    fireEvent.keyDown(element, { key: "ArrowDown", shiftKey: true });
+    expect(screen.getByLabelText("Top (mm)")).toHaveValue(13);
+    fireEvent.keyDown(element, { key: "ArrowRight", shiftKey: true });
+    expect(screen.getByLabelText("Left (mm)")).toHaveValue(14);
+    fireEvent.keyDown(element, { key: "ArrowLeft", shiftKey: true });
+    fireEvent.keyDown(element, { key: "ArrowLeft", shiftKey: true });
+    expect(screen.getByLabelText("Left (mm)")).toHaveValue(2);
+    fireEvent.keyDown(element, { key: "ArrowUp", shiftKey: true });
+    fireEvent.keyDown(element, { key: "ArrowUp", shiftKey: true });
+    expect(screen.getByLabelText("Top (mm)")).toHaveValue(2);
+  });
   it("rejects a size that would clip fields, and can reset the preview", () => {
     render(<StickerDesigner />);
     fireEvent.change(screen.getByLabelText("Width (mm)"), {

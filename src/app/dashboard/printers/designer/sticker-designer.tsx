@@ -6,6 +6,7 @@ import { saveStickerDesign } from "./actions";
 import { StickerSize } from "./sticker-size";
 import { PrinterFitNotice, type DesignerPrinter } from "./printer-fit-notice";
 import { AddFieldButtons } from "./add-field-buttons";
+import { arrowDelta, clampPosition, type DragState } from "./sticker-move";
 import { names } from "./sticker-content";
 import {
   discardLogo,
@@ -14,7 +15,13 @@ import {
   newLogoElement,
   uploadLogo,
 } from "./logo-panel";
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
 import {
   defaultStickerTemplate,
   stickerTemplateSchema,
@@ -53,14 +60,7 @@ export function StickerDesigner({
     },
     [rendered],
   );
-  const drag = useRef<{
-    id: string;
-    x: number;
-    y: number;
-    startX: number;
-    startY: number;
-    canvasWidth: number;
-  } | null>(null);
+  const drag = useRef<DragState | null>(null);
   const selected = template.elements.find(
     (element) => element.id === selectedId,
   );
@@ -185,32 +185,39 @@ export function StickerDesigner({
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
+  function endDrag() {
+    drag.current = null;
+  }
+
   function moveDrag(event: PointerEvent<HTMLButtonElement>) {
     const current = drag.current;
     const element = template.elements.find((item) => item.id === current?.id);
     if (!current || !element || !current.canvasWidth) return;
     const scale = template.widthMm / current.canvasWidth;
-    const xMm =
-      Math.round(
-        Math.max(
-          template.marginMm,
-          Math.min(
-            template.widthMm - template.marginMm - element.widthMm,
-            current.x + (event.clientX - current.startX) * scale,
-          ),
-        ) * 10,
-      ) / 10;
-    const yMm =
-      Math.round(
-        Math.max(
-          template.marginMm,
-          Math.min(
-            template.heightMm - template.marginMm - element.heightMm,
-            current.y + (event.clientY - current.startY) * scale,
-          ),
-        ) * 10,
-      ) / 10;
+    const { xMm, yMm } = clampPosition(
+      template,
+      element,
+      current.x + (event.clientX - current.startX) * scale,
+      current.y + (event.clientY - current.startY) * scale,
+    );
     updateElement(current.id, { xMm, yMm });
+  }
+
+  // Arrow keys give keyboard users the same movement as dragging, clamped to
+  // the same printable area.
+  function nudge(event: KeyboardEvent<HTMLButtonElement>, element: Element) {
+    const [dx, dy] = arrowDelta(event.key, event.shiftKey);
+    if (!dx && !dy) return;
+    event.preventDefault();
+    setSelectedId(element.id);
+    const { xMm, yMm } = clampPosition(
+      template,
+      element,
+      element.xMm + dx,
+      element.yMm + dy,
+    );
+    if (xMm === element.xMm && yMm === element.yMm) return;
+    updateElement(element.id, { xMm, yMm });
   }
 
   return (
@@ -290,22 +297,25 @@ export function StickerDesigner({
               containerType: "inline-size",
             }}
           >
+            <p id="designer-move-hint" className="sr-only">
+              Press the arrow keys to move this field by 1 millimetre, or hold
+              Shift to move it by 10.
+            </p>
             {template.elements.map((element) => (
               <button
                 key={element.id}
                 type="button"
                 aria-label={`Select ${element.kind === "field" ? names[element.field] : "logo"}`}
+                aria-describedby="designer-move-hint"
                 aria-pressed={selectedId === element.id}
+                onKeyDown={(event) => nudge(event, element)}
                 onPointerDown={(event) => startDrag(event, element)}
                 onPointerMove={moveDrag}
-                onPointerUp={() => {
-                  drag.current = null;
-                }}
-                onPointerCancel={() => {
-                  drag.current = null;
-                }}
+                onPointerUp={endDrag}
+                onPointerCancel={endDrag}
+                onLostPointerCapture={endDrag}
                 onClick={() => setSelectedId(element.id)}
-                className="absolute cursor-move touch-none overflow-hidden whitespace-pre-line border border-transparent leading-tight focus-visible:outline-2 aria-pressed:border-current"
+                className="absolute cursor-move touch-none overflow-hidden whitespace-pre-line border border-transparent leading-tight outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 aria-pressed:border-current"
                 style={{
                   left: `${(100 * element.xMm) / template.widthMm}%`,
                   top: `${(100 * element.yMm) / template.heightMm}%`,
@@ -332,7 +342,7 @@ export function StickerDesigner({
           <div>
             <h2 className="text-lg font-semibold">Fields</h2>
             <p className="text-muted-foreground text-sm">
-              Select a field or drag it on the sticker.
+              Select a field, then drag it on the sticker or use the arrow keys.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {template.elements.map((element) => (

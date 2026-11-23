@@ -111,7 +111,7 @@ finger-sized. The pinned `@merqo/ui` is 0.59.1 (94eb454; `LandingNav` folds its 
 remove-printer confirm uses its `ConfirmDialog`. See `src/components/README.md`.
 
 The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard
-`<main>` uses qkit's `px-5 py-7` spacing. See `src/app/dashboard/README.md`.
+`<main>` uses qkit's `px-5 py-7` spacing. See `src/app/dashboard/README.md`. Dashboard sub-pages use two width tiers: list pages `max-w-lg md:max-w-4xl`, form/flow pages `max-w-2xl`.
 
 A vendor can now reprint an already-`printed` label, not just a `failed`
 one — see `src/app/dashboard/history/README.md`'s `reprintJob` entry.
@@ -123,7 +123,7 @@ dialog, and a failed setup shows one plain message while the cause goes to the
 server log.
 
 History (and the Overview's recent list) shows each label as a card on a phone
-and as a table from the `sm` breakpoint up. An "All labels / Needs a booth"
+and as a table from the `md` (768px) breakpoint up. An "All labels / Needs a booth"
 control filters the list (`?unrouted=1` still deep-links to it), test prints
 have no Reprint, and the copy says "labels" rather than "jobs".
 
@@ -192,3 +192,7 @@ AGENTS.md is kept under 200 lines; file layout, data model and harness detail li
 The `Wordmark` in `src/components/wordmark.tsx` wraps `@merqo/ui`'s `Wordmark`, which always sets a size class, so the nav, dashboard nav and footer pass an explicit `text-*` size.
 
 The legal pages render the shared `LegalPage` (through a small client wrapper) and the accept page renders the shared `AuthShell` and `AcceptTermsForm` (with a local sign-out exit), and the cloud-print setup address uses the shared `CopyButton`.
+
+Each dashboard route has its own `loading.tsx` skeleton (Printers, History, Label design, printer setup, Bridge) that mirrors the page width, and `src/app/dashboard/not-found.tsx` keeps a bad `/dashboard/...` URL inside the dashboard shell; the `src/app/dashboard/[...slug]` catch-all throws `notFound()` for unmatched URLs so that page is reached instead of the root 404.
+
+The printers "More" menu uses `@merqo/ui/primitives`' `DropdownMenu`, and the label designer's fields are keyboard-movable (see `src/app/dashboard/printers/designer/README.md`).

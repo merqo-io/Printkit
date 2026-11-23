@@ -56,3 +56,5 @@ The page header (the shared `@merqo/ui` `PageHeader`) sets the "Printers" eyebro
 The bridge panel and location picker take `Button`, `Select`, `Badge` and `cn` from `@merqo/ui/primitives`.
 
 `ActionResult` comes from `@merqo/ui/kit-api`.
+
+`loading.tsx` is the route's skeleton, using the page's `max-w-2xl` cap so the layout does not jump when data arrives; it pulses only when motion is allowed.
