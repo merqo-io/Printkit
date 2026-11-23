@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ## [0.9.1] - 2026-11-23
+
 ### Fixed
 
 - An unknown `/dashboard/...` URL now renders the dashboard not-found page inside the dashboard nav and header instead of the bare root 404, via a `src/app/dashboard/[...slug]` catch-all.
