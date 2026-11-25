@@ -107,7 +107,7 @@ secondary, process-magenta accent) — see `src/app/globals.css`'s own header co
 The shared `@merqo/ui` `PageHeader` (props `eyebrow`, `title`, `description`,
 `action`, `back`, `responsive`) opens every dashboard page, and every `Button`
 size is at least 44px tall on touch screens, so tap targets stay
-finger-sized. The pinned `@merqo/ui` is 0.61.0 (64896f1; `Timestamp` and `formatDateTime` (Singapore time) replace the kit's own date helper; `LandingNav` folds its `links` (About) into a burger below `sm`; `AppLinks` in the root layout gives its client components `next/link`, so none takes a `LinkComponent` prop; 0.54.0 added the shared `/auth/confirm` form and handler back `src/app/auth/confirm/`, the shared `ErrorPage`, `NotFound`, `GlobalError`, `EmptyState` and `FormError` replace the kit's own copies); the
+finger-sized. The pinned `@merqo/ui` is 0.61.1 (c0f1f23; `Timestamp` and `formatDateTime` (Singapore time) replace the kit's own date helper; `LandingNav` folds its `links` (About) into a burger below `sm`; `AppLinks` in the root layout gives its client components `next/link`, so none takes a `LinkComponent` prop; 0.54.0 added the shared `/auth/confirm` form and handler back `src/app/auth/confirm/`, the shared `ErrorPage`, `NotFound`, `GlobalError`, `EmptyState` and `FormError` replace the kit's own copies); the
 remove-printer confirm uses its `ConfirmDialog`. See `src/components/README.md`.
 
 The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard

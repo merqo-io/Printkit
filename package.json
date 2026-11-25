@@ -21,7 +21,7 @@
     "test:operators": "node --test test/operators/*.test.mjs"
   },
   "dependencies": {
-    "@merqo/ui": "github:merqo-io/merqo-ui#64896f14ee78fb6013217a0d2cb938df1afea0d0",
+    "@merqo/ui": "github:merqo-io/merqo-ui#c0f1f23d9cc2e59d402179cf4ec3b0734c951e95",
     "@mmote/niimbluelib": "0.0.1-alpha.43",
     "@napi-rs/canvas": "^1.0.9",
     "@supabase/ssr": "^0.10.3",
