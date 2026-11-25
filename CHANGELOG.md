@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- `@merqo/ui` is pinned to 0.61.1. The History created column and cards render `<Timestamp variant="datetime" />`, and the printer status row uses the shared `formatDateTime`; the kit's own `src/lib/utils.ts` date helper is removed. Output is unchanged (Singapore time, "22 Aug 2026, 6:00 pm"). The shared `GlobalError` fallback heading now reads "Could not load the app" (was "Something went wrong").
+
 ## [0.9.1] - 2026-11-23
 
 ### Fixed

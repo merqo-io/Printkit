@@ -1,10 +1,14 @@
-import { DataTable, EmptyState, type DataTableColumn } from "@merqo/ui";
+import {
+  DataTable,
+  EmptyState,
+  Timestamp,
+  type DataTableColumn,
+} from "@merqo/ui";
 import { JobStatusBadge } from "../job-status-badge";
 import { JobHistoryCards } from "./job-history-cards";
 import { ReprintButton } from "./reprint-button";
 import { AssignLocationControl } from "./assign-location-control";
 import { failureReasonText } from "./failure-reason-copy";
-import { formatDateTime } from "@/lib/utils";
 import { payloadField } from "@/lib/print-job-payload";
 import { isTestPrint } from "@/lib/test-print";
 import type { PrintJob } from "@/lib/print-jobs-list";
@@ -67,7 +71,7 @@ export function JobHistoryTable({
     {
       header: "Created",
       className: "text-muted-foreground text-sm",
-      cell: (job) => formatDateTime(job.created_at),
+      cell: (job) => <Timestamp value={job.created_at} variant="datetime" />,
     },
     {
       header: "Action",

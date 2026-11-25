@@ -1,5 +1,5 @@
 import { cn } from "@merqo/ui/primitives";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime } from "@merqo/ui";
 
 export type PrinterStatusRowProps = {
   label: string;
