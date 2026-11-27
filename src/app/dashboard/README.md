@@ -14,9 +14,9 @@ The authenticated vendor area (`/dashboard/*`).
   `@merqo/ui`'s `accountLabel` (stall name, else name, else email local part),
   passed to the nav as `accountName`, then wraps `children` in
   `dashboard-nav.tsx`'s `DashboardNav` and a `max-w-7xl` `<main>`, followed by
-  a `<footer>` rendering `@merqo/ui`'s `LegalFooterLinks` — printkit has no
-  public landing page for a marketing footer to live on, so the Terms/Privacy
-  links live in the dashboard shell instead.
+  a `<footer>` rendering `@merqo/ui`'s `LegalFooterLinks` — printkit's
+  public landing is signed-out only, so the Terms/Privacy links also live in
+  the dashboard shell for signed-in vendors.
   The layout is a full-height column: nav, `main` (grows to fill), then
   `SiteFooter`, so the footer sits at the bottom of short pages instead of
   under the content. Nav and footer are hidden when printing.

@@ -53,8 +53,8 @@ The gate that sends vendors here lives in `@/lib/legal-gate`
 (`@/lib/vendor-session`) — printkit's single vendor-gate entry point, called
 from `dashboard/layout.tsx`. `terms/` and `privacy/` are also linked from the
 dashboard shell's footer (`@merqo/ui`'s `LegalFooterLinks` in
-`dashboard/layout.tsx`) — printkit has no public landing page for a marketing
-footer to live on instead.
+`dashboard/layout.tsx`) — printkit's public landing is signed-out only, so
+signed-in vendors get these links from the dashboard shell.
 
 ## Parent
 

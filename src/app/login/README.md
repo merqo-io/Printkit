@@ -56,7 +56,7 @@ OAuth, plus password reset. There is no sign-up: the tagline says "New to printk
 ## Connectivity
 
 Signed-out visitors reach `/login` directly (the landing page,
-`src/app/page.tsx`, redirects to `/dashboard`, whose auth gate sends signed-out visitors to `/login`). A
+`src/app/page.tsx`, shows signed-out visitors a Sign in call to `/login` and redirects signed-in vendors to `/dashboard`). A
 signed-out request for any other dashboard page arrives as
 `/login?next=<path and query>`, set by `updateSession`
 (`src/lib/supabase/middleware.ts`). On success the page calls
