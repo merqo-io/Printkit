@@ -9,10 +9,9 @@ Playwright end-to-end smoke tests. They need only `pnpm dev` and
 
 - `smoke.spec.ts` — public smoke: `/login` renders its "Continue with Google"
   button, and the public `/guides/bluetooth-printers` guide renders its
-  heading. printkit has no landing page (`/` redirects to `/dashboard`), so
-  the guide stands in as the public page.
-- `auth-guard.spec.ts` — signed-out route protection: `/` and `/dashboard`
-  end at `/login`; a deeper dashboard link ends at `/login` with its path
+  heading.
+- `auth-guard.spec.ts` — signed-out route protection: `/` stays on the public
+  landing (its h1 renders) and `/dashboard` ends at `/login`; a deeper dashboard link ends at `/login` with its path
   and query as `next`, and a fragment on it is still on the login URL.
   `src/proxy.ts`
   resolves `user: null` locally when there is no session cookie, so the
