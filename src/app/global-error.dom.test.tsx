@@ -17,7 +17,7 @@ it("renders the fallback copy and a retry button inside a main landmark", () => 
 
   expect(html).toContain("<html");
   expect(html).toContain("<main");
-  expect(html).toMatch(/something went wrong/i);
+  expect(html).toMatch(/could not load the app/i);
   expect(html).toMatch(/<button[^>]*>Try again<\/button>/);
 });
 

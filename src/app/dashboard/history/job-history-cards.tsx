@@ -1,8 +1,8 @@
+import { Timestamp } from "@merqo/ui";
 import { JobStatusBadge } from "../job-status-badge";
 import { AssignLocationControl } from "./assign-location-control";
 import { ReprintButton } from "./reprint-button";
 import { failureReasonText } from "./failure-reason-copy";
-import { formatDateTime } from "@/lib/utils";
 import { payloadField } from "@/lib/print-job-payload";
 import { isTestPrint } from "@/lib/test-print";
 import type { PrintJob } from "@/lib/print-jobs-list";
@@ -48,7 +48,7 @@ export function JobHistoryCards({
             <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-2 text-sm">
               <span>{booth ?? "Needs a booth"}</span>
               <span className="font-mono text-xs">
-                {formatDateTime(job.created_at)}
+                <Timestamp value={job.created_at} variant="datetime" />
               </span>
             </div>
             {job.location_id === null && job.status === "queued" && (

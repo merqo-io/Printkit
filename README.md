@@ -107,7 +107,7 @@ secondary, process-magenta accent) — see `src/app/globals.css`'s own header co
 The shared `@merqo/ui` `PageHeader` (props `eyebrow`, `title`, `description`,
 `action`, `back`, `responsive`) opens every dashboard page, and every `Button`
 size is at least 44px tall on touch screens, so tap targets stay
-finger-sized. The pinned `@merqo/ui` is 0.60.0 (d9ba206; `LandingNav` folds its `links` (About) into a burger below `sm`; `AppLinks` in the root layout gives its client components `next/link`, so none takes a `LinkComponent` prop; 0.54.0 added the shared `/auth/confirm` form and handler back `src/app/auth/confirm/`, the shared `ErrorPage`, `NotFound`, `GlobalError`, `EmptyState` and `FormError` replace the kit's own copies); the
+finger-sized. The pinned `@merqo/ui` is 0.61.1 (c0f1f23; `Timestamp` and `formatDateTime` (Singapore time) replace the kit's own date helper; `LandingNav` folds its `links` (About) into a burger below `sm`; `AppLinks` in the root layout gives its client components `next/link`, so none takes a `LinkComponent` prop; 0.54.0 added the shared `/auth/confirm` form and handler back `src/app/auth/confirm/`, the shared `ErrorPage`, `NotFound`, `GlobalError`, `EmptyState` and `FormError` replace the kit's own copies); the
 remove-printer confirm uses its `ConfirmDialog`. See `src/components/README.md`.
 
 The dashboard avatar menu has a "Bluetooth guide" link, and the dashboard
@@ -165,7 +165,7 @@ printkit runs Next.js 16.4.6 (pinned exactly, with a matching `eslint-config-nex
 
 ## Security headers
 
-`src/proxy.ts` sets the CSP (nonce on per-request routes) and `X-Robots-Tag` off production; see `docs/security/`. The site is noindex in every environment (root `metadata.robots`, `robots.ts` disallow-all) and presents printkit as the print companion for qkit booths.
+`src/proxy.ts` sets the CSP (nonce on per-request routes) and `X-Robots-Tag` off production; see `docs/security/`. Only the landing at `/` is indexable, and only in production (`app/page.tsx` robots metadata, `robots.ts` `allow: "/$"`); every other route and every preview is noindex and presents printkit as the print companion for qkit booths.
 
 ## Lint
 

@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- A public landing at `/` for signed-out visitors: an "In build" badge, a hero that acts out a label printing as a qkit order lands, a three-step journey (pair printer, order in, label prints), three FAQ rows linking the Bluetooth printer guide, and a closing sign-in call. Built from the shared `Journey`, `PhoneFrame`, `FaqRows` and `ClosingCall` in `src/components/landing/`. Signed-in vendors still go straight to `/dashboard`.
+
+### Changed
+
+- `/` is now indexable in production: `robots.ts` allows only the root and its page metadata drops noindex. Every other route and every preview stays noindex.
+- `@merqo/ui` is pinned to 0.61.1. The History created column and cards render `<Timestamp variant="datetime" />`, and the printer status row uses the shared `formatDateTime`; the kit's own `src/lib/utils.ts` date helper is removed. Output is unchanged (Singapore time, "22 Aug 2026, 6:00 pm"). The shared `GlobalError` fallback heading now reads "Could not load the app" (was "Something went wrong").
+
 ## [0.9.1] - 2026-11-23
 
 ### Fixed

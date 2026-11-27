@@ -29,7 +29,7 @@ for this project.
 - `dashboard/` — authenticated vendor area, gated by `layout.tsx`'s `getVendorSession()` and wrapped in `dashboard-nav.tsx`'s composed `@merqo/ui` `DashboardNav`/`AccountMenu` — see its own README.
 - `legal/` — public `/legal/terms` + `/legal/privacy` pages (rendered from `@merqo/ui`'s shared content) and the `/legal/accept` interstitial a signed-in vendor is bounced to when their accepted terms/privacy versions fall behind `@merqo/ui`'s `LEGAL_VERSIONS` — see `src/lib/legal-gate.ts` and its hook in `getVendorSession` (`@/lib/vendor-session`).
 - `error.tsx` — root-level error boundary (`"use client"`) for every route (landing, login, auth, dashboard — there is no more specific one yet). Renders the shared `ErrorPage` with the `Wordmark` (it also shows a "Reference" line with Next's digest when one is supplied), with a "Try again" (`retry()`, which re-fetches the page from the server like `dashboard/error.tsx`, so a server error does not come straight back) and a "Back to overview" (`next/link`) action. Logs the caught error to the console; the root boundary supplies recovery for all routes.
-- `global-error.tsx` — shared `GlobalError` for a failure in the root layout, with inline token copies because the stylesheet has not loaded; "Try again" is `retry()`.
+- `global-error.tsx` — shared `GlobalError` for a failure in the root layout, with inline token copies because the stylesheet has not loaded; the shared heading is "Could not load the app" (0.61.0); "Try again" is `retry()`.
 - `not-found.tsx` — branded "Page not found" fallback (the shared `NotFound` with the `Wordmark`), linking back to the overview (`/dashboard`). Reached by a stale setup link (`printers/setup/page.tsx` calls `notFound()`) or any unknown route.
 - `globals.css` — Tailwind v4 entry point: theme tokens, base layer, and custom utility classes; `@source` includes `node_modules/@merqo/ui/dist` so its components' Tailwind classes get compiled here too. Colour tokens are the "Ink and paper" palette: black-ink primary on receipt-paper background (inverted in `.dark`), the warm-grey secondary, and process magenta as the one accent (`magenta` for dots and marks, `magenta-text` for words, `magenta-foreground` for text on a magenta fill). The shadcn `accent` stays a neutral hover surface. `chart-1..5` and `sidebar-*` complete the shadcn set. Neutrals take the paper's warm hue; `muted-foreground` and every `*-text` token clear 4.5:1 on the page. `success`, `warning` and `info` each have a base (dots, fills, tints) and a `-text` variant (words).
 - `globals.contrast.test.ts` — parses the `:root` and `.dark` tokens from `globals.css` and asserts WCAG AA for the key pairs (4.5:1 text, 3:1 for input, ring, magenta and chart colours), using `test/color.ts`.
@@ -37,7 +37,7 @@ for this project.
 - `layout.tsx` — `RootLayout`. Loads `Fraunces`/`Inter`/`JetBrains_Mono` via `next/font/google`, sets `metadata` (title template `printkit | %s`, default `printkit`, noindex/nofollow robots), wraps children in `next-themes`' `ThemeProvider` (`attribute="class"`, system default), then `TooltipProvider` and `AppLinks` (`@/components/app-link-provider`, so shared client components get `next/link`) around the children and `Toaster`.
 - `login/` — sign-in page (no sign-up; new vendors start with qkit), including the "Forgot password?" flow — see its own README.
 - `page-titles.test.ts` — checks every page exports its own `metadata.title`, matching its heading, including the two `dev/ui-states/` previews. The label design page ("Label design") and the Bluetooth printer page ("Connect a Bluetooth printer") are covered there too.
-- `page.tsx` — `Home`. Redirects to `/dashboard` (which `src/proxy.ts` bounces on to `/login` if unauthenticated) — printkit has no cold-acquisition funnel, so `/` is not a marketing landing page (see the design spec's "Internal Merqo product" section).
+- `page.tsx` — `Home`. The public landing at `/` for signed-out visitors (`@/components/landing/*` inside `SiteNav`/`SiteFooter`); a signed-in vendor (`supabase.auth.getUser()`) is redirected to `/dashboard`. Its `metadata.robots` is index/follow, the only page that lifts the layout's noindex.
 
 ## Connectivity
 
@@ -47,7 +47,7 @@ vendor area, gated by `getVendorSession()` (`@/lib/vendor-session`) inside
 the layout now, not its own `page.tsx`). `src/proxy.ts` also runs
 `updateSession` (session refresh + `/dashboard/*` → `/login` redirect) on
 every request via `src/lib/supabase/middleware.ts`. `layout.tsx` (root)
-is the ancestor of every route below; `page.tsx` (a redirect to
+is the ancestor of every route below; `page.tsx` (the public landing, which redirects a signed-in vendor to
 `/dashboard`) is the only route directly under `app/` besides the special
 Next.js files.
 `api/v1/print-jobs/` is the inbound route qkit calls on order-placed;
@@ -60,9 +60,8 @@ calls `actions/feedback.ts` and `actions/support.ts` directly (their
 Sheet UI lives inside `@merqo/ui`'s `DashboardNav`, not a page route);
 `dashboard/layout.tsx` calls `actions/auth.ts`'s `signOutAction` and renders
 `@merqo/ui`'s `LegalFooterLinks` (linking to `legal/terms`/`legal/privacy`)
-below `<main>`. printkit has no public landing page (`page.tsx` redirects to
-`/dashboard`), so the footer link lives in the dashboard shell instead of a
-marketing footer. No `admin/` directory exists yet.
+below `<main>`. The footer link lives in the dashboard shell; the public landing
+at `/` carries the shared `SiteFooter`. No `admin/` directory exists yet.
 
 ## Parent
 
@@ -70,7 +69,7 @@ marketing footer. No `admin/` directory exists yet.
 
 Request boundaries use bounded body parsing before privileged work. Pending form states and bridge wake-lock cleanup are covered by component regressions.
 
-`robots.ts` disallows crawling in every environment and the root `metadata.robots` is noindex/nofollow, so printkit is never indexed. The login layout forces per-request rendering so the nonce CSP reaches its scripts.
+`robots.ts` disallows crawling everywhere except the landing at `/` in production (`allow: "/$"`), and the root `metadata.robots` is noindex/nofollow except for `app/page.tsx`, so only the landing can be indexed. The login layout forces per-request rendering so the nonce CSP reaches its scripts.
 
 `page-titles.test.ts` lists the virtual printer page at `/dashboard/printers/virtual`.
 

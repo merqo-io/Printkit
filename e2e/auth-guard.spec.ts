@@ -1,12 +1,21 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("auth guard", () => {
-  for (const path of ["/", "/dashboard"]) {
-    test(`redirects anonymous ${path} to /login`, async ({ page }) => {
-      await page.goto(path);
-      await expect(page).toHaveURL(/\/login$/);
-    });
-  }
+  test("redirects anonymous /dashboard to /login", async ({ page }) => {
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/login$/);
+  });
+
+  test("keeps anonymous / on the public landing", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Print qkit orders on a Bluetooth printer.",
+      }),
+    ).toBeVisible();
+  });
 
   test("records an anonymous deep link as next on /login", async ({ page }) => {
     await page.goto("/dashboard/printers/new?location=loc-1");

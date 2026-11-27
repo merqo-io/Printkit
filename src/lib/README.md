@@ -231,7 +231,6 @@ sinceHours = 72)` groups the window's events with the jobs queued or sent
   checks they equal the light-theme tokens in `globals.css`.
 - `env.ts` — `publicEnv`: required-env-var accessors that throw at import
   time if unset, instead of silently reading `undefined`.
-- `utils.ts` � `cn()` merges utility classes; `formatDateTime()` formats timestamps in the Singapore timezone.
 - `location-printer-summaries.ts` � reads active locations and batches minimal printer summaries, scoped by vendor and location IDs, for overview and printers pages.
 - `bluetooth-support.ts`: `getBluetoothSupport(nav, ua)`: `supported`, `ios` (iPhone, iPad including the Mac-UA iPad, Chrome for iOS), `unsupported-browser` or `insecure-context`, for the Bridge page.
 - `rate-limit.ts`: `clientIp(headers)` picks `x-vercel-forwarded-for`, then `x-real-ip`, then the LAST `x-forwarded-for` hop (the first is client-spoofable) and returns null when none is set. `rateLimit(supabase, key, limit, windowSeconds)` runs the `check_rate_limit` RPC and fails open; `rateLimitStrict` is the same but fails closed (used for pairing). `tooManyRequests()` builds the 429 with `Retry-After: 60`; `enforceIpLimit` (pre-auth, `kit-ip`/`agent-ip` buckets, skipped when no IP) and `enforceKitLimit` (post-auth, `kit:<slug>`) wrap it for routes. Limits per 60 seconds: pairing 10 per IP (shared `pair:noip` bucket when no IP), CloudPRNT 120 per token, kit routes 300 per IP and 600 per kit, agent routes 240 per IP.
@@ -268,7 +267,7 @@ The B1 calibration sample uses the shared label renderer at 40 mm across by 60 m
 - `upgrade-url.ts` - `merqoUpgradeUrl()`, built on the shared `merqoBaseUrl()` from `@merqo/ui/kit-api` (`MERQO_BASE_URL`, default `https://www.merqo.io`): (`<base>/dashboard`, where the kit cards hold the Upgrade button).
 - `labels-upgrade.ts` - client-safe `LABELS_UPGRADE_LINK_TEXT`, the phrase `LABELS_UPGRADE_MESSAGE` is built from and the dashboard turns into a link. `legal-gate.ts` imports `merqoBaseUrl` from `@merqo/ui/kit-api`.
 
-`utils.ts` no longer exports `cn`; it moved to `@merqo/ui/primitives`. `formatDateTime` stays here.
+`utils.ts` is gone: `cn` moved to `@merqo/ui/primitives` and `formatDateTime` to `@merqo/ui`.
 
 ## Wrappers over @merqo/ui
 
