@@ -165,7 +165,7 @@ printkit runs Next.js 16.4.6 (pinned exactly, with a matching `eslint-config-nex
 
 ## Security headers
 
-`src/proxy.ts` sets the CSP (nonce on per-request routes) and `X-Robots-Tag` off production; see `docs/security/`. The site is noindex in every environment (root `metadata.robots`, `robots.ts` disallow-all) and presents printkit as the print companion for qkit booths.
+`src/proxy.ts` sets the CSP (nonce on per-request routes) and `X-Robots-Tag` off production; see `docs/security/`. Only the landing at `/` is indexable, and only in production (`app/page.tsx` robots metadata, `robots.ts` `allow: "/$"`); every other route and every preview is noindex and presents printkit as the print companion for qkit booths.
 
 ## Lint
 

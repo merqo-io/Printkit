@@ -6,8 +6,8 @@ Design notes for printkit, the hardware print connector for Merqo vendors (in bu
 
 Public pages (about, guides, legal) follow the shared rules at https://github.com/merqo-io/merqo-ui/blob/main/docs/public-page-rules.md. This section never restates them; it only adds printkit's own values.
 
-- **Routes covered:** `/about`, `/guides/*` (today `/guides/bluetooth-printers`) and `/legal/*` (`privacy`, `terms`, `accept`).
-- **No landing page, by design:** `/` redirects to the dashboard, so there is no landing, no journey block and no `/faq`. Do not add one from the shared rules.
+- **Routes covered:** `/`, `/about`, `/guides/*` (today `/guides/bluetooth-printers`) and `/legal/*` (`privacy`, `terms`, `accept`).
+- **Landing (`/`):** signed-out visitors get a landing (`src/app/page.tsx`, built from `src/components/landing/`): an "In build" hero with a print demo (`hero.tsx`), a 3-step journey (`print-journey.tsx`), 3 FAQ rows and a closing Sign in call (`sections.tsx`). Signed-in visitors redirect to `/dashboard`. There is no `/faq` route; do not add one from the shared rules.
 - **Radius:** `--radius` is `0.625rem` (`src/app/globals.css:11`).
 - **Product objects:** none on the public pages.
 - **Open:**

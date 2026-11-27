@@ -32,6 +32,15 @@ test.describe("CSP", () => {
     expect(problems).toEqual([]);
   });
 
+  test("the public landing runs without CSP violations", async ({ page }) => {
+    const problems = watchCsp(page);
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Print qkit orders/ }),
+    ).toBeVisible();
+    expect(problems).toEqual([]);
+  });
+
   test("a static page keeps the static CSP and still runs", async ({
     page,
   }) => {
