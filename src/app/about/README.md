@@ -16,6 +16,8 @@ printkit, the same way qkit and loopkit do, so that link never lands on the
   with the sign-in link shown. Its tab title is "About".
 - `page.dom.test.tsx` — renders the real `AboutMerqo` copy: it names printkit, the call to action links to the public printer guide, and it has no `$`, em dash or banned words.
 
+The Bluetooth printer guide link is at least 44px tall (`min-h-11`) so it is finger-sized on a phone.
+
 ## Parent
 
 [app](../README.md)

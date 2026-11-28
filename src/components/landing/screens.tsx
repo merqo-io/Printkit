@@ -36,7 +36,7 @@ export function PairScreen({ frame }: { frame: number }) {
           size="sm"
           tabIndex={-1}
           aria-hidden
-          className="pointer-events-none"
+          className="pointer-events-none min-h-11"
         >
           {PAIR_BUTTON}
         </Button>
@@ -52,7 +52,7 @@ export function PairScreen({ frame }: { frame: number }) {
             variant="outline"
             tabIndex={-1}
             aria-hidden
-            className="pointer-events-none"
+            className="pointer-events-none min-h-11"
           >
             {PRINT_TEST}
           </Button>

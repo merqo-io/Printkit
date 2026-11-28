@@ -45,7 +45,7 @@ export function SiteNav({ user }: { user?: NavUser | null }) {
               supportCategories={SUPPORT_CATEGORY_LABELS}
             />
           ) : (
-            <Button asChild className="h-10 rounded-lg px-5 font-semibold">
+            <Button asChild className="h-11 rounded-lg px-5 font-semibold">
               <Link href="/login">Sign in</Link>
             </Button>
           )}
