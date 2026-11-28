@@ -165,3 +165,19 @@ it("does not create a preview or confirm an in-flight download after unmount", a
   expect(URL.createObjectURL).not.toHaveBeenCalled();
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
+
+it("logs a failed poll and keeps polling instead of throwing", async () => {
+  const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  const fetchMock = vi.fn().mockRejectedValue(new Error("network down"));
+  vi.stubGlobal("fetch", fetchMock);
+  const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  render(<VirtualPrinterPanel locations={LOCATIONS} />);
+  await user.click(screen.getByRole("button", { name: /start virtual/i }));
+  await act(async () => vi.advanceTimersByTimeAsync(6100));
+  expect(errorSpy).toHaveBeenCalledWith(
+    "virtual printer poll failed",
+    expect.any(Error),
+  );
+  expect(fetchMock.mock.calls.length).toBeGreaterThan(1);
+  errorSpy.mockRestore();
+});

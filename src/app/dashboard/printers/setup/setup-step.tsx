@@ -26,7 +26,7 @@ export function WaitingForPrinter({ locationId }: { locationId: string }) {
         console.error("Could not read the printer state", err);
       }
     },
-    { intervalMs: POLL_MS, enabled: true },
+    { intervalMs: POLL_MS, enabled: state !== "online" },
   );
 
   if (state === "online") {

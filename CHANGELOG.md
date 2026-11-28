@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- The printer setup "waiting for printer" step stops polling once the printer reports online; a test pins that and the virtual printer's failed-poll handling. The legal README now describes the shared `clientIp`.
 - Legal acceptance records the real client IP through the shared `clientIp` (last forwarded hop, not the client-supplied first one) and posts via `createMerqoClient`; device tokens hash through the shared `digest`; the info "i" button is a 44px target on touch screens; loading skeletons use the shared `ListSkeleton`/`Skeleton`; the Bluetooth guide title uses `PageHeader`.
 
 - Sign-in, reset-password and the shared copy now come from `@merqo/ui` instead of kit-local copies: `/login` renders `AuthShell` and `LoginForm`, `/reset-password` wraps `ResetPasswordForm`, auth errors use `authErrorMessage`, `Alert` comes from `@merqo/ui/primitives`, and the virtual printer shows times with `formatTime` (Singapore time). `src/lib/auth-errors.ts` and `src/components/ui/alert.tsx` are removed. Visible changes: auth error lines are slightly shorter ("Could not sign in. Try again."), a reset-link request and a failed password update show inline instead of as a toast, the email format check is the browser's own, and the footer line sits under the login card. Reset-password still states no length rule of its own.

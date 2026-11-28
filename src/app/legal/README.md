@@ -30,7 +30,8 @@ routes to it and, on `accept/`, records the vendor's acceptance with merqo.
   it has no slot for that exit.
 - `accept/actions.ts` — `acceptLegalTerms` server action. Re-checks for a
   signed-in user (redirects to `/login` otherwise), reads the vendor's
-  real `ip`/`user_agent` (via `headers()`/a local `clientIp` helper, since
+  real `ip`/`user_agent` (via `headers()` and the shared `clientIp` from `@merqo/ui/kit-api`, which
+  trusts only the last hop of `x-vercel-forwarded-for`/`x-forwarded-for`, since
   this action runs on the vendor's own browser submission), then `POST`s
   `/api/merqo/legal-accept` on merqo once per doc type (`terms`,
   `privacy`) — bearer-authed with `MERQO_CUSTOMER_SECRET`, `kit_slug:
