@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Repinned `@merqo/ui` to 0.62.1: new `AboutMerqo` copy (qkit running in a pilot, printkit listed) and 44px tap targets in the shared `Footer` and `LandingNav`. The landing's hero buttons, demo buttons, header Sign in and the Bluetooth guide links are now at least 44px tall too.
 - `/` is now indexable in production: `robots.ts` allows only the root and its page metadata drops noindex. Every other route and every preview stays noindex.
 - `@merqo/ui` is pinned to 0.61.1. The History created column and cards render `<Timestamp variant="datetime" />`, and the printer status row uses the shared `formatDateTime`; the kit's own `src/lib/utils.ts` date helper is removed. Output is unchanged (Singapore time, "22 Aug 2026, 6:00 pm"). The shared `GlobalError` fallback heading now reads "Could not load the app" (was "Something went wrong").
 

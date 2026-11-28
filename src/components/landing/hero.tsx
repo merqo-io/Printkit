@@ -71,13 +71,13 @@ export function Hero() {
           carry each label across.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="min-h-11">
             <Link href="/login">
               Sign in
               <ArrowRight className="size-4" />
             </Link>
           </Button>
-          <Button asChild size="lg" variant="outline">
+          <Button asChild size="lg" variant="outline" className="min-h-11">
             <a href="#how">How it works</a>
           </Button>
         </div>
