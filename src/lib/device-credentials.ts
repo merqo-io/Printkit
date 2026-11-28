@@ -1,10 +1,11 @@
-import { createHash, randomBytes } from "node:crypto";
+import { randomBytes } from "node:crypto";
+import { digest } from "@merqo/ui/kit-api";
 import { createServiceClient } from "@/lib/supabase/server";
 
 export type DeviceCredentialKind = "cloudprnt_url_token" | "bridge_agent_token";
 
 export function hashDeviceToken(token: string): string {
-  return createHash("sha256").update(token, "utf8").digest("hex");
+  return digest(token);
 }
 
 /**

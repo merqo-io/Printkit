@@ -5,5 +5,5 @@ import PrintersLoading from "./loading";
 
 it("announces that Printers is loading", () => {
   render(<PrintersLoading />);
-  expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent("Loading");
 });

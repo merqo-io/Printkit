@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { usePolling } from "@merqo/ui";
 import { readPrinterState } from "./actions";
 import { TestPrintButton } from "../test-print-button";
 
@@ -17,24 +18,16 @@ export function WaitingForPrinter({ locationId }: { locationId: string }) {
     "not_set_up",
   );
 
-  useEffect(() => {
-    let active = true;
-    const check = () => {
-      readPrinterState(locationId)
-        .then((next) => {
-          if (active) setState(next);
-        })
-        .catch((err: unknown) => {
-          console.error("Could not read the printer state", err);
-        });
-    };
-    check();
-    const timer = setInterval(check, POLL_MS);
-    return () => {
-      active = false;
-      clearInterval(timer);
-    };
-  }, [locationId]);
+  usePolling(
+    async () => {
+      try {
+        setState(await readPrinterState(locationId));
+      } catch (err: unknown) {
+        console.error("Could not read the printer state", err);
+      }
+    },
+    { intervalMs: POLL_MS, enabled: true },
+  );
 
   if (state === "online") {
     return (

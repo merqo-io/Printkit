@@ -5,5 +5,5 @@ import SetupLoading from "./loading";
 
 it("announces that Setup is loading", () => {
   render(<SetupLoading />);
-  expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent("Loading");
 });

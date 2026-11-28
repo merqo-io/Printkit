@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Switch } from "@merqo/ui/primitives";
 import { Button } from "@merqo/ui/primitives";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@merqo/ui/primitives";
 import { isBridgeModeEnabled, setBridgeModeEnabled } from "@/lib/bridge-mode";
 import {
   getBluetoothSupport,
@@ -188,6 +188,8 @@ export function BridgePanel({
       printJob();
     };
     beat();
+    // Not usePolling: a bridge tablet left with its screen off must keep
+    // reporting online and printing, which a hidden-tab pause would stop.
     const timer = setInterval(beat, HEARTBEAT_MS);
     return () => clearInterval(timer);
   }, [enabled, locationId, printJob]);

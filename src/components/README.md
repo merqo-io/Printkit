@@ -3,7 +3,7 @@
 ## Purpose
 
 Shared React components — not scoped to one dashboard sub-route. One
-subfolder groups a larger cluster (`ui/` shadcn primitives); everything
+subfolder groups a larger cluster; everything
 else sits flat here.
 
 ## Contents
@@ -18,7 +18,7 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
   bridge could ever feed.
 - `info-button.tsx` — `InfoButton({ topic })`: the small "i" next to a badge
   or filter, opening that topic's plain-language explanation from
-  `@/lib/printer-info-copy`. It composes shared InfoTooltip with a 24px trigger and opens on tap rather than hover, because
+  `@/lib/printer-info-copy`. It composes shared InfoTooltip with a 24px trigger (44px on coarse pointers) and opens on tap rather than hover, because
   vendors read these on an iPad where a hover tooltip never appears, and the
   trigger is a real button so it is reachable by keyboard.
 - `site-nav.tsx` — `SiteNav()`: `@merqo/ui`'s `LandingNav` with the printkit wordmark (to `/dashboard`), About (passed as `links`, so it folds into a burger below `sm`) and a "Sign in" button (to `/login`), the top bar of the public pages (`/about`, the Bluetooth guide). Given a `user` (the signed-in visitor as a `NavUser`, from `getNavUser()`), it shows `@merqo/ui`'s `LandingAccountNav` (Dashboard link, account menu) instead of Sign in; it stays a Server Component, so it passes no function props (such as `LinkComponent`) to the client account nav.
@@ -60,6 +60,6 @@ lastSeenAt })`: one booth's printer and whether it is reachable. On a phone the 
 
 - `labels-upgrade-message.tsx` - `LabelsUpgradeMessage`: the labels-blocked message with "Upgrade in your Merqo account" rendered as a `TextLink` to the Merqo dashboard (same tab).
 
-Shared components import shadcn primitives and `cn` from `@merqo/ui/primitives`; only `ui/alert` remains a local primitive. `button-touch.dom.test.tsx` guards the 44px touch sizes of the shared `Button`.
+Shared components import shadcn primitives and `cn` from `@merqo/ui/primitives`; `Alert` too. `button-touch.dom.test.tsx` guards the 44px touch sizes of the shared `Button`.
 
 `site-nav.tsx`'s header Sign in button is `h-11` (44px) to match the shared `LandingNav` tap targets.

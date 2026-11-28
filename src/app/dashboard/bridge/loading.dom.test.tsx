@@ -5,5 +5,5 @@ import BridgeLoading from "./loading";
 
 it("announces that Bridge is loading", () => {
   render(<BridgeLoading />);
-  expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent("Loading");
 });

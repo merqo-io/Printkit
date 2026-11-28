@@ -10,7 +10,7 @@ export function InfoButton({ topic }: { topic: InfoTopic }) {
     <InfoTooltip
       trigger="tap"
       ariaLabel={`What does "${copy.title}" mean?`}
-      triggerClassName="size-6 shrink-0 transition-colors focus-visible:ring-ring"
+      triggerClassName="size-6 pointer-coarse:size-11 shrink-0 transition-colors focus-visible:ring-ring"
       iconClassName="size-4"
       contentClassName="rounded-lg text-foreground shadow-lg"
       content={
