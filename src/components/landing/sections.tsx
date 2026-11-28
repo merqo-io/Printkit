@@ -33,7 +33,10 @@ export function LandingFaq() {
           <h2 className={H2}>Questions vendors ask first.</h2>
           <div className="space-y-6">
             <FaqRows rows={LANDING_FAQ} />
-            <TextLink href={GUIDE_HREF}>
+            <TextLink
+              href={GUIDE_HREF}
+              className="inline-flex min-h-11 items-center"
+            >
               Read the Bluetooth printer guide
             </TextLink>
           </div>

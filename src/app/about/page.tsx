@@ -17,7 +17,10 @@ export default async function AboutPage() {
       <SiteNav user={user} />
       <main className="flex-1">
         <AboutMerqo kitName="printkit">
-          <TextLink href="/guides/bluetooth-printers">
+          <TextLink
+            href="/guides/bluetooth-printers"
+            className="inline-flex min-h-11 items-center"
+          >
             Read the Bluetooth printer guide
           </TextLink>
         </AboutMerqo>
