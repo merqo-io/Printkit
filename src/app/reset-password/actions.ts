@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@/lib/supabase/server";
 import { passwordChangeSchema } from "@/lib/password-change";
-import { passwordUpdateErrorMessage } from "@/lib/auth-errors";
+import { authErrorMessage } from "@merqo/ui";
 import {
   RECOVERY_WINDOW_COOKIE,
   getRecoveryState,
@@ -48,7 +48,7 @@ export async function updatePasswordAction(
       password: parsed.data.password,
     });
     if (error)
-      return { success: false, error: passwordUpdateErrorMessage(error) };
+      return { success: false, error: authErrorMessage(error, "update") };
   } catch {
     return {
       success: false,

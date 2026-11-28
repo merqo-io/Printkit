@@ -19,4 +19,4 @@ The designer page carries the tab title "Label design", matching its heading.
 
 A failed save shows its message through the shared `@merqo/ui` `FormError`.
 
-`loading.tsx` is the route's skeleton, using the page's `max-w-6xl` cap so the layout does not jump when data arrives; it pulses only when motion is allowed.
+`loading.tsx` is the route's skeleton, built from the shared `Skeleton`, using the page's `max-w-6xl` cap so the layout does not jump when data arrives; the shared skeleton pulses only when motion is allowed.

@@ -4,7 +4,7 @@ Public page rules (radius, shadow, hover and motion) are recorded in `DESIGN.md`
 
 Hardware print connector for Merqo vendors. Prints a label for every
 order, through one of three connectors (`src/lib/connectors/`):
-`cloud_poll` for printers that fetch their own jobs (Star CloudPRNT),
+`cloud_poll` for printers that fetch their own jobs (Star CloudPRNT; the setup page stops polling once the printer is online),
 `vendor_cloud` for printers reached through their maker's cloud (Feie 4G),
 and `bridge` for Bluetooth printers (NIIMBOT B1) through the Connect a Bluetooth printer page in
 Chrome on an Android phone, a Windows laptop or a Mac, or the Raspberry Pi
@@ -75,7 +75,7 @@ payloads 90 days after printing and deletes expired bridge pairing codes.
 for the security context). The Vercel build does not use
 `output: "standalone"`; that config was dropped.
 
-Shared shadcn primitives (`Badge`, `Button`, `Input`, `Label`, `Select`, `Switch`, `Tooltip`, `cn`) come from `@merqo/ui/primitives`; only `alert` is a local copy under `src/components/ui/`.
+Shared shadcn primitives (`Badge`, `Button`, `Input`, `Label`, `Select`, `Switch`, `Tooltip`, `Alert`, `cn`) come from `@merqo/ui/primitives`.
 
 The Overview fills the dashboard layout's full `max-w-7xl` width, shows three first-run steps (booth, printer, first label) until a label has printed (a step shows done only when every earlier step is done), refreshes itself on tab focus and every 30 seconds while visible, and every dashboard page header carries a short eyebrow (Overview: "Your booths"); the designer is reached from Printers. Set the optional `NEXT_PUBLIC_QKIT_URL` (see `.env.example`) before building to make the first step link to qkit.
 
@@ -135,7 +135,7 @@ Supabase says failed (the client states no length rule of its own), and the new-
 
 Sign-in, password reset and terms acceptance show plain sentence-case copy.
 Supabase auth errors are mapped to short next-step messages in
-`src/lib/auth-errors.ts` (unknown ones get a generic "Try again in a minute"
+the shared `authErrorMessage` from `@merqo/ui` (unknown ones get a generic "Try again"
 rather than the raw text), the login page checks the email inline before
 calling Supabase, and `/legal/accept` has a "Sign out instead" button so a
 vendor who declines the updated terms is not stuck.

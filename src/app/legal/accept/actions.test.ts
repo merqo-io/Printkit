@@ -37,7 +37,7 @@ function formData(next?: string): FormData {
 }
 
 function okFetch() {
-  return vi.fn().mockResolvedValue({ ok: true, status: 200 });
+  return vi.fn().mockImplementation(async () => Response.json({ ok: true }));
 }
 
 beforeEach(() => {
@@ -77,7 +77,9 @@ describe("acceptLegalTerms", () => {
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
     for (const call of fetchSpy.mock.calls) {
-      expect(call[0]).toBe("https://merqo.example.com/api/merqo/legal-accept");
+      expect(String(call[0])).toBe(
+        "https://merqo.example.com/api/merqo/legal-accept",
+      );
       expect(call[1].headers.Authorization).toBe("Bearer test-secret");
     }
     const bodies = fetchSpy.mock.calls.map((c) => JSON.parse(c[1].body));
@@ -202,12 +204,35 @@ describe("acceptLegalTerms", () => {
     expect(redirectMock).toHaveBeenCalledWith("/dashboard/bridge");
   });
 
-  it("falls back to x-real-ip when x-forwarded-for is absent", async () => {
+  it("records the last x-forwarded-for hop, not a client-supplied first one", async () => {
     getUserMock.mockResolvedValue({
       data: { user: { id: "u1", email: "vendor@business.sg" } },
     });
     headersMock.mockResolvedValue(
-      new Headers({ "x-real-ip": "198.51.100.9", "user-agent": REAL_UA }),
+      new Headers({
+        "x-forwarded-for": `198.51.100.99, ${REAL_IP}`,
+        "user-agent": REAL_UA,
+      }),
+    );
+    const fetchSpy = okFetch();
+    global.fetch = fetchSpy as never;
+
+    await acceptLegalTerms(formData("/dashboard"));
+
+    const body = JSON.parse(fetchSpy.mock.calls[0][1].body);
+    expect(body.ip).toBe(REAL_IP);
+  });
+
+  it("prefers x-vercel-forwarded-for, which the edge overwrites", async () => {
+    getUserMock.mockResolvedValue({
+      data: { user: { id: "u1", email: "vendor@business.sg" } },
+    });
+    headersMock.mockResolvedValue(
+      new Headers({
+        "x-vercel-forwarded-for": "198.51.100.9",
+        "x-forwarded-for": REAL_IP,
+        "user-agent": REAL_UA,
+      }),
     );
     const fetchSpy = okFetch();
     global.fetch = fetchSpy as never;

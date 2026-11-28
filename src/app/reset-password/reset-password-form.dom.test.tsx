@@ -17,7 +17,8 @@ const { updatePasswordAction, push, refresh, toast } = vi.hoisted(() => ({
 vi.mock("./actions", () => ({ updatePasswordAction }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 vi.mock("sonner", () => ({ toast }));
-import { PASSWORD_REQUIREMENTS_HINT } from "@/lib/auth-errors";
+import { PASSWORD_REQUIREMENTS_HINT } from "@merqo/ui";
+import userEvent from "@testing-library/user-event";
 import { ResetPasswordForm } from "./reset-password-form";
 
 beforeEach(() => {
@@ -82,18 +83,21 @@ describe("password recovery", () => {
     });
     render(<ResetPasswordForm initialState="ready" />);
     await enterPasswords();
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
+    expect(
+      await screen.findByText(
         "Password is too short. Use at least 8 characters.",
       ),
-    );
+    ).toBeInTheDocument();
   });
 
-  it("keeps submit disabled while the password is empty", async () => {
+  it("asks for a password instead of calling the server when both fields are empty", async () => {
     render(<ResetPasswordForm initialState="ready" />);
-    expect(
+    fireEvent.click(
       await screen.findByRole("button", { name: "Update password" }),
-    ).toBeDisabled();
+    );
+    expect(
+      await screen.findByText("Enter a new password."),
+    ).toBeInTheDocument();
     expect(updatePasswordAction).not.toHaveBeenCalled();
   });
 
@@ -110,11 +114,11 @@ describe("password recovery", () => {
         confirm: "short",
       }),
     );
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
+    expect(
+      await screen.findByText(
         "Password is too short. Use at least 8 characters.",
       ),
-    );
+    ).toBeInTheDocument();
   });
 
   it("shows update errors and permits a retry without redirecting", async () => {
@@ -124,9 +128,7 @@ describe("password recovery", () => {
     });
     render(<ResetPasswordForm initialState="ready" />);
     await enterPasswords();
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Password is too weak"),
-    );
+    expect(await screen.findByText("Password is too weak")).toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
     expect(
       screen.getByRole("button", { name: "Update password" }),
@@ -164,11 +166,11 @@ describe("password recovery", () => {
     updatePasswordAction.mockRejectedValue(new Error("network"));
     render(<ResetPasswordForm initialState="ready" />);
     await enterPasswords();
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
+    expect(
+      await screen.findByText(
         "Could not update your password. Try again in a minute.",
       ),
-    );
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Update password" }),
     ).toBeEnabled();
@@ -189,4 +191,16 @@ describe("password recovery", () => {
     expect(updatePasswordAction).toHaveBeenCalledTimes(1);
     await act(async () => resolve({ success: true }));
   });
+});
+
+it("submits by touch without a hover click", async () => {
+  const user = userEvent.setup();
+  render(<ResetPasswordForm initialState="ready" />);
+  await user.type(await screen.findByLabelText("New password"), "abc12345");
+  await user.type(screen.getByLabelText("Confirm new password"), "abc12345");
+  await user.pointer({
+    keys: "[TouchA]",
+    target: screen.getByRole("button", { name: "Update password" }),
+  });
+  await waitFor(() => expect(push).toHaveBeenCalledWith("/dashboard"));
 });

@@ -33,12 +33,6 @@ vi.mock("@/lib/supabase/client", () => ({
   })),
 }));
 
-vi.mock("sonner", () => ({
-  toast: { success: vi.fn(), error: vi.fn() },
-}));
-
-import { toast } from "sonner";
-
 beforeEach(() => {
   useRouterMock.mockReset().mockReturnValue({
     push: vi.fn(),
@@ -48,8 +42,6 @@ beforeEach(() => {
   signInWithOAuthMock.mockReset().mockResolvedValue({ error: null });
   signInWithPasswordMock.mockReset().mockResolvedValue({ error: null });
   resetPasswordForEmailMock.mockReset().mockResolvedValue({ error: null });
-  vi.mocked(toast.success).mockReset();
-  vi.mocked(toast.error).mockReset();
 });
 
 describe("LoginPage", () => {
@@ -139,6 +131,18 @@ describe("LoginPage", () => {
     });
   });
 
+  it("confirms the reset link inline", async () => {
+    const user = userEvent.setup();
+    render(<LoginPage />);
+    await user.type(screen.getByLabelText(/email/i), "vendor@example.com");
+    await user.click(screen.getByRole("button", { name: /forgot password/i }));
+    expect(
+      await screen.findByText(
+        "Reset link sent to vendor@example.com. Check your inbox.",
+      ),
+    ).toBeVisible();
+  });
+
   it("flags the email inline and does not send a reset email when the email field is empty", async () => {
     const user = userEvent.setup();
     const { default: LoginPage } = await import("./page");
@@ -146,27 +150,26 @@ describe("LoginPage", () => {
 
     await user.click(screen.getByRole("button", { name: /forgot password/i }));
 
-    expect(screen.getByText(/Enter a valid email/)).toBeVisible();
+    expect(await screen.findByText("Enter your email first.")).toBeVisible();
     expect(resetPasswordForEmailMock).not.toHaveBeenCalled();
   });
 
-  it("toasts plain copy when resetPasswordForEmail is rate limited", async () => {
+  it("shows plain copy inline when resetPasswordForEmail is rate limited", async () => {
     resetPasswordForEmailMock.mockResolvedValue({
       error: { message: "Too many requests", status: 429 },
     });
     const user = userEvent.setup();
-    const { default: LoginPage } = await import("./page");
     render(<LoginPage />);
 
     await user.type(screen.getByLabelText(/email/i), "vendor@example.com");
-    await user.click(screen.getByRole("button", { name: /forgot password/i }));
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        "Too many requests. Wait a few minutes and try again.",
-      );
+    await user.pointer({
+      keys: "[TouchA]",
+      target: screen.getByRole("button", { name: /forgot password/i }),
     });
-    expect(toast.success).not.toHaveBeenCalled();
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Too many attempts. Wait a minute and try again.",
+    );
   });
 
   it("points new vendors to qkit instead of offering sign-up", () => {
@@ -325,15 +328,12 @@ describe("LoginPage return path", () => {
 
 it("releases reset controls after transport rejection", async () => {
   resetPasswordForEmailMock.mockRejectedValue(new Error("network"));
-  const { default: LoginPage } = await import("./page");
   render(<LoginPage />);
   const user = userEvent.setup();
   await user.type(screen.getByLabelText("Email"), "vendor@example.com");
   await user.click(screen.getByRole("button", { name: /forgot password/i }));
-  await waitFor(() =>
-    expect(toast.error).toHaveBeenCalledWith(
-      "Could not send a reset link. Try again in a minute.",
-    ),
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "Could not send the reset link. Try again.",
   );
   expect(
     screen.getByRole("button", { name: /forgot password/i }),

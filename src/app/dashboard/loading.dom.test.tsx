@@ -5,5 +5,5 @@ import DashboardLoading from "./loading";
 
 it("announces that the dashboard is loading", () => {
   render(<DashboardLoading />);
-  expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent("Loading");
 });

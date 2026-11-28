@@ -26,7 +26,8 @@ when `VERCEL_ENV === "production"`.
   overlap the next tick. The token lives in component state only.
   Its pending label uses the ellipsis character ("Starting…"), matching every other pending button.
 - `virtual-printer-panel.dom.test.tsx` — idle state, a full job round trip
-  (poll, fetch, render, confirm), and the error path.
+  (poll, fetch, render, confirm), the error path, and a failed poll that is
+  logged without stopping the next one.
 
 ## Connectivity
 

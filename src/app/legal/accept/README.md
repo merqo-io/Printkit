@@ -22,7 +22,9 @@ folder's job is entirely to collect the vendor's consent and forward it.
   exit.
 - `actions.ts` — `acceptLegalTerms` server action. Re-checks for a signed-in
   user (redirects to `/login` otherwise), reads the vendor's real
-  `ip`/`user_agent`, then `POST`s `/api/merqo/legal-accept` on merqo once
+  `ip` (shared `clientIp`, trusting `x-vercel-forwarded-for` then the last
+  `x-forwarded-for` hop, never the spoofable first one) and `user_agent`, then
+  posts through `createMerqoClient` to `/api/merqo/legal-accept` on merqo once
   per doc type (`terms`, `privacy`), each independent so a
   duplicate-acceptance conflict on one never blocks the other. The
   recorded `doc_sha256` hashes `getLegalDocSource(docType, "printkit")` —
@@ -31,7 +33,7 @@ folder's job is entirely to collect the vendor's consent and forward it.
   cache (a failed cache write is logged, not fatal) and redirects to a `safeRedirectPath`-checked `next` (default
   `/dashboard`).
 - `actions.test.ts` — covers the two independent posts, the cache prime,
-  `next`-param safety, the no-user/missing-secret branches, and a
+  `next`-param safety, client IP selection, the no-user/missing-secret branches, and a
   non-2xx throw.
 
 ## Parent

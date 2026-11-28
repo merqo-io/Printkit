@@ -5,5 +5,5 @@ import HistoryLoading from "./loading";
 
 it("announces that History is loading", () => {
   render(<HistoryLoading />);
-  expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent("Loading");
 });

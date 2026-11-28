@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BackToTop } from "@merqo/ui";
+import { BackToTop, PageHeader } from "@merqo/ui";
 import { Notice } from "@/components/notice";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
@@ -59,9 +59,7 @@ export default async function BluetoothPrintersGuide() {
     <>
       <SiteNav user={user} />
       <main className="mx-auto max-w-2xl px-5 py-12">
-        <h1 className="font-display text-4xl leading-tight font-semibold">
-          Bluetooth printers
-        </h1>
+        <PageHeader title="Bluetooth printers" />
 
         <Notice tone="warning" title="Read this first" className="mt-6">
           <p>{BLUETOOTH_WARNING}</p>

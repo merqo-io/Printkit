@@ -81,11 +81,10 @@ describe("VirtualPrinterPanel", () => {
     render(<VirtualPrinterPanel locations={LOCATIONS} />);
     await user.click(screen.getByRole("button", { name: /start virtual/i }));
 
-    await vi.advanceTimersByTimeAsync(3100);
-
     await waitFor(() => {
       expect(screen.getByAltText(/label for job job-1/i)).toBeInTheDocument();
     });
+    expect(screen.getByText(/^\d{1,2}:\d{2} (am|pm)$/)).toBeInTheDocument();
     await waitFor(() => {
       expect(calls.some((call) => call.method === "DELETE")).toBe(true);
     });
@@ -130,7 +129,7 @@ it("bounds previews and releases discarded and retained object URLs", async () =
   const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
   const { unmount } = render(<VirtualPrinterPanel locations={LOCATIONS} />);
   await user.click(screen.getByRole("button", { name: /start virtual/i }));
-  await act(async () => vi.advanceTimersByTimeAsync(63_000));
+  await act(async () => vi.advanceTimersByTimeAsync(60_100));
   expect(screen.getAllByRole("img")).toHaveLength(20);
   expect(URL.createObjectURL).toHaveBeenCalledTimes(21);
   expect(URL.revokeObjectURL).toHaveBeenCalledExactlyOnceWith("blob:label-1");
@@ -165,4 +164,20 @@ it("does not create a preview or confirm an in-flight download after unmount", a
   });
   expect(URL.createObjectURL).not.toHaveBeenCalled();
   expect(fetchMock).toHaveBeenCalledTimes(2);
+});
+
+it("logs a failed poll and keeps polling instead of throwing", async () => {
+  const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  const fetchMock = vi.fn().mockRejectedValue(new Error("network down"));
+  vi.stubGlobal("fetch", fetchMock);
+  const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  render(<VirtualPrinterPanel locations={LOCATIONS} />);
+  await user.click(screen.getByRole("button", { name: /start virtual/i }));
+  await act(async () => vi.advanceTimersByTimeAsync(6100));
+  expect(errorSpy).toHaveBeenCalledWith(
+    "virtual printer poll failed",
+    expect.any(Error),
+  );
+  expect(fetchMock.mock.calls.length).toBeGreaterThan(1);
+  errorSpy.mockRestore();
 });

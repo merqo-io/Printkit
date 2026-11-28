@@ -24,13 +24,6 @@ everything else sits flat here.
   `GET /api/v1/print-locations/status` as `manage_url` so no calling kit
   builds a printkit path. `locationRowId(id)` is the row's element id,
   shared with the printers page so the link and the row cannot drift.
-- `auth-errors.ts` — maps Supabase auth errors to short plain copy for the
-  login and reset-password screens (`signInErrorMessage`,
-  `resetErrorMessage`, `passwordUpdateErrorMessage`, `oauthErrorMessage`).
-  Unknown errors get a generic fallback so raw provider text never reaches
-  the page. `weakPasswordMessage` names the failed password rules from
-  Supabase's `reasons` and message; `PASSWORD_REQUIREMENTS_HINT` is the
-  requirements copy the reset form shows beside the new-password field.
 - `auth-return.ts` — `authNextCookie(next, secure)`: the `document.cookie`
   string that saves the login page's return path as `printkit_auth_next`
   (`Path=/auth`, `Max-Age=600`, `SameSite=Lax`, `Secure` on https), or

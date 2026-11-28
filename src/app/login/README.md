@@ -8,28 +8,23 @@ OAuth, plus password reset. There is no sign-up: the tagline says "New to printk
 ## Contents
 
 - `layout.tsx` — a pass-through server layout that sets the tab title "Sign in"; `page.tsx` is a client component and cannot export `metadata`.
-- `page.tsx` — `LoginPage()` wraps the actual `LoginForm` client component
-  in `<Suspense>` (it reads `useSearchParams()` for `?error=oauth` and `?error=link`, the latter for an invalid or expired emailed link).
-  `LoginForm` handles:
+- `page.tsx` — `LoginPage()` wraps `LoginScreen` in `<Suspense>` (it reads
+  `useSearchParams()` for `?error=oauth` and `?error=link`, shown through
+  `initialError`). `LoginScreen` renders the shared `AuthShell` and `LoginForm`
+  from `@merqo/ui` and supplies the Supabase calls:
   - Google OAuth via `supabase.auth.signInWithOAuth`, redirecting through
     `/auth/callback`; `queryParams: { hl: "en" }` forces an English consent
     screen regardless of the visitor's browser/account locale.
-  - Email+password sign-in via `supabase.auth.signInWithPassword`. The email
-    is checked with Zod first and a bad one shows an inline error tied to the
-    field with `aria-describedby`. Supabase errors never show raw: they go
-    through `@/lib/auth-errors` (wrong credentials, unconfirmed email, rate
-    limit, network, and a generic "Could not sign in. Try again in a
-    minute."). The button reads "Signing in…" while pending.
-  - "Forgot password?" calls
-    `supabase.auth.resetPasswordForEmail`, showing the inline email error if
-    the field is not a valid email, a mapped error toast if the call fails,
-    and a success toast otherwise. The
+  - Email+password sign-in via `supabase.auth.signInWithPassword`. Supabase
+    errors are returned as `{ error }` and mapped by the shared
+    `authErrorMessage(error, context)`, so raw provider text never shows. The
+    form owns the email check, the pending state and the 44px touch targets.
+  - "Forgot password?" calls `supabase.auth.resetPasswordForEmail` and shows
+    the form's inline notice on success or its mapped error. The
     reset link lands on the bare `/auth/callback` URL, which recognises the
     recovery exchange, opens a 15-minute recovery window and forwards to
     `/reset-password`.
-  - `Wordmark` (`@/components/wordmark`) and `GoogleMark`
-    (`@merqo/ui`) brand the card; the card container is `ElevatedCard`
-    (`@merqo/ui`), matching every other kit's login page.
+  - `Wordmark` (`@/components/wordmark`) is the `AuthShell` wordmark slot; the tagline, subtitle and footer line are `AuthShell` props.
   - The return path. `returnPath()` reads `?next=` through
     `safeRedirectPath` (`@merqo/ui`), so an absolute URL, a
     `//host` or a backslash path falls back to `/dashboard`. Password

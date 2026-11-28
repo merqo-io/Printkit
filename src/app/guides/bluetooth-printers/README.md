@@ -15,7 +15,7 @@ least recommended way to print, then gives complete steps.
   and a troubleshooting FAQ.
   Headings use the display face; "Read this first" is a warning `Notice`; step numbers match the setup flows' `Step` marker.
   Opens with `SiteNav` (Dashboard and the shared `LandingAccountNav` menu when signed in, from `getNavUser()`) and ends with `SiteFooter` (sign-in shown) and the shared `BackToTop`, like every public page.
-  Ends with a "set up a printer" text link beside the help hint. Opens by naming printkit the print companion for qkit booths. Its tab title "Bluetooth printers" goes through the root template.
+  Ends with a "set up a printer" text link beside the help hint. Opens by naming printkit the print companion for qkit booths. Its tab title "Bluetooth printers" goes through the root template. The title is the shared `@merqo/ui` `PageHeader` rather than a hand-styled `h1`.
 
 ## Parent
 

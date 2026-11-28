@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@merqo/ui/primitives";
+import { formatTime, usePolling } from "@merqo/ui";
 import { startVirtualPrinter } from "./actions";
 
 const POLL_INTERVAL_MS = 3000;
@@ -73,7 +74,7 @@ export function VirtualPrinterPanel({
         {
           jobId,
           src: URL.createObjectURL(blob),
-          at: new Date().toLocaleTimeString(),
+          at: formatTime(new Date()),
         },
         ...printedRef.current,
       ];
@@ -92,17 +93,13 @@ export function VirtualPrinterPanel({
     }
   }, []);
 
-  useEffect(() => {
-    if (!token) return;
-    const timer = setInterval(() => {
-      pollOnce(token).catch((err: unknown) => {
-        console.error("virtual printer poll failed", err);
-      });
-    }, POLL_INTERVAL_MS);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [token, pollOnce]);
+  usePolling(
+    async () => {
+      if (!token) return;
+      await pollOnce(token);
+    },
+    { intervalMs: POLL_INTERVAL_MS, enabled: token !== null },
+  );
 
   const onStart = async () => {
     setStarting(true);

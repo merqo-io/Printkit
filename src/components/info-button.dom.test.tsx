@@ -33,3 +33,15 @@ it("opens with the keyboard, dismisses on Escape and restores trigger focus", as
   ).not.toBeInTheDocument();
   expect(trigger).toHaveFocus();
 });
+it("grows to a 44px target on touch screens and opens by touch", async () => {
+  const user = userEvent.setup();
+  render(<InfoButton topic="ipad_alone" />);
+  const trigger = screen.getByRole("button", {
+    name: 'What does "Works with iPad alone" mean?',
+  });
+  expect(trigger).toHaveClass("pointer-coarse:size-11");
+  await user.pointer({ keys: "[TouchA]", target: trigger });
+  expect(
+    await screen.findByText(INFO_COPY.ipad_alone.body),
+  ).toBeInTheDocument();
+});

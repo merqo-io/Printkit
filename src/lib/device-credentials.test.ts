@@ -31,6 +31,10 @@ describe("hashDeviceToken", () => {
     expect(hash).toMatch(/^[0-9a-f]{64}$/);
     expect(hashDeviceToken("abc")).toBe(hash);
     expect(hashDeviceToken("abd")).not.toBe(hash);
+    // Hashes already stored in device_credentials must keep matching.
+    expect(hash).toBe(
+      "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+    );
   });
 });
 

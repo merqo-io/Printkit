@@ -4,19 +4,16 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@merqo/ui/primitives";
-import { Input } from "@merqo/ui/primitives";
-import { Label } from "@merqo/ui/primitives";
 import {
   ElevatedCard,
-  InfoTooltip,
-  useAsyncAction,
+  PasswordRequirementsHint,
+  ResetPasswordForm as SharedResetPasswordForm,
   navigatingAway,
 } from "@merqo/ui";
-import { PASSWORD_REQUIREMENTS_HINT } from "@/lib/auth-errors";
-import { passwordChangeSchema } from "@/lib/password-change";
 import type { RecoveryState } from "@/lib/recovery-window";
 import { updatePasswordAction } from "./actions";
+
+const UPDATE_FAILED = "Could not update your password. Try again in a minute.";
 
 /**
  * Sets a new password once the server has confirmed a recovery window: the
@@ -31,129 +28,47 @@ export function ResetPasswordForm({
 }) {
   const router = useRouter();
   const [state, setState] = useState<RecoveryState>(initialState);
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const { pending, run } = useAsyncAction((fn: () => Promise<void>) => fn());
-
-  function submit() {
-    if (state !== "ready" || pending) return;
-    const parsed = passwordChangeSchema.safeParse({ password, confirm });
-    if (!parsed.success) {
-      setError(
-        parsed.error.issues[0]?.message ??
-          "Could not use that password. Check both fields.",
-      );
-      return;
-    }
-    setError(null);
-    return run(async () => {
-      try {
-        const result = await updatePasswordAction(parsed.data);
-        if (!result.success) {
-          if (result.expired) setState("expired");
-          else toast.error(result.error);
-          return;
-        }
-        toast.success("Password updated");
-        router.push("/dashboard");
-        router.refresh();
-        await navigatingAway();
-      } catch {
-        toast.error("Could not update your password. Try again in a minute.");
-      }
-    });
-  }
-
-  if (state === "expired" || state === "failed") {
-    return (
-      <ElevatedCard className="px-7 py-8">
-        <h1 className="font-display text-2xl font-semibold leading-tight">
-          {state === "failed"
-            ? "Could not check your reset link"
-            : "This link has expired"}
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {state === "failed"
-            ? "Check your connection and reload this page, or go back to sign in."
-            : "Reset links work once and expire after a short while. Request a new one from the sign-in page."}
-        </p>
-        <Button
-          asChild
-          variant="outline"
-          className="mt-6 h-11 w-full rounded-xl"
-        >
-          <Link href="/login">Back to sign in</Link>
-        </Button>
-      </ElevatedCard>
-    );
-  }
 
   return (
     <ElevatedCard className="px-7 py-8">
-      <h1 className="font-display text-2xl font-semibold leading-tight">
-        Set a new password
-      </h1>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submit();
+      <SharedResetPasswordForm
+        state={state}
+        title="Set a new password"
+        signInHref="/login"
+        LinkComponent={Link}
+        passwordLabelSlot={<PasswordRequirementsHint />}
+        minLength={1}
+        tooShortMessage="Enter a new password."
+        mismatchMessage="Passwords do not match. Type the same one twice."
+        errorFallback={UPDATE_FAILED}
+        expiredTitle="This link has expired"
+        expiredBody="Reset links work once and expire after a short while. Request a new one from the sign-in page."
+        failedTitle="Could not check your reset link"
+        failedBody="Check your connection and reload this page, or go back to sign in."
+        submitLabel="Update password"
+        confirmLabel="Confirm new password"
+        mapError={(message) => message}
+        onSubmit={async (password) => {
+          // mapError passes strings through, so a transport failure is
+          // converted here rather than letting its raw message through.
+          const result = await updatePasswordAction({
+            password,
+            confirm: password,
+          }).catch(() => null);
+          if (!result) return UPDATE_FAILED;
+          if (!result.success) {
+            if (result.expired) {
+              setState("expired");
+              return;
+            }
+            return result.error;
+          }
+          toast.success("Password updated");
+          router.push("/dashboard");
+          router.refresh();
+          await navigatingAway();
         }}
-        className="mt-6 space-y-5"
-      >
-        <div className="space-y-2">
-          <div className="flex items-center gap-1.5">
-            <Label htmlFor="new-password" className="text-sm font-medium">
-              New password
-            </Label>
-            <InfoTooltip
-              content={PASSWORD_REQUIREMENTS_HINT}
-              ariaLabel="Password requirements"
-              trigger="tap"
-            />
-          </div>
-          <Input
-            id="new-password"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-11 rounded-xl text-base"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirm-password" className="text-sm font-medium">
-            Confirm new password
-          </Label>
-          <Input
-            id="confirm-password"
-            type="password"
-            autoComplete="new-password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? "reset-password-error" : undefined}
-            className="h-11 rounded-xl text-base"
-          />
-          {error && (
-            <p
-              id="reset-password-error"
-              role="alert"
-              className="text-sm text-destructive"
-            >
-              {error}
-            </p>
-          )}
-        </div>
-        <Button
-          type="submit"
-          size="lg"
-          disabled={pending || !password || !confirm}
-          className="h-12 w-full rounded-xl text-base font-semibold"
-        >
-          {pending ? "Updating…" : "Update password"}
-        </Button>
-      </form>
+      />
     </ElevatedCard>
   );
 }

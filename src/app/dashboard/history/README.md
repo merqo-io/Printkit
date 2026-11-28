@@ -41,7 +41,7 @@ History controls take `Button`, `Select`, `Badge` and `cn` from `@merqo/ui/primi
 
 `ActionResult` and `useAsyncAction` come from `@merqo/ui` (`@merqo/ui/kit-api` for the type); the Upgrade link uses `merqoUpgradeUrl` from `@/lib/upgrade-url`.
 
-`loading.tsx` is the route's skeleton, using the page's `max-w-lg md:max-w-4xl` cap so the layout does not jump when data arrives; it pulses only when motion is allowed.
+`loading.tsx` is the route's skeleton, built from the shared `Skeleton` and `ListSkeleton`, using the page's `max-w-lg md:max-w-4xl` cap so the layout does not jump when data arrives; the shared skeleton pulses only when motion is allowed.
 
 ## Width
 
