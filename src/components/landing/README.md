@@ -15,6 +15,8 @@ page never reads as live and carries no price.
 - `rhythm.ts` - shared container and section padding classes.
 - `guardrails.dom.test.tsx` - no em dash, price or live claim; In build badge; three journey steps and three FAQ rows; guide link; reduced-motion final state.
 
+The hero buttons, the guide link and the demo's "Pair printer" and "Print test" buttons have a minimum height of 44px (`min-h-11`) for touch.
+
 ## Parent
 
 [components](../README.md)
