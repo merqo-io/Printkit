@@ -4,7 +4,7 @@ Public page rules (radius, shadow, hover and motion) are recorded in `DESIGN.md`
 
 Hardware print connector for Merqo vendors. Prints a label for every
 order, through one of three connectors (`src/lib/connectors/`):
-`cloud_poll` for printers that fetch their own jobs (Star CloudPRNT),
+`cloud_poll` for printers that fetch their own jobs (Star CloudPRNT; the setup page stops polling once the printer is online),
 `vendor_cloud` for printers reached through their maker's cloud (Feie 4G),
 and `bridge` for Bluetooth printers (NIIMBOT B1) through the Connect a Bluetooth printer page in
 Chrome on an Android phone, a Windows laptop or a Mac, or the Raspberry Pi
